@@ -1,0 +1,17 @@
+{
+  "id": "multi-family-live-pilot",
+  "name": "Bounded multi-family OpenHands live pilot",
+  "policy": "managed",
+  "attempt_budget": 6,
+  "repository": "rajshah4/openhands-agent-research-lab",
+  "branch": "main",
+  "model": null,
+  "task_paths": [
+    "tasks/scale/color-bipartite-8.json",
+    "tasks/scale/color-cycle-7.json",
+    "tasks/scale/cover-campus.json",
+    "tasks/scale/cover-grid.json",
+    "tasks/scale/pack-alpha.json",
+    "tasks/scale/pack-beta.json"
+  ]
+}

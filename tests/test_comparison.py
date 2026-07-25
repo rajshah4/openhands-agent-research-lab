@@ -52,6 +52,30 @@ class MatchedComparisonTests(unittest.TestCase):
                 any(attempt["retrieved_lesson_ids"] for attempt in managed_attempts)
             )
 
+    def test_multi_family_scale_campaign_rewards_validated_memory(self) -> None:
+        campaign = CampaignSpec.from_path(
+            PROJECT_ROOT / "examples" / "multi-family-campaign.json"
+        )
+        self.assertEqual(
+            {task.family for task in campaign.tasks},
+            {"graph-coloring", "set-cover", "bin-packing"},
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            _, comparison, _ = MatchedComparisonRunner(
+                root=Path(directory),
+                worker=LocalHeuristicWorker(),
+            ).run(campaign)
+
+        naive = comparison["arms"]["naive"]["metrics"]
+        managed = comparison["arms"]["managed"]["metrics"]
+        self.assertEqual(naive["problems_solved"], 12)
+        self.assertEqual(managed["problems_solved"], 12)
+        self.assertGreater(
+            managed["normalized_solution_quality"],
+            naive["normalized_solution_quality"],
+        )
+        self.assertGreater(managed["quality_auc"], naive["quality_auc"])
+
 
 if __name__ == "__main__":
     unittest.main()

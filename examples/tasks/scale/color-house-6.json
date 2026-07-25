@@ -1,0 +1,13 @@
+{
+  "id": "color-house-6",
+  "family": "graph-coloring",
+  "description": "Color a house graph with a diagonal brace.",
+  "tags": ["graph-coloring", "triangle", "scale"],
+  "nodes": ["roof", "left-top", "right-top", "left-bottom", "right-bottom", "brace"],
+  "edges": [
+    ["roof", "left-top"], ["roof", "right-top"], ["left-top", "right-top"],
+    ["left-top", "left-bottom"], ["right-top", "right-bottom"],
+    ["left-bottom", "right-bottom"], ["left-top", "brace"], ["brace", "right-bottom"]
+  ],
+  "target_score": 3
+}

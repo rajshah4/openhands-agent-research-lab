@@ -75,6 +75,10 @@ def command_preflight(args: argparse.Namespace) -> int:
                 "base_url": client.base_url,
                 "authentication": "passed",
                 "identity_fields": sorted(identity.keys()),
+                "capacity": client.capacity_snapshot(
+                    runtime_limit=args.runtime_capacity,
+                    launch_lock_at=args.launch_lock_at,
+                ),
             }
         )
     else:
@@ -96,6 +100,8 @@ def command_run(args: argparse.Namespace) -> int:
             execution_timeout_seconds=args.execution_timeout,
             poll_seconds=args.poll_seconds,
             pause_after_attempt=not args.keep_sandbox,
+            runtime_limit=args.runtime_capacity,
+            launch_lock_at=args.launch_lock_at,
         )
     else:
         worker = LocalHeuristicWorker()
@@ -124,6 +130,8 @@ def _worker(args: argparse.Namespace) -> LocalHeuristicWorker | OpenHandsWorker:
             execution_timeout_seconds=args.execution_timeout,
             poll_seconds=args.poll_seconds,
             pause_after_attempt=not args.keep_sandbox,
+            runtime_limit=args.runtime_capacity,
+            launch_lock_at=args.launch_lock_at,
         )
     return LocalHeuristicWorker()
 
@@ -154,6 +162,18 @@ def build_parser() -> argparse.ArgumentParser:
         subparser.add_argument("--branch")
         subparser.add_argument("--base-url")
         subparser.add_argument("--env-file", type=Path)
+        subparser.add_argument(
+            "--runtime-capacity",
+            type=int,
+            default=10,
+            help="documented runtime ceiling for the target OpenHands instance",
+        )
+        subparser.add_argument(
+            "--launch-lock-at",
+            type=int,
+            default=7,
+            help="refuse new conversations at or above this active-sandbox count",
+        )
 
     preflight = subparsers.add_parser(
         "preflight",

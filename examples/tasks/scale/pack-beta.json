@@ -1,0 +1,8 @@
+{
+  "id": "pack-beta",
+  "family": "bin-packing",
+  "description": "Pack two large and two small items into capacity-ten bins.",
+  "tags": ["bin-packing", "capacity", "scale"],
+  "target_score": 2,
+  "payload": {"capacity": 10, "items": {"a": 8, "b": 8, "c": 2, "d": 2}}
+}

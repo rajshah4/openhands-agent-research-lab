@@ -19,6 +19,7 @@ TERMINAL_STATUSES = {
     "waiting_for_confirmation",
 }
 FAILED_START_STATUSES = {"ERROR", "FAILED", "STOPPED"}
+ACTIVE_SANDBOX_STATUSES = {"RUNNING", "STARTING", "PENDING", "CREATING"}
 SENSITIVE_KEYS = {
     "api_key",
     "authorization",
@@ -34,6 +35,10 @@ CONTENT_KEYS = {"initial_message", "messages", "prompt", "system_prompt"}
 
 class OpenHandsAPIError(RuntimeError):
     """Raised when a supported OpenHands V1 operation fails."""
+
+
+class OpenHandsCapacityError(OpenHandsAPIError):
+    """Raised before launch when the configured runtime safety gate is closed."""
 
 
 def configured_base_url(explicit: str | None = None) -> str:
@@ -210,6 +215,64 @@ class OpenHandsClient:
             timeout=30,
         )
         return sanitize_metadata(record or {})
+
+    def search_sandboxes(self, *, limit: int = 100) -> list[dict[str, Any]]:
+        """Return all sandboxes visible to the authenticated OpenHands user."""
+        sandboxes: list[dict[str, Any]] = []
+        page_id: str | None = None
+        while True:
+            query: dict[str, Any] = {"limit": limit}
+            if page_id:
+                query["page_id"] = page_id
+            page = self._request(
+                "GET",
+                _endpoint(self.base_url, "/api/v1/sandboxes/search", query),
+                self.headers,
+                timeout=60,
+            )
+            if isinstance(page, list):
+                sandboxes.extend(item for item in page if isinstance(item, dict))
+                break
+            if not isinstance(page, dict):
+                break
+            sandboxes.extend(
+                item for item in page.get("items", []) if isinstance(item, dict)
+            )
+            page_id = page.get("next_page_id")
+            if not page_id:
+                break
+        return [sanitize_metadata(record) for record in sandboxes]
+
+    def capacity_snapshot(
+        self,
+        *,
+        runtime_limit: int = 10,
+        launch_lock_at: int = 7,
+    ) -> dict[str, Any]:
+        if runtime_limit < 1:
+            raise ValueError("runtime_limit must be at least 1")
+        if not 1 <= launch_lock_at <= runtime_limit:
+            raise ValueError("launch_lock_at must be between 1 and runtime_limit")
+        sandboxes = self.search_sandboxes()
+        status_counts: dict[str, int] = {}
+        for sandbox in sandboxes:
+            status = str(sandbox.get("status", "UNKNOWN")).upper()
+            status_counts[status] = status_counts.get(status, 0) + 1
+        active = sum(
+            count
+            for status, count in status_counts.items()
+            if status in ACTIVE_SANDBOX_STATUSES
+        )
+        return {
+            "scope": "authenticated-user-visible-sandboxes",
+            "active": active,
+            "runtime_limit": runtime_limit,
+            "launch_lock_at": launch_lock_at,
+            "launch_allowed": active < launch_lock_at,
+            "available_before_limit": max(runtime_limit - active, 0),
+            "status_counts": dict(sorted(status_counts.items())),
+            "observed_sandboxes": len(sandboxes),
+        }
 
     def start_conversation(
         self,

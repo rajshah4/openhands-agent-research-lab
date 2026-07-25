@@ -1,14 +1,27 @@
 import unittest
 
 from research_lab.domain import CampaignSpec, TaskSpec
+from research_lab.openhands import OpenHandsCapacityError
 from research_lab.workers import OpenHandsWorker
 
 
 class FakeOpenHandsClient:
     def __init__(self) -> None:
         self.paused = []
+        self.starts = 0
+        self.active = 1
+
+    def capacity_snapshot(self, *, runtime_limit, launch_lock_at):
+        return {
+            "scope": "authenticated-user-visible-sandboxes",
+            "active": self.active,
+            "runtime_limit": runtime_limit,
+            "launch_lock_at": launch_lock_at,
+            "launch_allowed": self.active < launch_lock_at,
+        }
 
     def start_conversation(self, **kwargs):
+        self.starts += 1
         return {"id": "start-1"}
 
     def poll_start_task(self, *args, **kwargs):
@@ -74,8 +87,48 @@ class OpenHandsWorkerTests(unittest.TestCase):
         )
 
         self.assertEqual(client.paused, ["sandbox-1"])
+        self.assertEqual(client.starts, 1)
+        self.assertEqual(lifecycle[0][0], "capacity_checked")
         self.assertIn("sandbox_pause_requested", [kind for kind, _ in lifecycle])
         self.assertIn("sandbox_paused", [kind for kind, _ in lifecycle])
+
+    def test_refuses_launch_when_capacity_gate_is_closed(self) -> None:
+        client = FakeOpenHandsClient()
+        client.active = 7
+        lifecycle = []
+        worker = OpenHandsWorker(client, launch_lock_at=7)
+        campaign = CampaignSpec(
+            id="campaign-1",
+            name="Campaign",
+            policy="managed",
+            attempt_budget=1,
+            repository=None,
+            branch=None,
+            model=None,
+            tasks=(),
+        )
+        task = TaskSpec(
+            id="task-1",
+            family="graph-coloring",
+            description="test",
+            tags=("graph-coloring",),
+            nodes=("0",),
+            edges=(),
+            target_score=1,
+        )
+
+        with self.assertRaises(OpenHandsCapacityError):
+            worker.execute(
+                campaign=campaign,
+                task=task,
+                run_id="run-1",
+                attempt_id="attempt-1",
+                lessons=[],
+                on_lifecycle=lambda kind, payload: lifecycle.append((kind, payload)),
+            )
+
+        self.assertEqual(client.starts, 0)
+        self.assertEqual([kind for kind, _ in lifecycle], ["capacity_checked"])
 
 
 if __name__ == "__main__":

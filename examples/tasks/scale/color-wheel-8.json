@@ -1,0 +1,12 @@
+{
+  "id": "color-wheel-8",
+  "family": "graph-coloring",
+  "description": "Color a seven-node odd rim plus its hub.",
+  "tags": ["graph-coloring", "wheel", "scale"],
+  "nodes": ["hub", "0", "1", "2", "3", "4", "5", "6"],
+  "edges": [
+    ["0", "1"], ["1", "2"], ["2", "3"], ["3", "4"], ["4", "5"], ["5", "6"], ["6", "0"],
+    ["hub", "0"], ["hub", "1"], ["hub", "2"], ["hub", "3"], ["hub", "4"], ["hub", "5"], ["hub", "6"]
+  ],
+  "target_score": 4
+}

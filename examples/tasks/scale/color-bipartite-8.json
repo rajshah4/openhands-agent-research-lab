@@ -1,0 +1,14 @@
+{
+  "id": "color-bipartite-8",
+  "family": "graph-coloring",
+  "description": "Color the complete bipartite graph K4,4.",
+  "tags": ["graph-coloring", "bipartite", "scale"],
+  "nodes": ["a1", "b1", "a2", "b2", "a3", "b3", "a4", "b4"],
+  "edges": [
+    ["a1", "b1"], ["a1", "b2"], ["a1", "b3"], ["a1", "b4"],
+    ["a2", "b1"], ["a2", "b2"], ["a2", "b3"], ["a2", "b4"],
+    ["a3", "b1"], ["a3", "b2"], ["a3", "b3"], ["a3", "b4"],
+    ["a4", "b1"], ["a4", "b2"], ["a4", "b3"], ["a4", "b4"]
+  ],
+  "target_score": 2
+}

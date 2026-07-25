@@ -6,7 +6,7 @@ from collections.abc import Callable
 from typing import Any, Protocol
 
 from .domain import CampaignSpec, Lesson, TaskSpec, WorkerExecution
-from .openhands import OpenHandsClient, sanitize_metadata
+from .openhands import OpenHandsCapacityError, OpenHandsClient, sanitize_metadata
 
 
 class WorkerBackend(Protocol):
@@ -42,6 +42,62 @@ def _greedy_coloring(task: TaskSpec, *, use_validated_memory: bool) -> dict[str,
     return assignments
 
 
+def _set_cover(task: TaskSpec, *, use_validated_memory: bool) -> list[str]:
+    universe = {str(item) for item in task.payload["universe"]}
+    sets = {
+        str(set_id): {str(item) for item in members}
+        for set_id, members in task.payload["sets"].items()
+    }
+    uncovered = set(universe)
+    selected: list[str] = []
+    remaining = dict(sets)
+    while uncovered:
+        if use_validated_memory:
+            set_id = min(
+                remaining,
+                key=lambda item: (-len(remaining[item] & uncovered), item),
+            )
+        else:
+            set_id = next(iter(remaining))
+        contribution = remaining.pop(set_id) & uncovered
+        if contribution:
+            selected.append(set_id)
+            uncovered -= contribution
+        if not remaining and uncovered:
+            break
+    return selected
+
+
+def _bin_pack(task: TaskSpec, *, use_validated_memory: bool) -> list[list[str]]:
+    capacity = float(task.payload["capacity"])
+    items = [(str(item), float(weight)) for item, weight in task.payload["items"].items()]
+    if use_validated_memory:
+        items.sort(key=lambda item: (-item[1], item[0]))
+        bins: list[list[str]] = []
+        loads: list[float] = []
+        for item_id, weight in items:
+            for index, load in enumerate(loads):
+                if load + weight <= capacity:
+                    bins[index].append(item_id)
+                    loads[index] += weight
+                    break
+            else:
+                bins.append([item_id])
+                loads.append(weight)
+        return bins
+
+    bins = []
+    load = 0.0
+    for item_id, weight in items:
+        if not bins or load + weight > capacity:
+            bins.append([item_id])
+            load = weight
+        else:
+            bins[-1].append(item_id)
+            load += weight
+    return bins
+
+
 class LocalHeuristicWorker:
     """Deterministic offline worker used to validate the complete control path."""
 
@@ -56,23 +112,68 @@ class LocalHeuristicWorker:
         on_lifecycle: Callable[[str, dict[str, Any]], None],
     ) -> WorkerExecution:
         on_lifecycle("worker_started", {"worker_kind": "local"})
-        use_validated_memory = any(
-            "high-degree" in lesson.statement.lower() for lesson in lessons
-        )
-        assignments = _greedy_coloring(
-            task,
-            use_validated_memory=use_validated_memory,
-        )
-        contract = {
-            "status": "done",
-            "candidate": {"assignments": assignments},
-            "lesson": {
+        lesson_text = " ".join(lesson.statement.lower() for lesson in lessons)
+        if task.family == "graph-coloring":
+            use_validated_memory = "high-degree" in lesson_text
+            candidate = {
+                "assignments": _greedy_coloring(
+                    task,
+                    use_validated_memory=use_validated_memory,
+                )
+            }
+            lesson = {
                 "statement": "Assign high-degree vertices before lower-degree vertices.",
                 "tags": ["graph-coloring", *task.tags],
                 "evidence": "The deterministic largest-degree-first candidate passed to validation.",
-            },
+            }
+            summary = f"Colored {len(task.nodes)} nodes."
+            algorithm = (
+                "largest-degree-first" if use_validated_memory else "input-order-greedy"
+            )
+        elif task.family == "set-cover":
+            use_validated_memory = "most uncovered" in lesson_text
+            candidate = {
+                "selected_sets": _set_cover(
+                    task,
+                    use_validated_memory=use_validated_memory,
+                )
+            }
+            lesson = {
+                "statement": "Choose the set covering the most uncovered elements first.",
+                "tags": ["set-cover", *task.tags],
+                "evidence": "The greedy marginal-coverage candidate passed to validation.",
+            }
+            summary = f"Covered {len(task.payload['universe'])} elements."
+            algorithm = (
+                "largest-marginal-coverage"
+                if use_validated_memory
+                else "input-order-cover"
+            )
+        elif task.family == "bin-packing":
+            use_validated_memory = "largest items first" in lesson_text
+            candidate = {
+                "bins": _bin_pack(
+                    task,
+                    use_validated_memory=use_validated_memory,
+                )
+            }
+            lesson = {
+                "statement": "Place the largest items first, using the first bin with room.",
+                "tags": ["bin-packing", *task.tags],
+                "evidence": "The first-fit-decreasing candidate passed to validation.",
+            }
+            summary = f"Packed {len(task.payload['items'])} items."
+            algorithm = (
+                "first-fit-decreasing" if use_validated_memory else "next-fit-input-order"
+            )
+        else:
+            raise ValueError(f"unsupported local worker family: {task.family}")
+        contract = {
+            "status": "done",
+            "candidate": candidate,
+            "lesson": lesson,
             "summary": [
-                f"Colored {len(task.nodes)} nodes.",
+                summary,
                 f"Received {len(lessons)} validated lessons.",
             ],
             "next_gate": "validate",
@@ -81,11 +182,7 @@ class LocalHeuristicWorker:
             final_text=json.dumps(contract, sort_keys=True),
             worker_kind="local",
             metadata={
-                "algorithm": (
-                    "largest-degree-first"
-                    if use_validated_memory
-                    else "input-order-greedy"
-                ),
+                "algorithm": algorithm,
                 "used_validated_memory": use_validated_memory,
             },
         )
@@ -110,20 +207,40 @@ def render_worker_prompt(
         }
         for lesson in lessons
     ]
-    task_payload = {
+    task_payload: dict[str, Any] = {
         "id": task.id,
         "family": task.family,
         "description": task.description,
         "tags": list(task.tags),
-        "nodes": list(task.nodes),
-        "edges": [list(edge) for edge in task.edges],
     }
+    if task.family == "graph-coloring":
+        task_payload.update(
+            {
+                "nodes": list(task.nodes),
+                "edges": [list(edge) for edge in task.edges],
+            }
+        )
+        objective = """Produce a graph-color assignment using as few colors as possible. Every node
+must be assigned, and adjacent nodes must have different colors."""
+        candidate_example: dict[str, Any] = {"assignments": {"0": 0}}
+    elif task.family == "set-cover":
+        task_payload["payload"] = task.payload
+        objective = """Select as few named sets as possible while covering every element in the
+universe. Return only set IDs defined by the task, with no duplicates."""
+        candidate_example = {"selected_sets": ["set-a"]}
+    elif task.family == "bin-packing":
+        task_payload["payload"] = task.payload
+        objective = """Pack every named item exactly once into as few bins as possible. The sum of
+item weights in each bin must not exceed the task capacity."""
+        candidate_example = {"bins": [["item-a", "item-b"]]}
+    else:
+        raise ValueError(f"unsupported worker prompt family: {task.family}")
     contract_example = {
         "status": "done",
-        "candidate": {"assignments": {"0": 0}},
+        "candidate": candidate_example,
         "lesson": {
             "statement": "One concise, reusable claim.",
-            "tags": ["graph-coloring"],
+            "tags": [task.family],
             "evidence": "What this attempt observed; validation happens outside this worker.",
         },
         "summary": ["Five or fewer concise strings."],
@@ -138,8 +255,7 @@ Repository: {campaign.repository or "none"}
 Branch: {campaign.branch or "none"}
 
 Objective:
-Produce a graph-color assignment using as few colors as possible. Every node
-must be assigned, and adjacent nodes must have different colors.
+{objective}
 
 Task:
 {json.dumps(task_payload, indent=2, sort_keys=True)}
@@ -174,6 +290,8 @@ class OpenHandsWorker:
         poll_seconds: int = 10,
         pause_after_attempt: bool = True,
         pause_timeout_seconds: int = 120,
+        runtime_limit: int = 10,
+        launch_lock_at: int = 7,
     ):
         self.client = client
         self.start_timeout_seconds = start_timeout_seconds
@@ -181,6 +299,8 @@ class OpenHandsWorker:
         self.poll_seconds = poll_seconds
         self.pause_after_attempt = pause_after_attempt
         self.pause_timeout_seconds = pause_timeout_seconds
+        self.runtime_limit = runtime_limit
+        self.launch_lock_at = launch_lock_at
 
     def execute(
         self,
@@ -192,6 +312,17 @@ class OpenHandsWorker:
         lessons: list[Lesson],
         on_lifecycle: Callable[[str, dict[str, Any]], None],
     ) -> WorkerExecution:
+        capacity = self.client.capacity_snapshot(
+            runtime_limit=self.runtime_limit,
+            launch_lock_at=self.launch_lock_at,
+        )
+        on_lifecycle("capacity_checked", capacity)
+        if not capacity["launch_allowed"]:
+            raise OpenHandsCapacityError(
+                "OpenHands launch blocked: "
+                f"{capacity['active']} active sandboxes meets or exceeds the "
+                f"{capacity['launch_lock_at']} launch threshold"
+            )
         on_lifecycle("worker_started", {"worker_kind": "openhands"})
         prompt = render_worker_prompt(
             campaign=campaign,

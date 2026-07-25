@@ -7,7 +7,7 @@ from collections import Counter
 from datetime import UTC, datetime
 from typing import Any
 
-from .benchmark import GraphColoringValidator
+from .benchmark import DeterministicValidator
 from .contracts import ContractError, WorkerContract, parse_worker_contract
 from .domain import CampaignSpec, Lesson, SchedulerDecision, TaskSpec, utc_now
 from .scheduler import SchedulerPolicy
@@ -74,12 +74,12 @@ class CampaignRunner:
         store: ResearchStore,
         worker: WorkerBackend,
         scheduler: SchedulerPolicy,
-        validator: GraphColoringValidator | None = None,
+        validator: DeterministicValidator | None = None,
     ):
         self.store = store
         self.worker = worker
         self.scheduler = scheduler
-        self.validator = validator or GraphColoringValidator()
+        self.validator = validator or DeterministicValidator()
 
     def run(self, campaign: CampaignSpec) -> tuple[str, str]:
         run_id = _run_id(campaign.id)

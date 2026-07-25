@@ -1,0 +1,8 @@
+{
+  "id": "pack-alpha",
+  "family": "bin-packing",
+  "description": "Pack four complementary items into capacity-ten bins.",
+  "tags": ["bin-packing", "capacity", "scale"],
+  "target_score": 2,
+  "payload": {"capacity": 10, "items": {"a": 6, "b": 6, "c": 4, "d": 4}}
+}

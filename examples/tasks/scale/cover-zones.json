@@ -1,0 +1,16 @@
+{
+  "id": "cover-zones",
+  "family": "set-cover",
+  "description": "Cover seven response zones with the fewest teams.",
+  "tags": ["set-cover", "coverage", "scale"],
+  "target_score": 2,
+  "payload": {
+    "universe": ["z1", "z2", "z3", "z4", "z5", "z6", "z7"],
+    "sets": {
+      "one": ["z1"], "two": ["z2"], "three": ["z3"], "four": ["z4"],
+      "five": ["z5"], "six": ["z6"], "seven": ["z7"],
+      "west": ["z1", "z2", "z3", "z4"],
+      "east": ["z4", "z5", "z6", "z7"]
+    }
+  }
+}

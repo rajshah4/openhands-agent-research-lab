@@ -1,0 +1,8 @@
+{
+  "id": "pack-delta",
+  "family": "bin-packing",
+  "description": "Pack three sixes and three fours into capacity-ten bins.",
+  "tags": ["bin-packing", "capacity", "scale"],
+  "target_score": 3,
+  "payload": {"capacity": 10, "items": {"a": 6, "b": 6, "c": 6, "d": 4, "e": 4, "f": 4}}
+}

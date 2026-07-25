@@ -1,0 +1,16 @@
+{
+  "id": "cover-grid",
+  "family": "set-cover",
+  "description": "Cover an eight-cell grid with the fewest named regions.",
+  "tags": ["set-cover", "coverage", "scale"],
+  "target_score": 2,
+  "payload": {
+    "universe": ["a", "b", "c", "d", "e", "f", "g", "h"],
+    "sets": {
+      "cell-a": ["a"], "cell-b": ["b"], "cell-c": ["c"], "cell-d": ["d"],
+      "cell-e": ["e"], "cell-f": ["f"], "cell-g": ["g"], "cell-h": ["h"],
+      "north": ["a", "b", "c", "d"], "south": ["e", "f", "g", "h"],
+      "middle": ["c", "d", "e", "f"]
+    }
+  }
+}

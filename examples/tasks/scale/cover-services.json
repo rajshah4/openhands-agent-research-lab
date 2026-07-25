@@ -1,0 +1,18 @@
+{
+  "id": "cover-services",
+  "family": "set-cover",
+  "description": "Cover nine service capabilities with three platform bundles.",
+  "tags": ["set-cover", "services", "scale"],
+  "target_score": 3,
+  "payload": {
+    "universe": ["auth", "billing", "chat", "data", "events", "files", "logs", "search", "users"],
+    "sets": {
+      "auth-only": ["auth"], "billing-only": ["billing"], "chat-only": ["chat"],
+      "data-only": ["data"], "events-only": ["events"], "files-only": ["files"],
+      "logs-only": ["logs"], "search-only": ["search"], "users-only": ["users"],
+      "identity": ["auth", "users", "billing"],
+      "content": ["chat", "files", "search"],
+      "operations": ["data", "events", "logs"]
+    }
+  }
+}

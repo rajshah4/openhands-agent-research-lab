@@ -17,9 +17,10 @@ class TaskSpec:
     family: str
     description: str
     tags: tuple[str, ...]
-    nodes: tuple[str, ...]
-    edges: tuple[tuple[str, str], ...]
+    nodes: tuple[str, ...] = ()
+    edges: tuple[tuple[str, str], ...] = ()
     target_score: float | None = None
+    payload: dict[str, Any] = field(default_factory=dict)
 
     @classmethod
     def from_path(cls, path: Path) -> "TaskSpec":
@@ -29,13 +30,16 @@ class TaskSpec:
             family=str(data["family"]),
             description=str(data["description"]),
             tags=tuple(str(tag) for tag in data.get("tags", [])),
-            nodes=tuple(str(node) for node in data["nodes"]),
-            edges=tuple((str(edge[0]), str(edge[1])) for edge in data["edges"]),
+            nodes=tuple(str(node) for node in data.get("nodes", [])),
+            edges=tuple(
+                (str(edge[0]), str(edge[1])) for edge in data.get("edges", [])
+            ),
             target_score=(
                 float(data["target_score"])
                 if data.get("target_score") is not None
                 else None
             ),
+            payload=dict(data.get("payload", {})),
         )
 
     def to_dict(self) -> dict[str, Any]:

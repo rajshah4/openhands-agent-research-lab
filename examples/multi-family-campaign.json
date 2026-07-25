@@ -1,0 +1,23 @@
+{
+  "id": "multi-family-scale",
+  "name": "Multi-family deterministic optimization scale test",
+  "policy": "managed",
+  "attempt_budget": 12,
+  "repository": "rajshah4/openhands-agent-research-lab",
+  "branch": "main",
+  "model": null,
+  "task_paths": [
+    "tasks/scale/color-bipartite-8.json",
+    "tasks/scale/color-cycle-7.json",
+    "tasks/scale/color-house-6.json",
+    "tasks/scale/color-wheel-8.json",
+    "tasks/scale/cover-campus.json",
+    "tasks/scale/cover-grid.json",
+    "tasks/scale/cover-services.json",
+    "tasks/scale/cover-zones.json",
+    "tasks/scale/pack-alpha.json",
+    "tasks/scale/pack-beta.json",
+    "tasks/scale/pack-delta.json",
+    "tasks/scale/pack-gamma.json"
+  ]
+}
