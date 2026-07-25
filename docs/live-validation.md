@@ -197,3 +197,49 @@ SHA-256 plus length for the final response without persisting raw model text.
 
 The hardened parser passed the full offline suite and both already-finished live
 responses. A fresh matched run is the next live gate.
+
+## Stage 3 matched live result
+
+Date: 2026-07-25
+
+Comparison:
+
+- ID: `graph-coloring-demo-comparison-20260725T205154Z-ba746980`
+- Fixed budget: three OpenHands conversations per arm
+- Same public repository, branch, model configuration, tasks, and timeouts
+- Isolated stores prevented evidence leakage between arms
+
+Result:
+
+| Metric | Naive | Managed |
+| --- | ---: | ---: |
+| Problems solved | 3 | 3 |
+| Coverage | 1.000 | 1.000 |
+| Normalized solution quality | 1.000 | 1.000 |
+| Quality AUC | 0.667 | 0.667 |
+| Duplicate experiments | 0 | 0 |
+
+All six candidates passed independent validation at the known target scores.
+The naive arm retrieved no lessons. The managed arm retrieved one validated
+lesson on its second task and two on its third task, proving the intended
+cross-conversation memory path without a separate database.
+
+Managed conversations:
+
+- `da32d5a75f9f4637b6470a0c8804cd19`
+- `524c6c7129594cbc812bcee1af6111c4`
+- `b3c0af97f3af4d77aa85ad23b0a9d202`
+
+Naive conversations:
+
+- `ac9f02dfe633481c97f9022cfcebc14f`
+- `13f4db27cc3e47a58635bffc36da7ebc`
+- `5906755d68ea4883b9640ea0b3f2159e`
+
+Conclusion:
+
+- The production-shaped execution, validation, metadata, and memory paths work.
+- This three-task benchmark is too easy for the configured model to distinguish
+  managed quality from naive quality.
+- The next stage should add a larger task set and harder instances where agents
+  must choose among strategies, then repeat the matched comparison.

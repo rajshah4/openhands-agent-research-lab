@@ -117,6 +117,10 @@ indexing behavior. Stage 3 adds the matched naive-versus-managed harness and a
 deterministic offline result: managed memory improves normalized solution quality
 from 0.889 to 1.000 under the same four-attempt budget. Duplicate work remains
 tied, identifying experiment diversification as the next scheduler improvement.
+The first matched live Rajistics pilot also completed: both arms solved all
+three tasks optimally, while only the managed arm retrieved validated lessons.
+That tie shows the execution and memory architecture works but the bundled
+three-task benchmark is not yet discriminating enough for a production claim.
 
 See [the design](docs/design.md), [the framing record](FRAMING.md), and the
 [live validation log](docs/live-validation.md). The metric definitions and

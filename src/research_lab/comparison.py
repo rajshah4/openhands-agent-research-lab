@@ -115,14 +115,23 @@ def _report(comparison: dict[str, Any]) -> str:
         naive = format(arms["naive"]["metrics"][key], format_spec)
         managed = format(arms["managed"]["metrics"][key], format_spec)
         lines.append(f"| {label} | {naive} | {managed} |")
-    lines.extend(
-        [
-            "",
-            "The offline worker is deterministic test instrumentation, not evidence",
-            "about model performance. A live OpenHands comparison must keep the same",
-            "contract and budget before making production claims.",
-        ]
-    )
+    lines.append("")
+    if comparison["worker_kind"] == "LocalHeuristicWorker":
+        lines.extend(
+            [
+                "The offline worker is deterministic test instrumentation, not evidence",
+                "about model performance. A live OpenHands comparison must keep the same",
+                "contract and budget before making production claims.",
+            ]
+        )
+    else:
+        lines.extend(
+            [
+                "This live pilot demonstrates the measured orchestration path, not a",
+                "general model-performance advantage. Repeat across a larger, more",
+                "discriminating benchmark before making production claims.",
+            ]
+        )
     return "\n".join(lines) + "\n"
 
 
