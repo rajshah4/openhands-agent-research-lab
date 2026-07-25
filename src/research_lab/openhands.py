@@ -287,6 +287,51 @@ class OpenHandsClient:
         )
         return records[0] if isinstance(records, list) and records else {}
 
+    def get_sandbox(self, sandbox_id: str) -> dict[str, Any]:
+        records = self._request(
+            "GET",
+            _endpoint(
+                self.base_url,
+                "/api/v1/sandboxes",
+                {"id": sandbox_id},
+            ),
+            self.headers,
+            timeout=60,
+        )
+        return records[0] if isinstance(records, list) and records else {}
+
+    def pause_sandbox(
+        self,
+        sandbox_id: str,
+        *,
+        timeout_seconds: int = 120,
+        poll_seconds: int = 2,
+    ) -> dict[str, Any]:
+        response = self._request(
+            "POST",
+            _endpoint(
+                self.base_url,
+                f"/api/v1/sandboxes/{urllib.parse.quote(sandbox_id, safe='')}/pause",
+            ),
+            self.headers,
+            timeout=60,
+        )
+        if isinstance(response, dict) and response.get("success") is False:
+            raise OpenHandsAPIError(f"sandbox {sandbox_id} rejected pause request")
+
+        deadline = self._monotonic() + timeout_seconds
+        while self._monotonic() < deadline:
+            record = self.get_sandbox(sandbox_id)
+            status = str(record.get("status", "")).upper()
+            if status == "PAUSED":
+                return sanitize_metadata(record)
+            if status in {"ERROR", "MISSING"}:
+                raise OpenHandsAPIError(
+                    f"sandbox {sandbox_id} reached {status} while pausing"
+                )
+            self._sleep(poll_seconds)
+        raise TimeoutError(f"timed out pausing OpenHands sandbox {sandbox_id}")
+
     def fetch_events(self, conversation_id: str, *, limit: int = 100) -> list[dict[str, Any]]:
         events: list[dict[str, Any]] = []
         page_id: str | None = None

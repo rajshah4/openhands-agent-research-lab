@@ -243,3 +243,36 @@ Conclusion:
   managed quality from naive quality.
 - The next stage should add a larger task set and harder instances where agents
   must choose among strategies, then repeat the matched comparison.
+
+## Automatic sandbox pause
+
+Date: 2026-07-25
+
+The deployed OpenHands Enterprise 0.24.0 schema exposes supported V1 sandbox
+lifecycle endpoints:
+
+- `GET /api/v1/sandboxes?id=<sandbox-id>`
+- `POST /api/v1/sandboxes/<sandbox-id>/pause`
+
+The worker now requests a pause after capturing the terminal response, verifies
+that the sandbox reaches `PAUSED`, and records both the request and result in the
+append-only lifecycle journal. A pause failure is recorded without discarding a
+valid experiment result. `--keep-sandbox` is an explicit debugging opt-out.
+
+Before validation, eight finished research-lab sandboxes were still `RUNNING`.
+All eight were verified terminal and paused through the supported API. Cluster
+runtime pods dropped from nine to one, with zero unhealthy OpenHands pods.
+
+One fresh end-to-end validation then confirmed:
+
+- Run: `graph-coloring-demo-20260725T211735Z-a4632ed7`
+- Conversation: `b34bc3d136be42e4b5bb50da29d39433`
+- Sandbox: `7gGjgKvBw3ua1bYckzk1lU`
+- Candidate: independently valid, score 3
+- Lifecycle: `sandbox_pause_requested` followed by `sandbox_paused`
+- Final sandbox status: `PAUSED`
+- Cluster after completion: one running runtime pod, zero unhealthy pods
+
+This closes the retained-sandbox capacity leak for research-lab initiated
+conversations while preserving their OpenHands conversation history and local
+evidence.

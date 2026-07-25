@@ -45,6 +45,7 @@ for the existing Rajistics install environment.
 7. Confirm start-task, sandbox, conversation, terminal state, final contract,
    event counts, candidate score, and UI link appear in the attempt artifact.
 8. Run a second attempt only after the first lifecycle is correct.
+9. Confirm the `sandbox_pause_requested` and `sandbox_paused` lifecycle events.
 
 Until this repository is published, the smoke test can use the existing public
 demo repository without modifying it:
@@ -78,4 +79,8 @@ PYTHONPATH=src python3 -m research_lab.cli run \
 - Do not print session keys, API keys, environment dumps, or full event
   payloads.
 - Do not create more than two concurrent workers.
+- Do not start a live batch when seven or more runtime sandboxes are active on
+  the approximately ten-runtime Rajistics demo instance.
+- Pause every completed lab sandbox by default. Retain one only for an explicit,
+  bounded debugging session.
 - Do not install dependencies inside timed worker runs.

@@ -40,6 +40,8 @@ PYTHONPATH=src python3 -m compileall -q src tests
 - Never print or persist API keys, session keys, credentials, or environment
   dumps.
 - Live commands must require an explicit `--live` flag and bounded timeouts.
+- Live workers must pause their sandbox after capturing the final response
+  unless an explicit bounded debugging flag requests retention.
 - Record immutable start-task, conversation, sandbox, run, and attempt IDs.
 - Preserve failed attempts and lifecycle evidence; do not infer success from a
   commit, candidate, or partial response.

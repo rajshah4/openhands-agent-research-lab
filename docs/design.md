@@ -102,8 +102,12 @@ when it is the unique trailing JSON object; that attempt is marked
 7. Allow bounded grace for the final response to appear in the event index.
 8. Parse the strict contract and pass the candidate to the deterministic
    validator.
+9. After the final response is captured, pause the sandbox through
+   `POST /api/v1/sandboxes/{sandbox_id}/pause` and verify its status becomes
+   `PAUSED`. Record pause failures without discarding the attempt.
 
 Live execution requires an explicit CLI flag.
+Sandbox retention requires a separate explicit debugging flag.
 
 ### 3.4 Storage layout
 

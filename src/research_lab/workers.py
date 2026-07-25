@@ -172,11 +172,15 @@ class OpenHandsWorker:
         start_timeout_seconds: int = 600,
         execution_timeout_seconds: int = 1800,
         poll_seconds: int = 10,
+        pause_after_attempt: bool = True,
+        pause_timeout_seconds: int = 120,
     ):
         self.client = client
         self.start_timeout_seconds = start_timeout_seconds
         self.execution_timeout_seconds = execution_timeout_seconds
         self.poll_seconds = poll_seconds
+        self.pause_after_attempt = pause_after_attempt
+        self.pause_timeout_seconds = pause_timeout_seconds
 
     def execute(
         self,
@@ -211,60 +215,98 @@ class OpenHandsWorker:
             poll_seconds=self.poll_seconds,
         )
         conversation_id = str(ready["app_conversation_id"])
+        sandbox_id = ready.get("sandbox_id")
         on_lifecycle(
             "conversation_ready",
             {
                 "start_task_id": start_task_id,
                 "conversation_id": conversation_id,
-                "sandbox_id": ready.get("sandbox_id"),
+                "sandbox_id": sandbox_id,
                 "ui_url": self.client.conversation_url(conversation_id),
             },
         )
-        record, events, recovered = self.client.wait_for_terminal(
-            conversation_id,
-            timeout_seconds=self.execution_timeout_seconds,
-            poll_seconds=self.poll_seconds,
-        )
-        on_lifecycle(
-            "conversation_terminal",
-            {
+        try:
+            record, events, recovered = self.client.wait_for_terminal(
+                conversation_id,
+                timeout_seconds=self.execution_timeout_seconds,
+                poll_seconds=self.poll_seconds,
+            )
+            sandbox_id = sandbox_id or record.get("sandbox_id")
+            on_lifecycle(
+                "conversation_terminal",
+                {
+                    "conversation_id": conversation_id,
+                    "execution_status": record.get("execution_status"),
+                    "sandbox_status": record.get("sandbox_status"),
+                    "terminal_status_recovered_from_events": recovered,
+                },
+            )
+            final_text, final_events = self.client.final_response(
+                conversation_id,
+                initial_events=events,
+            )
+            on_lifecycle(
+                "final_response_ready",
+                {
+                    "conversation_id": conversation_id,
+                    "present": bool(final_text),
+                    "event_count": len(final_events),
+                },
+            )
+            event_counts = Counter(
+                str(event.get("kind", "unknown")) for event in final_events
+            )
+            conversation = {
+                "start_task_id": start_task_id,
                 "conversation_id": conversation_id,
+                "sandbox_id": sandbox_id,
+                "ui_url": self.client.conversation_url(conversation_id),
                 "execution_status": record.get("execution_status"),
                 "sandbox_status": record.get("sandbox_status"),
                 "terminal_status_recovered_from_events": recovered,
-            },
-        )
-        final_text, final_events = self.client.final_response(
-            conversation_id,
-            initial_events=events,
-        )
-        on_lifecycle(
-            "final_response_ready",
-            {
-                "conversation_id": conversation_id,
-                "present": bool(final_text),
+            }
+            metadata = {
+                "conversation_snapshot": sanitize_metadata(record),
+                "start_task_snapshot": sanitize_metadata(ready),
+                "event_counts": dict(sorted(event_counts.items())),
                 "event_count": len(final_events),
-            },
-        )
-        event_counts = Counter(str(event.get("kind", "unknown")) for event in final_events)
-        conversation = {
-            "start_task_id": start_task_id,
-            "conversation_id": conversation_id,
-            "sandbox_id": ready.get("sandbox_id") or record.get("sandbox_id"),
-            "ui_url": self.client.conversation_url(conversation_id),
-            "execution_status": record.get("execution_status"),
-            "sandbox_status": record.get("sandbox_status"),
-            "terminal_status_recovered_from_events": recovered,
-        }
-        metadata = {
-            "conversation_snapshot": sanitize_metadata(record),
-            "start_task_snapshot": sanitize_metadata(ready),
-            "event_counts": dict(sorted(event_counts.items())),
-            "event_count": len(final_events),
-        }
-        return WorkerExecution(
-            final_text=final_text,
-            worker_kind="openhands",
-            conversation=conversation,
-            metadata=metadata,
-        )
+            }
+            return WorkerExecution(
+                final_text=final_text,
+                worker_kind="openhands",
+                conversation=conversation,
+                metadata=metadata,
+            )
+        finally:
+            if self.pause_after_attempt and sandbox_id:
+                on_lifecycle(
+                    "sandbox_pause_requested",
+                    {
+                        "conversation_id": conversation_id,
+                        "sandbox_id": sandbox_id,
+                    },
+                )
+                try:
+                    paused = self.client.pause_sandbox(
+                        str(sandbox_id),
+                        timeout_seconds=self.pause_timeout_seconds,
+                        poll_seconds=min(self.poll_seconds, 2),
+                    )
+                    on_lifecycle(
+                        "sandbox_paused",
+                        {
+                            "conversation_id": conversation_id,
+                            "sandbox_id": sandbox_id,
+                            "sandbox_status": paused.get("status"),
+                        },
+                    )
+                except (RuntimeError, TimeoutError, ValueError) as exc:
+                    on_lifecycle(
+                        "sandbox_pause_failed",
+                        {
+                            "conversation_id": conversation_id,
+                            "sandbox_id": sandbox_id,
+                            "type": type(exc).__name__,
+                            "message": str(exc)[:1000],
+                        },
+                    )

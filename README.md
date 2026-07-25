@@ -90,6 +90,10 @@ PYTHONPATH=src python3 -m research_lab.cli run \
 
 Live execution creates real OpenHands conversations and may incur model and
 infrastructure cost. The CLI will not create conversations without `--live`.
+After each final response, the controller pauses the sandbox through the
+supported V1 API and verifies it reached `PAUSED`. Use `--keep-sandbox` only
+when a bounded debugging session intentionally needs the runtime to remain
+available.
 
 ## Storage boundary
 

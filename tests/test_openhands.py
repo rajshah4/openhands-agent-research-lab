@@ -79,6 +79,34 @@ class OpenHandsHelpersTests(unittest.TestCase):
         self.assertTrue(recovered)
         self.assertEqual(len(events), 1)
 
+    def test_pause_sandbox_waits_for_paused_and_sanitizes_record(self) -> None:
+        calls = []
+
+        def requester(method, url, headers, body=None, timeout=60):
+            calls.append((method, url))
+            if method == "POST" and url.endswith("/sandboxes/sandbox-1/pause"):
+                return {"success": True}
+            if method == "GET" and "/api/v1/sandboxes?" in url:
+                return [
+                    {
+                        "id": "sandbox-1",
+                        "status": "PAUSED",
+                        "session_api_key": "do-not-persist",
+                    }
+                ]
+            raise AssertionError((method, url))
+
+        client = OpenHandsClient(
+            "https://example.test",
+            "not-logged",
+            requester=requester,
+            sleeper=lambda _: None,
+            monotonic=lambda: 0,
+        )
+        record = client.pause_sandbox("sandbox-1")
+        self.assertEqual(record, {"id": "sandbox-1", "status": "PAUSED"})
+        self.assertEqual([method for method, _ in calls], ["POST", "GET"])
+
 
 if __name__ == "__main__":
     unittest.main()

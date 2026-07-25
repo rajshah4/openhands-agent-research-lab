@@ -95,6 +95,7 @@ def command_run(args: argparse.Namespace) -> int:
             start_timeout_seconds=args.start_timeout,
             execution_timeout_seconds=args.execution_timeout,
             poll_seconds=args.poll_seconds,
+            pause_after_attempt=not args.keep_sandbox,
         )
     else:
         worker = LocalHeuristicWorker()
@@ -122,6 +123,7 @@ def _worker(args: argparse.Namespace) -> LocalHeuristicWorker | OpenHandsWorker:
             start_timeout_seconds=args.start_timeout,
             execution_timeout_seconds=args.execution_timeout,
             poll_seconds=args.poll_seconds,
+            pause_after_attempt=not args.keep_sandbox,
         )
     return LocalHeuristicWorker()
 
@@ -167,6 +169,11 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument("--start-timeout", type=int, default=600)
     run.add_argument("--execution-timeout", type=int, default=1800)
     run.add_argument("--poll-seconds", type=int, default=10)
+    run.add_argument(
+        "--keep-sandbox",
+        action="store_true",
+        help="leave live sandboxes running for debugging instead of pausing them",
+    )
     run.set_defaults(func=command_run)
 
     compare = subparsers.add_parser(
@@ -179,6 +186,11 @@ def build_parser() -> argparse.ArgumentParser:
     compare.add_argument("--start-timeout", type=int, default=600)
     compare.add_argument("--execution-timeout", type=int, default=1800)
     compare.add_argument("--poll-seconds", type=int, default=10)
+    compare.add_argument(
+        "--keep-sandbox",
+        action="store_true",
+        help="leave live sandboxes running for debugging instead of pausing them",
+    )
     compare.set_defaults(func=command_compare)
     return parser
 

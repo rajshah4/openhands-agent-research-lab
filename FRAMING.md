@@ -62,10 +62,10 @@ system to subjective research tasks.
 
 | Assumption | One-day test | If false | Status |
 | --- | --- | --- | --- |
-| Enterprise V1 can create and observe isolated worker conversations | Start one child and reconcile its terminal state and final response | Add a version-specific supported adapter or stop the live path | untested |
-| A strict final contract can carry a small candidate and lesson | Run two children and validate both contracts deterministically | Move candidate transport to a committed artifact or object store | untested |
+| Enterprise V1 can create, observe, and pause isolated worker conversations | Start one child, reconcile its terminal state and final response, then verify its sandbox reaches `PAUSED` | Add a version-specific supported adapter or stop the live path | holding |
+| A strict final contract can carry a small candidate and lesson | Run two children and validate both contracts deterministically | Move candidate transport to a committed artifact or object store | holding with measured JSON transport fallbacks |
 | Files are sufficient for one-controller Stage 1 | Complete an offline campaign and recover its report from artifacts | Implement PostgreSQL earlier | holding |
-| Relevant lessons can be retrieved by explicit task tags | Compare retrieved lesson IDs with task-family expectations | Add structured feature extraction or embeddings later | untested |
+| Relevant lessons can be retrieved by explicit task tags | Compare retrieved lesson IDs with task-family expectations | Add structured feature extraction or embeddings later | holding for the three-task live pilot |
 
 ## Simplest non-AI alternative (what it is, coverage %)
 
@@ -96,7 +96,7 @@ valuable when fixed heuristics solve the workload adequately.
 | Signal | Type | Number | Horizon | Agreed with |
 | --- | --- | --- | --- | --- |
 | Offline vertical slice passes deterministic tests | leading | all tests pass | Stage 1 | project assumption |
-| Live conversations start, finish, and reconcile correctly | leading | 2 validated runs, with intermediate failures retained | Stage 2 smoke test | observed |
+| Live conversations start, finish, reconcile, and release capacity correctly | leading | matched six-conversation pilot plus automatic-pause validation | Stage 2/3 live tests | observed |
 | Managed organization improves quality per attempt over baseline | success | open | at least 3 matched runs | open |
 | Managed mode does not improve quality or duplication | stop | open | open | open |
 
