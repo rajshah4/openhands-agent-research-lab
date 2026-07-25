@@ -7,4 +7,6 @@ __pycache__/
 .lab*/
 dist/
 build/
+!dashboard/build/
+!dashboard/build/**
 *.egg-info/

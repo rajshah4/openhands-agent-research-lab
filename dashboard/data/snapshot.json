@@ -1,0 +1,163 @@
+{
+  "generatedAt": "2026-07-25T21:19:00Z",
+  "environment": {
+    "name": "Rajistics Replicated",
+    "version": "0.24.0",
+    "mode": "single controller"
+  },
+  "capacity": {
+    "active": 1,
+    "limit": 10,
+    "launchAtOrAbove": 7,
+    "maxNewConcurrent": 2,
+    "memoryAvailable": "18 GiB",
+    "unhealthyPods": 0,
+    "launchAllowed": true
+  },
+  "proof": {
+    "tests": 18,
+    "liveAttempts": 7,
+    "validAttempts": 7,
+    "invalidLessons": 0,
+    "tasks": 3,
+    "targetTasks": 20
+  },
+  "comparison": {
+    "naive": {
+      "solved": 3,
+      "quality": 1,
+      "qualityAuc": 0.667,
+      "duplicates": 0,
+      "retrievedLessons": 0
+    },
+    "managed": {
+      "solved": 3,
+      "quality": 1,
+      "qualityAuc": 0.667,
+      "duplicates": 0,
+      "retrievedLessons": 3
+    }
+  },
+  "agents": [
+    {
+      "id": "ac9f02dfe633481c97f9022cfcebc14f",
+      "arm": "Naive",
+      "task": "cycle-5",
+      "score": 3,
+      "target": 3,
+      "status": "valid",
+      "sandbox": "PAUSED",
+      "transport": "fenced-json-fallback",
+      "lessons": 0,
+      "conversationUrl": "https://app.replicated.rajistics.com/conversations/ac9f02dfe633481c97f9022cfcebc14f"
+    },
+    {
+      "id": "13f4db27cc3e47a58635bffc36da7ebc",
+      "arm": "Naive",
+      "task": "scrambled-path-5",
+      "score": 2,
+      "target": 2,
+      "status": "valid",
+      "sandbox": "PAUSED",
+      "transport": "trailing-json-fallback",
+      "lessons": 0,
+      "conversationUrl": "https://app.replicated.rajistics.com/conversations/13f4db27cc3e47a58635bffc36da7ebc"
+    },
+    {
+      "id": "5906755d68ea4883b9640ea0b3f2159e",
+      "arm": "Naive",
+      "task": "wheel-6",
+      "score": 4,
+      "target": 4,
+      "status": "valid",
+      "sandbox": "PAUSED",
+      "transport": "trailing-json-fallback",
+      "lessons": 0,
+      "conversationUrl": "https://app.replicated.rajistics.com/conversations/5906755d68ea4883b9640ea0b3f2159e"
+    },
+    {
+      "id": "da32d5a75f9f4637b6470a0c8804cd19",
+      "arm": "Managed",
+      "task": "cycle-5",
+      "score": 3,
+      "target": 3,
+      "status": "valid",
+      "sandbox": "PAUSED",
+      "transport": "exact-json",
+      "lessons": 0,
+      "conversationUrl": "https://app.replicated.rajistics.com/conversations/da32d5a75f9f4637b6470a0c8804cd19"
+    },
+    {
+      "id": "524c6c7129594cbc812bcee1af6111c4",
+      "arm": "Managed",
+      "task": "scrambled-path-5",
+      "score": 2,
+      "target": 2,
+      "status": "valid",
+      "sandbox": "PAUSED",
+      "transport": "fenced-json-fallback",
+      "lessons": 1,
+      "conversationUrl": "https://app.replicated.rajistics.com/conversations/524c6c7129594cbc812bcee1af6111c4"
+    },
+    {
+      "id": "b3c0af97f3af4d77aa85ad23b0a9d202",
+      "arm": "Managed",
+      "task": "wheel-6",
+      "score": 4,
+      "target": 4,
+      "status": "valid",
+      "sandbox": "PAUSED",
+      "transport": "fenced-json-fallback",
+      "lessons": 2,
+      "conversationUrl": "https://app.replicated.rajistics.com/conversations/b3c0af97f3af4d77aa85ad23b0a9d202"
+    },
+    {
+      "id": "b34bc3d136be42e4b5bb50da29d39433",
+      "arm": "Validation",
+      "task": "cycle-5",
+      "score": 3,
+      "target": 3,
+      "status": "valid",
+      "sandbox": "PAUSED",
+      "transport": "trailing-json-fallback",
+      "lessons": 0,
+      "conversationUrl": "https://app.replicated.rajistics.com/conversations/b34bc3d136be42e4b5bb50da29d39433"
+    }
+  ],
+  "lessons": [
+    {
+      "id": "lesson-7019dfc6",
+      "statement": "Odd cycles require a third color at the closing edge.",
+      "source": "managed / cycle-5",
+      "usedBy": ["scrambled-path-5", "wheel-6"],
+      "evidence": "Promoted only after the independent validator accepted a three-color solution."
+    },
+    {
+      "id": "lesson-7a83b434",
+      "statement": "Order constrained vertices before low-degree leaves.",
+      "source": "managed / scrambled-path-5",
+      "usedBy": ["wheel-6"],
+      "evidence": "The lesson remained traceable to its source attempt and entered only the managed arm."
+    }
+  ],
+  "incidents": [
+    {
+      "title": "Contract envelope mismatch",
+      "finding": "Agents returned valid JSON inside prose or a terminal code fence.",
+      "resolution": "Bounded fallback accepts one exact five-field contract and measures transport compliance.",
+      "state": "Resolved"
+    },
+    {
+      "title": "Final message indexing race",
+      "finding": "Streaming deltas appeared before the complete terminal MessageEvent.",
+      "resolution": "Only completed MessageEvents or FinishActions can satisfy the final-response gate.",
+      "state": "Resolved"
+    },
+    {
+      "title": "Retained runtime capacity",
+      "finding": "Eight finished sandboxes remained running and pushed the cluster to nine runtimes.",
+      "resolution": "Every completed lab sandbox now pauses and verifies PAUSED through the supported V1 API.",
+      "state": "Resolved"
+    }
+  ]
+}
