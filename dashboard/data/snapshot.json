@@ -80,27 +80,27 @@
   ],
   "incidents": [
     {
-      "title": "Contract envelope mismatch",
-      "finding": "Agents returned valid JSON inside prose or a terminal code fence.",
-      "resolution": "Bounded fallback accepts one exact five-field contract and measures transport compliance.",
+      "title": "Agents wrapped the answer in prose",
+      "finding": "Many agents returned the right JSON inside an explanation or a code block.",
+      "resolution": "I accept one tightly defined result object and record when the reply missed the preferred format.",
       "state": "Resolved"
     },
     {
-      "title": "Final message indexing race",
-      "finding": "Streaming deltas appeared before the complete terminal MessageEvent.",
-      "resolution": "Only completed MessageEvents or FinishActions can satisfy the final-response gate.",
+      "title": "The final answer arrived late",
+      "finding": "A conversation could say it was finished before OpenHands had indexed the complete final message.",
+      "resolution": "The controller now waits for the completed message instead of treating a partial stream as the answer.",
       "state": "Resolved"
     },
     {
-      "title": "Retained runtime capacity",
-      "finding": "Finished sandboxes remained running and consumed nearly all demo capacity.",
-      "resolution": "Every completed sandbox pauses; every new launch is blocked at seven active runtimes.",
+      "title": "Finished workspaces kept running",
+      "finding": "Eight completed agent workspaces were still using nearly all of the small demo server.",
+      "resolution": "The controller pauses every finished workspace and stops launching new work when seven are active.",
       "state": "Resolved"
     },
     {
-      "title": "Placeholder identifier aliasing",
-      "finding": "Two agents copied item-a from the contract example instead of exact task ID a.",
-      "resolution": "Examples now use task-bound IDs; the two-conversation live regression validated 2/2.",
+      "title": "Agents copied an example ID",
+      "finding": "Two agents used item-a from my prompt example instead of the real item named a.",
+      "resolution": "Prompts now use the actual problem IDs. A focused rerun passed 2/2, followed by 36/36 valid runs.",
       "state": "Resolved"
     }
   ]

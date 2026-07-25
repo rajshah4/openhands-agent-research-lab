@@ -24,9 +24,9 @@ export async function generateMetadata(): Promise<Metadata> {
     requestHeaders.get("x-forwarded-proto") ??
     (host.startsWith("localhost") ? "http" : "https");
   const socialImage = `${protocol}://${host}/og.png`;
-  const title = "NeuroGolf Lab | OpenHands Research Organization";
+  const title = "NeuroGolf with OpenHands | A public multi-agent experiment";
   const description =
-    "A measurable multi-agent research organization: scheduling, validation, memory provenance, and operational capacity.";
+    "I ran 36 OpenHands agent conversations to test whether coding agents can learn from earlier experiments. See the code, conversations, bugs, and results.";
 
   return {
     title,

@@ -22,16 +22,20 @@ async function render() {
   );
 }
 
-test("renders the research organization dashboard", async () => {
+test("renders the NeuroGolf experiment for a new reader", async () => {
   const response = await render();
   assert.equal(response.status, 200);
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
 
   const html = await response.text();
-  assert.match(html, /<title>NeuroGolf Lab \| OpenHands Research Organization<\/title>/i);
-  assert.match(html, /From a swarm of agents to a learning organization/);
-  assert.match(html, /Rajistics capacity/);
-  assert.match(html, /Same budget\. Different organization/);
-  assert.match(html, /Claims do not become memory\. Evidence does/);
+  assert.match(
+    html,
+    /<title>NeuroGolf with OpenHands \| A public multi-agent experiment<\/title>/i,
+  );
+  assert.match(html, /Can coding agents learn from each other/);
+  assert.match(html, /A Kaggle team used many agents/);
+  assert.match(html, /I ran the same six problems two ways, three times/);
+  assert.match(html, /The six live problems were too easy/);
+  assert.match(html, /These are real OpenHands runs/);
   assert.doesNotMatch(html, /codex-preview|Your site is taking shape/);
 });

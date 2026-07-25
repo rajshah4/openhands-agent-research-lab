@@ -66,7 +66,7 @@ type Snapshot = {
   }>;
 };
 
-const views = ["Story", "Operations", "Memory"] as const;
+const views = ["Overview", "Runs", "Lessons"] as const;
 type View = (typeof views)[number];
 
 function pct(value: number) {
@@ -77,8 +77,25 @@ function shortId(value: string) {
   return value.length > 12 ? `${value.slice(0, 8)}…` : value;
 }
 
+function armLabel(value: string) {
+  return {
+    all: "All runs",
+    naive: "No memory",
+    managed: "Shared lessons",
+    regression: "Fix check",
+  }[value.toLowerCase()] ?? value;
+}
+
+function transportLabel(value: string) {
+  return {
+    "exact-json": "Exact JSON",
+    "fenced-json-fallback": "JSON in a code block",
+    "trailing-json-fallback": "JSON after an explanation",
+  }[value] ?? value.replaceAll("-", " ");
+}
+
 export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
-  const [view, setView] = useState<View>("Story");
+  const [view, setView] = useState<View>("Overview");
   const [arm, setArm] = useState("all");
 
   const visibleAgents = useMemo(
@@ -98,8 +115,8 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
         <a className="brand" href="#top" aria-label="Research Lab home">
           <span className="brand-mark">N</span>
           <span>
-            <strong>NeuroGolf Lab</strong>
-            <small>OpenHands research organization</small>
+            <strong>NeuroGolf with OpenHands</strong>
+            <small>A public multi-agent experiment</small>
           </span>
         </a>
         <nav className="view-switcher" aria-label="Dashboard view">
@@ -122,125 +139,127 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
 
       <section className="hero" id="top">
         <div className="hero-copy">
-          <p className="eyebrow">Evidence, not agent theater</p>
-          <h1>From a swarm of agents to a learning organization.</h1>
+          <p className="eyebrow">A question I wanted to test</p>
+          <h1>Can coding agents learn from each other&apos;s experiments?</h1>
           <p className="lede">
-            Every experiment is scheduled, independently validated, traced to
-            its conversation, and converted into memory only when the evidence
-            improves.
+            A Kaggle team used many agents to search for better solutions. I
+            wanted a smaller public example that people could inspect and build
+            on. So I used OpenHands to run the same problems with and without
+            shared memory, then saved every result.
           </p>
           <div className="hero-actions">
             <a href="#live-agents" className="primary-action">
-              Inspect the live proof
+              See what happened
             </a>
             <a
               href="https://github.com/rajshah4/openhands-agent-research-lab"
               className="text-action"
             >
-              View the public repository <span aria-hidden="true">↗</span>
+              Read the code <span aria-hidden="true">↗</span>
             </a>
             <a
               href="https://github.com/rajshah4/openhands-agent-research-lab/tree/main/evidence/2026-07-25-final-reference"
               className="text-action"
             >
-              Download final evidence <span aria-hidden="true">↗</span>
+              Download the results <span aria-hidden="true">↗</span>
             </a>
           </div>
         </div>
 
-        <aside className="capacity-card" aria-label="Rajistics capacity">
+        <aside className="capacity-card" aria-label="OpenHands server capacity">
           <div className="card-heading">
-            <span>Rajistics capacity</span>
+            <span>OpenHands after the test</span>
             <span
               className={`status-badge ${
                 snapshot.capacity.launchAllowed ? "healthy" : "blocked"
               }`}
             >
-              {snapshot.capacity.launchAllowed ? "Launch safe" : "Launch locked"}
+              {snapshot.capacity.launchAllowed ? "Ready for another run" : "Runs paused"}
             </span>
           </div>
           <div className="capacity-number">
             <strong>{snapshot.capacity.active}</strong>
-            <span>/ {snapshot.capacity.limit} runtimes</span>
+            <span>/ {snapshot.capacity.limit} agent workspaces running</span>
           </div>
           <div className="meter" aria-label={`${pct(utilization)} capacity used`}>
             <span style={{ width: pct(utilization) }} />
           </div>
           <dl className="capacity-details">
             <div>
-              <dt>Batch guard</dt>
-              <dd>Lock at {snapshot.capacity.launchAtOrAbove} active</dd>
+              <dt>Stop new runs</dt>
+              <dd>At {snapshot.capacity.launchAtOrAbove} running</dd>
             </div>
             <div>
-              <dt>New concurrency</dt>
-              <dd>≤ {snapshot.capacity.maxNewConcurrent} workers</dd>
+              <dt>Runs at once</dt>
+              <dd>{snapshot.capacity.maxNewConcurrent} agent</dd>
             </div>
             <div>
-              <dt>Memory available</dt>
+              <dt>Server memory free</dt>
               <dd>{snapshot.capacity.memoryAvailable}</dd>
             </div>
             <div>
-              <dt>Unhealthy pods</dt>
+              <dt>Unhealthy services</dt>
               <dd>{snapshot.capacity.unhealthyPods}</dd>
             </div>
           </dl>
           <p className="capacity-note">
-            Completed sandboxes pause automatically. Conversation history and
-            research evidence remain available.
+            Each agent gets its own workspace. When the agent finishes, I pause
+            that workspace but keep the conversation and result.
           </p>
         </aside>
       </section>
 
       <section className="proof-strip" aria-label="Proof summary">
         <div>
-          <span>Deterministic tests</span>
+          <span>Automated code checks</span>
           <strong>{snapshot.proof.tests}</strong>
-          <small>all passing</small>
+          <small>all passed</small>
         </div>
         <div>
-          <span>Post-fix live attempts</span>
+          <span>Valid live agent runs</span>
           <strong>
             {snapshot.proof.validAttempts}/{snapshot.proof.liveAttempts}
           </strong>
-          <small>independently valid</small>
+          <small>checked by code</small>
         </div>
         <div>
-          <span>Invalid memory</span>
+          <span>Bad lessons shared</span>
           <strong>{snapshot.proof.invalidLessons}</strong>
-          <small>promotion is gated</small>
+          <small>failed answers stay out</small>
         </div>
         <div>
-          <span>Scale benchmark</span>
+          <span>Example problems</span>
           <strong>
             {snapshot.proof.tasks}/{snapshot.proof.targetTasks}
           </strong>
-          <small>tasks prepared</small>
+          <small>built so far</small>
           <div className="mini-meter">
             <span style={{ width: pct(taskProgress) }} />
           </div>
         </div>
       </section>
 
-      {view === "Story" && (
+      {view === "Overview" && (
         <>
           <section className="section narrative">
             <div className="section-heading">
               <div>
-                <p className="eyebrow">The organizational loop</p>
-                <h2>One worker. One contract. One earned lesson.</h2>
+                <p className="eyebrow">Where the idea came from</p>
+                <h2>NeuroGolf showed what many agents can try. I wanted to know what they should remember.</h2>
               </div>
               <p>
-                OpenHands owns isolated execution. The lab owns allocation,
-                validation, memory, and the evidence ledger.
+                OpenHands runs each coding agent in a separate workspace. My
+                controller picks the problem, checks the answer, and decides
+                whether the next agent should see what the first one learned.
               </p>
             </div>
             <div className="workflow">
               {[
-                ["01", "Select", "Scheduler chooses the next useful experiment."],
-                ["02", "Retrieve", "Only validated, relevant lessons enter context."],
-                ["03", "Execute", "One isolated OpenHands conversation does the work."],
-                ["04", "Validate", "Deterministic checks, never worker confidence."],
-                ["05", "Promote", "Improving evidence becomes reusable memory."],
+                ["01", "Pick", "Choose one small optimization problem."],
+                ["02", "Brief", "Give the agent only relevant lessons that already passed."],
+                ["03", "Try", "Let one OpenHands agent produce a candidate answer."],
+                ["04", "Check", "Run code that can prove whether the answer works."],
+                ["05", "Remember", "Share the lesson only when the answer is valid and better."],
               ].map(([number, title, copy]) => (
                 <article className="workflow-step" key={number}>
                   <span>{number}</span>
@@ -254,13 +273,13 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
           <section className="section comparison">
             <div className="section-heading">
               <div>
-                <p className="eyebrow">Three matched live seeds</p>
-                <h2>Same budget. Different organization.</h2>
+                <p className="eyebrow">What I tested</p>
+                <h2>I ran the same six problems two ways, three times.</h2>
               </div>
               <p>
-                Each seed used the same six tasks and budget per arm. All 36
-                post-fix conversations produced independently valid candidates
-                and released their runtime capacity.
+                The first group started fresh on every problem. The second
+                group could read lessons from earlier valid answers. Both
+                groups used the same model, problems, and number of attempts.
               </p>
             </div>
             <div className="comparison-grid">
@@ -269,8 +288,8 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
                 return (
                   <article className={`arm-card ${name}`} key={name}>
                     <div className="arm-title">
-                      <span>{name === "naive" ? "Baseline" : "Learning system"}</span>
-                      <h3>{name[0].toUpperCase() + name.slice(1)}</h3>
+                      <span>{name === "naive" ? "Naive setup" : "Managed setup"}</span>
+                      <h3>{name === "naive" ? "No shared memory" : "Validated shared lessons"}</h3>
                     </div>
                     <dl>
                       <div>
@@ -278,15 +297,15 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
                         <dd>{result.solved}/{snapshot.comparisonTaskCount}</dd>
                       </div>
                       <div>
-                        <dt>Solution quality</dt>
+                        <dt>Average quality</dt>
                         <dd>{result.quality.toFixed(3)}</dd>
                       </div>
                       <div>
-                        <dt>Quality AUC</dt>
+                        <dt>Quality during each run</dt>
                         <dd>{result.qualityAuc.toFixed(3)}</dd>
                       </div>
                       <div>
-                        <dt>Lessons retrieved</dt>
+                        <dt>Earlier lessons provided</dt>
                         <dd>{result.retrievedLessons}</dd>
                       </div>
                     </dl>
@@ -297,13 +316,14 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
                 );
               })}
               <article className="finding-card">
-                <span className="finding-label">Honest finding</span>
-                <strong>Reliability is proven. Quality separation is not.</strong>
+                <span className="finding-label">What happened</span>
+                <strong>The six live problems were too easy.</strong>
                 <p>
-                  Naive and managed both reached every target on these small
-                  tasks. The managed arm exercised validated retrieval nine
-                  times, but harder tasks are required to measure its quality
-                  advantage.
+                  Both groups solved all 18 problems. The managed agents used
+                  nine earlier lessons, but they did not score better. I would
+                  not claim a quality win from this benchmark. It does show
+                  that the agents, checks, memory, records, and cleanup worked
+                  across 36 live conversations.
                 </p>
               </article>
             </div>
@@ -311,12 +331,16 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
         </>
       )}
 
-      {(view === "Story" || view === "Operations") && (
+      {(view === "Overview" || view === "Runs") && (
         <section className="section" id="live-agents">
           <div className="section-heading agents-heading">
             <div>
-              <p className="eyebrow">Representative experiment ledger</p>
-              <h2>Every agent leaves a verifiable trail.</h2>
+              <p className="eyebrow">The actual conversations</p>
+              <h2>These are real OpenHands runs. You can open them.</h2>
+              <p>
+                Each row links to the agent conversation. The score came from
+                the independent checker, not from the agent grading itself.
+              </p>
             </div>
             <div className="filter-row" aria-label="Filter experiments">
               {["all", "naive", "managed", "regression"].map((item) => (
@@ -326,7 +350,7 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
                   onClick={() => setArm(item)}
                   type="button"
                 >
-                  {item}
+                  {armLabel(item)}
                 </button>
               ))}
             </div>
@@ -335,13 +359,13 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
             <table className="agent-table">
               <thead>
                 <tr>
-                  <th>Worker</th>
-                  <th>Organization</th>
-                  <th>Task</th>
-                  <th>Score</th>
-                  <th>Memory</th>
-                  <th>Contract</th>
-                  <th>Sandbox</th>
+                  <th>Agent run</th>
+                  <th>Test setup</th>
+                  <th>Problem</th>
+                  <th>Result</th>
+                  <th>Lessons provided</th>
+                  <th>Reply format</th>
+                  <th>Workspace</th>
                 </tr>
               </thead>
               <tbody>
@@ -354,7 +378,7 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
                     </td>
                     <td>
                       <span className={`arm-chip ${agent.arm.toLowerCase()}`}>
-                        {agent.arm}
+                        {armLabel(agent.arm)}
                       </span>
                     </td>
                     <td>{agent.task}</td>
@@ -363,10 +387,10 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
                       <small> / target {agent.target}</small>
                     </td>
                     <td>{agent.lessons ? `${agent.lessons} retrieved` : "none"}</td>
-                    <td>{agent.transport.replaceAll("-", " ")}</td>
+                    <td>{transportLabel(agent.transport)}</td>
                     <td>
                       <span className="paused-dot" />
-                      {agent.sandbox}
+                      {agent.sandbox.toLowerCase()}
                     </td>
                   </tr>
                 ))}
@@ -376,16 +400,17 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
         </section>
       )}
 
-      {(view === "Story" || view === "Memory") && (
+      {(view === "Overview" || view === "Lessons") && (
         <section className="section memory-section">
           <div className="section-heading">
             <div>
-              <p className="eyebrow">Memory provenance</p>
-              <h2>Claims do not become memory. Evidence does.</h2>
+              <p className="eyebrow">What agents passed forward</p>
+              <h2>An agent shared a lesson only after its answer passed the test.</h2>
             </div>
             <p>
-              Every lesson points backward to a valid improvement and forward
-              to the workers that received it.
+              I kept the source problem, the checker result, and the later
+              agents that received each lesson. A plausible sentence by itself
+              was never enough.
             </p>
           </div>
           <div className="memory-grid">
@@ -407,27 +432,28 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
               </article>
             ))}
             <article className="memory-rule">
-              <span>Promotion rule</span>
+              <span>When a lesson gets shared</span>
               <strong>valid ∧ improving ∧ traceable</strong>
               <p>
-                Proposed lessons that fail any condition remain in the attempt
-                record and never enter retrieval.
+                The answer must work, improve the best score, and point back to
+                the run that produced it. Failed lessons stay in the record but
+                never reach another agent.
               </p>
             </article>
           </div>
         </section>
       )}
 
-      {view === "Operations" && (
+      {view === "Runs" && (
         <section className="section">
           <div className="section-heading">
             <div>
-              <p className="eyebrow">Reliability learning</p>
-              <h2>Failures became controls.</h2>
+              <p className="eyebrow">Bugs I found while building it</p>
+              <h2>The first version broke in four useful ways.</h2>
             </div>
             <p>
-              The ledger preserves intermediate failures so compatibility work
-              becomes reusable infrastructure.
+              I kept the failed runs. They exposed problems that a polished
+              architecture diagram would have missed.
             </p>
           </div>
           <div className="incident-list">
@@ -450,30 +476,30 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
 
       <section className="section next-gate">
         <div>
-          <p className="eyebrow">Next proof gate</p>
-          <h2>Move from reliable orchestration to discriminating research.</h2>
+          <p className="eyebrow">What I would test next</p>
+          <h2>The next run needs harder problems.</h2>
         </div>
         <ol>
           <li>
             <span>✓</span>
-            Three matched live seeds completed with 36/36 valid attempts.
+            Keep this version as the working reference: 36/36 valid agent runs.
           </li>
           <li>
             <span>1</span>
-            Add harder instances that separate model strategy quality.
+            Add problems where an earlier technique can change the final score.
           </li>
           <li>
             <span>2</span>
-            Add application-owned PostgreSQL only when controllers become
-            concurrent.
+            Keep using files until more than one controller needs to claim work
+            at the same time. Then add a separate PostgreSQL database.
           </li>
         </ol>
       </section>
 
       <footer>
         <div>
-          <strong>NeuroGolf Lab</strong>
-          <span>OpenHands is the execution plane. Evidence is the memory.</span>
+          <strong>NeuroGolf with OpenHands</strong>
+          <span>Built by Rajiv Shah as a public multi-agent experiment.</span>
         </div>
         <div>
           <span>
