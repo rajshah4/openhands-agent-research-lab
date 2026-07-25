@@ -268,6 +268,15 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
                 </article>
               ))}
             </div>
+            <p className="architecture-note">
+              Each of the 36 attempts was a separate OpenHands conversation
+              with its own context and workspace. The controller chose the next
+              problem, passed in earlier lessons, waited for the answer, ran
+              the checker, saved the result, and paused the workspace. The next
+              agent received only lessons that survived that loop. This
+              reproduces the multi-agent research setup on small public
+              problems that anyone can rerun.
+            </p>
           </section>
 
           <section className="section comparison">
@@ -327,6 +336,114 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
                 </p>
               </article>
             </div>
+          </section>
+
+          <section className="section implementation-section">
+            <div className="section-heading">
+              <div>
+                <p className="eyebrow">Three ways to run it in OpenHands</p>
+                <h2>The research loop stays the same. The operating model changes.</h2>
+              </div>
+              <p>
+                This experiment used the first option. A second pilot tested
+                the shared Canvas setup on Kubernetes. The SDK version is the
+                next implementation I would build. These choices mostly move
+                the boundaries around isolation, startup cost, and how much
+                infrastructure your team owns.
+              </p>
+            </div>
+            <div className="implementation-grid">
+              <article className="implementation-card">
+                <span className="implementation-status tested">
+                  Tested here: 36 conversations
+                </span>
+                <h3>One Enterprise sandbox per agent</h3>
+                <p>
+                  An external controller starts each worker through the
+                  OpenHands Conversation API. Every agent gets a separate
+                  conversation, context window, and runtime. OpenHands keeps
+                  the conversation history and gives people a place to inspect
+                  the work.
+                </p>
+                <dl>
+                  <div>
+                    <dt>Use it when</dt>
+                    <dd>You need user access controls, audit trails, or stronger isolation.</dd>
+                  </div>
+                  <div>
+                    <dt>Tradeoff</dt>
+                    <dd>Each active agent needs a runtime. Startup time and container capacity set the pace.</dd>
+                  </div>
+                  <div>
+                    <dt>Your team owns</dt>
+                    <dd>The scheduler, validator, research memory, and experiment records.</dd>
+                  </div>
+                </dl>
+              </article>
+
+              <article className="implementation-card">
+                <span className="implementation-status pilot">
+                  Pilot tested: 2 at once
+                </span>
+                <h3>Many agents on one Agent Canvas</h3>
+                <p>
+                  One Agent Canvas pod can run several conversations against a
+                  shared volume. In the GKE pilot, two simultaneous agents
+                  finished in 12.0 and 22.5 seconds. Both answers passed the
+                  independent checker, and the pod used about 691 MiB of memory
+                  afterward.
+                </p>
+                <dl>
+                  <div>
+                    <dt>Use it when</dt>
+                    <dd>One trusted team wants fast startup and more work from a small cluster.</dd>
+                  </div>
+                  <div>
+                    <dt>Tradeoff</dt>
+                    <dd>Agents share a pod, process boundary, and filesystem. This is not tenant isolation.</dd>
+                  </div>
+                  <div>
+                    <dt>Your team owns</dt>
+                    <dd>The Kubernetes service, workspace boundaries, access policy, and recovery plan.</dd>
+                  </div>
+                </dl>
+              </article>
+
+              <article className="implementation-card">
+                <span className="implementation-status next">
+                  Next implementation
+                </span>
+                <h3>Embed the OpenHands SDK</h3>
+                <p>
+                  Your Python service creates the agents and conversations
+                  directly. You can add custom tools, async execution,
+                  delegation, and your own API or user interface without
+                  routing every decision through the OpenHands application.
+                </p>
+                <dl>
+                  <div>
+                    <dt>Use it when</dt>
+                    <dd>The agent system is part of your product and needs custom behavior.</dd>
+                  </div>
+                  <div>
+                    <dt>Tradeoff</dt>
+                    <dd>This gives the most control and leaves the most production work with your team.</dd>
+                  </div>
+                  <div>
+                    <dt>Your team owns</dt>
+                    <dd>The isolation layer and the design for authentication, persistence, restarts, scaling, and observability.</dd>
+                  </div>
+                </dl>
+              </article>
+            </div>
+            <p className="architecture-note">
+              Storage is a separate choice. This repo writes a file ledger
+              because one controller owns the queue. Git is useful for
+              publishing the artifacts, but I would not use it to claim
+              concurrent work. Once multiple controllers can pick tasks at the
+              same time, I would add an application-owned PostgreSQL database.
+              I would leave the OpenHands internal database alone.
+            </p>
           </section>
         </>
       )}

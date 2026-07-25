@@ -36,6 +36,11 @@ test("renders the NeuroGolf experiment for a new reader", async () => {
   assert.match(html, /A Kaggle team used many agents/);
   assert.match(html, /I ran the same six problems two ways, three times/);
   assert.match(html, /The six live problems were too easy/);
+  assert.match(html, /This reproduces the multi-agent research setup/);
+  assert.match(html, /One Enterprise sandbox per agent/);
+  assert.match(html, /Many agents on one Agent Canvas/);
+  assert.match(html, /Embed the OpenHands SDK/);
+  assert.match(html, /Pilot tested: 2 at once/);
   assert.match(html, /These are real OpenHands runs/);
   assert.doesNotMatch(html, /codex-preview|Your site is taking shape/);
 });

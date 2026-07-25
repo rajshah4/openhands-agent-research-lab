@@ -419,6 +419,14 @@ dd {
   line-height: 1.55;
 }
 
+.architecture-note {
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.75;
+  margin: 32px 0 0;
+  max-width: 900px;
+}
+
 .comparison {
   background: #ebe9e2;
   max-width: none;
@@ -497,6 +505,75 @@ dd {
   font-size: 12px;
   line-height: 1.6;
   margin-bottom: 0;
+}
+
+.implementation-section {
+  background: var(--panel);
+}
+
+.implementation-grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.implementation-card {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 25px;
+}
+
+.implementation-status {
+  border-radius: 999px;
+  display: inline-block;
+  font: 600 9px var(--mono);
+  padding: 6px 9px;
+  text-transform: uppercase;
+}
+
+.implementation-status.tested {
+  background: var(--green-soft);
+  color: #0d6840;
+}
+
+.implementation-status.pilot {
+  background: var(--blue-soft);
+  color: var(--blue);
+}
+
+.implementation-status.next {
+  background: var(--amber-soft);
+  color: #8a5319;
+}
+
+.implementation-card h3 {
+  font-size: 25px;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  margin: 28px 0 16px;
+}
+
+.implementation-card > p {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.65;
+  min-height: 118px;
+}
+
+.implementation-card dl {
+  margin: 28px 0 0;
+}
+
+.implementation-card dl div {
+  border-top: 1px solid var(--line);
+  padding: 14px 0;
+}
+
+.implementation-card dd {
+  color: var(--ink);
+  font-family: var(--font-manrope), sans-serif;
+  font-size: 12px;
+  line-height: 1.55;
 }
 
 .agents-heading {
@@ -799,8 +876,13 @@ footer > div:last-child {
   }
 
   .comparison-grid,
-  .memory-grid {
+  .memory-grid,
+  .implementation-grid {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .implementation-card:last-child {
+    grid-column: 1 / -1;
   }
 
   .finding-card,
@@ -863,8 +945,13 @@ footer > div:last-child {
 
   .workflow,
   .comparison-grid,
-  .memory-grid {
+  .memory-grid,
+  .implementation-grid {
     grid-template-columns: 1fr;
+  }
+
+  .implementation-card:last-child {
+    grid-column: auto;
   }
 
   .finding-card,
