@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "date": "2026-07-25",
+  "deployment": {
+    "product": "OpenHands Enterprise",
+    "version": "0.24.0",
+    "distribution": "Replicated",
+    "sandbox_grouping_strategy": "GROUP_BY_NEWEST",
+    "runtime_limit": 10,
+    "launch_lock_at": 7
+  },
+  "result": {
+    "conversation_count": 5,
+    "distinct_sandbox_count": 1,
+    "independently_valid_count": 5,
+    "maximum_tested_concurrent_conversations": 2,
+    "peak_active_user_visible_sandboxes": 1,
+    "final_active_user_visible_sandboxes": 0,
+    "final_sandbox_status": "PAUSED",
+    "cluster_services_healthy": true,
+    "runtime_resources_deleted_after_pause": true
+  },
+  "sandbox_id": "vX0duDryphyDwDirN5qor",
+  "conversations": [
+    {
+      "phase": "seed",
+      "task_family": "graph_coloring",
+      "conversation_id": "d7543891fab94d73b4177604bddde924",
+      "url": "https://app.replicated.rajistics.com/conversations/d7543891fab94d73b4177604bddde924",
+      "valid": true,
+      "score": 2
+    },
+    {
+      "phase": "sequential",
+      "task_family": "graph_coloring",
+      "conversation_id": "5fb7db32895c4214821e3fbbfa162012",
+      "url": "https://app.replicated.rajistics.com/conversations/5fb7db32895c4214821e3fbbfa162012",
+      "valid": true,
+      "score": 2
+    },
+    {
+      "phase": "sequential",
+      "task_family": "graph_coloring",
+      "conversation_id": "11ce1f266f354b1f986e6e65b18df68f",
+      "url": "https://app.replicated.rajistics.com/conversations/11ce1f266f354b1f986e6e65b18df68f",
+      "valid": true,
+      "score": 3
+    },
+    {
+      "phase": "concurrent",
+      "task_family": "graph_coloring",
+      "conversation_id": "54dc47db5c214b8295cdd9a7d17ae376",
+      "url": "https://app.replicated.rajistics.com/conversations/54dc47db5c214b8295cdd9a7d17ae376",
+      "valid": true,
+      "score": 3
+    },
+    {
+      "phase": "concurrent",
+      "task_family": "bin_packing",
+      "conversation_id": "42ba429d5ffc4cb5bdf4c5849d944754",
+      "url": "https://app.replicated.rajistics.com/conversations/42ba429d5ffc4cb5bdf4c5849d944754",
+      "valid": true,
+      "score": 2
+    }
+  ],
+  "production_gap": {
+    "name": "pool_lifecycle_ownership",
+    "description": "Per-attempt pause must be replaced by a sandbox lease or reference count so one conversation cannot pause a sandbox while another is active."
+  }
+}
