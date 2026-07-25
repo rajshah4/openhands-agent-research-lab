@@ -1,0 +1,13 @@
+{
+  "id": "bin-packing-contract-regression",
+  "name": "Exact item-ID contract regression",
+  "policy": "managed",
+  "attempt_budget": 2,
+  "repository": "rajshah4/openhands-agent-research-lab",
+  "branch": "main",
+  "model": null,
+  "task_paths": [
+    "tasks/scale/pack-alpha.json",
+    "tasks/scale/pack-beta.json"
+  ]
+}

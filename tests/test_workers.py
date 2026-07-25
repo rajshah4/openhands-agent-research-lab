@@ -2,7 +2,7 @@ import unittest
 
 from research_lab.domain import CampaignSpec, TaskSpec
 from research_lab.openhands import OpenHandsCapacityError
-from research_lab.workers import OpenHandsWorker
+from research_lab.workers import OpenHandsWorker, render_worker_prompt
 
 
 class FakeOpenHandsClient:
@@ -129,6 +129,36 @@ class OpenHandsWorkerTests(unittest.TestCase):
 
         self.assertEqual(client.starts, 0)
         self.assertEqual([kind for kind, _ in lifecycle], ["capacity_checked"])
+
+    def test_bin_packing_contract_example_uses_exact_task_item_ids(self) -> None:
+        campaign = CampaignSpec(
+            id="campaign-1",
+            name="Campaign",
+            policy="managed",
+            attempt_budget=1,
+            repository=None,
+            branch=None,
+            model=None,
+            tasks=(),
+        )
+        task = TaskSpec(
+            id="pack",
+            family="bin-packing",
+            description="pack",
+            tags=("bin-packing",),
+            payload={"capacity": 10, "items": {"a": 6, "b": 4}},
+        )
+        prompt = render_worker_prompt(
+            campaign=campaign,
+            task=task,
+            run_id="run-1",
+            attempt_id="attempt-1",
+            lessons=[],
+        )
+        self.assertIn('"bins": [', prompt)
+        self.assertIn('"a"', prompt)
+        self.assertNotIn('"item-a"', prompt)
+        self.assertIn("Never add a", prompt)
 
 
 if __name__ == "__main__":

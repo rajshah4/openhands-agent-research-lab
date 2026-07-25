@@ -222,17 +222,23 @@ def render_worker_prompt(
         )
         objective = """Produce a graph-color assignment using as few colors as possible. Every node
 must be assigned, and adjacent nodes must have different colors."""
-        candidate_example: dict[str, Any] = {"assignments": {"0": 0}}
+        candidate_example: dict[str, Any] = {
+            "assignments": {node: 0 for node in task.nodes}
+        }
     elif task.family == "set-cover":
         task_payload["payload"] = task.payload
         objective = """Select as few named sets as possible while covering every element in the
 universe. Return only set IDs defined by the task, with no duplicates."""
-        candidate_example = {"selected_sets": ["set-a"]}
+        candidate_example = {
+            "selected_sets": [str(set_id) for set_id in task.payload["sets"]]
+        }
     elif task.family == "bin-packing":
         task_payload["payload"] = task.payload
         objective = """Pack every named item exactly once into as few bins as possible. The sum of
 item weights in each bin must not exceed the task capacity."""
-        candidate_example = {"bins": [["item-a", "item-b"]]}
+        candidate_example = {
+            "bins": [[str(item_id)] for item_id in task.payload["items"]]
+        }
     else:
         raise ValueError(f"unsupported worker prompt family: {task.family}")
     contract_example = {
@@ -269,6 +275,8 @@ Constraints:
 - Do not merge, deploy, or mutate production systems.
 - Do not claim that your candidate is valid; an independent deterministic
   validator owns that decision.
+- Copy node, set, and item IDs exactly as written in the task. Never add a
+  prefix, suffix, or descriptive alias.
 - Use JSON scalar color values.
 - Your final response must be exactly one JSON object with no prose or fence.
 

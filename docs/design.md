@@ -17,9 +17,9 @@ validator measures each candidate, and a storage interface records attempts and
 validated lessons. OpenHands supplies isolated execution, lifecycle metadata,
 events, model configuration, and human-visible audit trails.
 
-Stage 1 uses a single-writer filesystem store so the entire workflow is
-inspectable and testable offline. The storage boundary is designed for a later
-PostgreSQL implementation without changing domain behavior.
+The reference deployment uses a single-writer filesystem store so the entire
+workflow is inspectable and testable offline. The storage boundary is designed
+for a later PostgreSQL implementation without changing domain behavior.
 
 ## 2. New Concepts
 
@@ -95,14 +95,16 @@ when it is the unique trailing JSON object; that attempt is marked
 1. Build a self-contained prompt with task, repository, branch, run ID, attempt
    ID, retrieved lesson IDs, limits, and final contract.
 2. Create an app conversation through the V1 endpoint.
-3. Poll the returned start task to `READY`.
-4. Persist start-task, sandbox, and app-conversation IDs.
-5. Poll the app-conversation record with a bounded execution timeout.
-6. If list state becomes incomplete, inspect durable events for terminal state.
-7. Allow bounded grace for the final response to appear in the event index.
-8. Parse the strict contract and pass the candidate to the deterministic
+3. Before creation, count user-visible active sandboxes and refuse launch when
+   the configured safety threshold is closed.
+4. Poll the returned start task to `READY`.
+5. Persist start-task, sandbox, and app-conversation IDs.
+6. Poll the app-conversation record with a bounded execution timeout.
+7. If list state becomes incomplete, inspect durable events for terminal state.
+8. Allow bounded grace for the final response to appear in the event index.
+9. Parse the strict contract and pass the candidate to the deterministic
    validator.
-9. After the final response is captured, pause the sandbox through
+10. After the final response is captured, pause the sandbox through
    `POST /api/v1/sandboxes/{sandbox_id}/pause` and verify its status becomes
    `PAUSED`. Record pause failures without discarding the attempt.
 
@@ -145,11 +147,11 @@ The policy version and rationale are recorded with every attempt.
 
 ### 3.7 Validation and promotion
 
-The included benchmark validates graph-color assignments:
+The included benchmark registry validates three minimization families:
 
-- every graph node must have an assignment
-- adjacent nodes must use different colors
-- score is the number of distinct colors; lower is better
+- graph coloring: complete assignments, edge conflicts, distinct colors
+- set cover: known set IDs, complete universe coverage, selected-set count
+- bin packing: every item exactly once, capacity per bin, bin count
 
 A lesson is promoted only when the candidate is valid and strictly improves the
 best prior score for that task.
