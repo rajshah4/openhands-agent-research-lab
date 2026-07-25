@@ -44,6 +44,14 @@ class WorkerContractTests(unittest.TestCase):
         )
         self.assertEqual(contract.transport, "trailing-json-fallback")
 
+    def test_accepts_one_terminal_fenced_contract_and_marks_fallback(self) -> None:
+        contract = parse_worker_contract(
+            "Reasoning that should not have been returned.\n```json\n"
+            + json.dumps(self.valid_contract())
+            + "\n```"
+        )
+        self.assertEqual(contract.transport, "fenced-json-fallback")
+
     def test_rejects_non_contract_trailing_json(self) -> None:
         with self.assertRaisesRegex(ContractError, "no unique trailing JSON contract"):
             parse_worker_contract('Result:\n{"status": "failed"}')

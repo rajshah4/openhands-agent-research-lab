@@ -33,13 +33,25 @@ class WorkerContract:
 
 def _json_object_from_text(text: str) -> tuple[dict[str, Any], str]:
     stripped = text.strip()
-    if stripped.startswith("```") and stripped.endswith("```"):
-        lines = stripped.splitlines()
-        if len(lines) >= 3:
-            stripped = "\n".join(lines[1:-1]).strip()
     try:
         data = json.loads(stripped)
     except json.JSONDecodeError as exc:
+        if stripped.endswith("```"):
+            closing_start = len(stripped) - 3
+            opening_start = stripped.rfind("```", 0, closing_start)
+            if opening_start >= 0:
+                fenced = stripped[opening_start + 3 : closing_start].strip()
+                if fenced.lower().startswith("json"):
+                    fenced = fenced[4:].lstrip()
+                try:
+                    candidate = json.loads(fenced)
+                except json.JSONDecodeError:
+                    candidate = None
+                if (
+                    isinstance(candidate, dict)
+                    and set(candidate) == REQUIRED_FIELDS
+                ):
+                    return candidate, "fenced-json-fallback"
         decoder = json.JSONDecoder()
         candidates: list[dict[str, Any]] = []
         for index, character in enumerate(stripped):

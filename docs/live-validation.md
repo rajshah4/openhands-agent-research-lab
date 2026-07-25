@@ -171,3 +171,29 @@ Next gate:
 - Add a matched naive-versus-managed experiment with fixed model, attempt,
   timeout, and concurrency budgets.
 - Expand the benchmark beyond two illustrative graph instances.
+
+## Stage 3 comparison pilot
+
+Date: 2026-07-25
+
+The first three-attempt-per-arm live comparison was stopped after the first
+recorded attempt rather than spending the remaining budget on a repeated
+protocol failure.
+
+- Conversation `c8fb1f1a7108491cb08316439f7e35cd` finished with one valid
+  five-field contract inside a terminal `json` fence after explanatory prose.
+  The strict parser rejected the fence even though it already supported one
+  trailing raw JSON object.
+- Conversation `61bea580a3d546ecbd98434beca35a1f` had already started when the
+  controller was interrupted. Its terminal output had the same shape and was
+  reconciled from the durable event stream.
+
+The fix accepts exactly one terminal fenced object only when its top-level
+fields exactly match the worker contract. It labels the transport
+`fenced-json-fallback`, so protocol compliance remains measurable rather than
+silently treating the response as exact JSON. Failed attempt records now retain
+the worker kind, conversation metadata, sanitized execution metadata, and a
+SHA-256 plus length for the final response without persisting raw model text.
+
+The hardened parser passed the full offline suite and both already-finished live
+responses. A fresh matched run is the next live gate.

@@ -136,6 +136,7 @@ class CampaignRunner:
                     "scheduler_decision": decision.to_dict(),
                 },
             )
+            execution = None
             try:
                 execution = self.worker.execute(
                     campaign=campaign,
@@ -172,6 +173,25 @@ class CampaignRunner:
                     "finished_at": utc_now(),
                     "scheduler_decision": decision.to_dict(),
                     "retrieved_lesson_ids": [lesson.id for lesson in lessons],
+                    "worker_kind": (
+                        execution.worker_kind if execution is not None else None
+                    ),
+                    "conversation": (
+                        execution.conversation if execution is not None else {}
+                    ),
+                    "metadata": (
+                        execution.metadata if execution is not None else {}
+                    ),
+                    "final_response": (
+                        {
+                            "sha256": hashlib.sha256(
+                                execution.final_text.encode("utf-8")
+                            ).hexdigest(),
+                            "length": len(execution.final_text),
+                        }
+                        if execution is not None
+                        else None
+                    ),
                     "outcome": "failed",
                     "failure": {
                         "type": type(exc).__name__,
@@ -253,6 +273,12 @@ class CampaignRunner:
             "retrieved_lesson_ids": decision.to_dict()["retrieved_lesson_ids"],
             "conversation": execution.conversation,
             "metadata": execution.metadata,
+            "final_response": {
+                "sha256": hashlib.sha256(
+                    execution.final_text.encode("utf-8")
+                ).hexdigest(),
+                "length": len(execution.final_text),
+            },
             "contract": {
                 "status": contract.status,
                 "summary": list(contract.summary),
