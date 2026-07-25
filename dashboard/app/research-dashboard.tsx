@@ -6,7 +6,7 @@ type AgentRecord = {
   id: string;
   arm: string;
   task: string;
-  score: number;
+  score: number | null;
   target: number;
   status: string;
   sandbox: string;
@@ -49,6 +49,7 @@ type Snapshot = {
       retrievedLessons: number;
     }
   >;
+  comparisonTaskCount: number;
   agents: AgentRecord[];
   lessons: Array<{
     id: string;
@@ -251,8 +252,9 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
                 <h2>Same budget. Different organization.</h2>
               </div>
               <p>
-                Both arms solved the easy pilot. Only managed work accumulated
-                and reused organizational memory.
+                Both arms used the same six tasks and budget. The validator
+                exposed two managed prompt-contract failures that a confidence
+                score would have missed.
               </p>
             </div>
             <div className="comparison-grid">
@@ -267,7 +269,7 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
                     <dl>
                       <div>
                         <dt>Problems solved</dt>
-                        <dd>{result.solved}/3</dd>
+                        <dd>{result.solved}/{snapshot.comparisonTaskCount}</dd>
                       </div>
                       <div>
                         <dt>Solution quality</dt>
@@ -290,10 +292,11 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
               })}
               <article className="finding-card">
                 <span className="finding-label">Honest finding</span>
-                <strong>The architecture works. The benchmark is too easy.</strong>
+                <strong>Validation found a prompt defect, then proved its fix.</strong>
                 <p>
-                  A tie is evidence, not failure. The next gate is a harder,
-                  multi-family benchmark where memory can change decisions.
+                  Placeholder item IDs invalidated two managed candidates. A
+                  corrected two-conversation regression then validated 2/2 at
+                  the optimal score.
                 </p>
               </article>
             </div>
@@ -309,7 +312,7 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
               <h2>Every agent leaves a verifiable trail.</h2>
             </div>
             <div className="filter-row" aria-label="Filter experiments">
-              {["all", "naive", "managed", "validation"].map((item) => (
+              {["all", "naive", "managed", "regression"].map((item) => (
                 <button
                   className={arm === item ? "active" : ""}
                   key={item}
@@ -349,7 +352,7 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
                     </td>
                     <td>{agent.task}</td>
                     <td>
-                      <strong>{agent.score}</strong>
+                      <strong>{agent.score ?? "invalid"}</strong>
                       <small> / target {agent.target}</small>
                     </td>
                     <td>{agent.lessons ? `${agent.lessons} retrieved` : "none"}</td>
@@ -446,16 +449,16 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
         <ol>
           <li>
             <span>1</span>
-            Expand to 10–20 harder tasks across multiple families.
+            Repeat the live comparison across three matched seeds.
           </li>
           <li>
             <span>2</span>
-            Run three matched experiments in batches of two or fewer.
+            Add harder instances that separate model strategy quality.
           </li>
           <li>
             <span>3</span>
-            Decide on PostgreSQL only from measured concurrency and recovery
-            needs.
+            Add application-owned PostgreSQL only when controllers become
+            concurrent.
           </li>
         </ol>
       </section>

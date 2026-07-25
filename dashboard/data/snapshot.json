@@ -1,143 +1,81 @@
 {
-  "generatedAt": "2026-07-25T21:19:00Z",
+  "generatedAt": "2026-07-25T21:57:00Z",
   "environment": {
     "name": "Rajistics Replicated",
     "version": "0.24.0",
     "mode": "single controller"
   },
   "capacity": {
-    "active": 1,
+    "active": 0,
     "limit": 10,
     "launchAtOrAbove": 7,
-    "maxNewConcurrent": 2,
+    "maxNewConcurrent": 1,
     "memoryAvailable": "18 GiB",
     "unhealthyPods": 0,
     "launchAllowed": true
   },
   "proof": {
-    "tests": 18,
-    "liveAttempts": 7,
-    "validAttempts": 7,
+    "tests": 27,
+    "liveAttempts": 14,
+    "validAttempts": 12,
     "invalidLessons": 0,
-    "tasks": 3,
+    "tasks": 12,
     "targetTasks": 20
   },
+  "comparisonTaskCount": 6,
   "comparison": {
     "naive": {
-      "solved": 3,
+      "solved": 6,
       "quality": 1,
-      "qualityAuc": 0.667,
+      "qualityAuc": 0.583,
       "duplicates": 0,
       "retrievedLessons": 0
     },
     "managed": {
-      "solved": 3,
-      "quality": 1,
-      "qualityAuc": 0.667,
+      "solved": 4,
+      "quality": 0.667,
+      "qualityAuc": 0.5,
       "duplicates": 0,
-      "retrievedLessons": 3
+      "retrievedLessons": 2
     }
   },
   "agents": [
-    {
-      "id": "ac9f02dfe633481c97f9022cfcebc14f",
-      "arm": "Naive",
-      "task": "cycle-5",
-      "score": 3,
-      "target": 3,
-      "status": "valid",
-      "sandbox": "PAUSED",
-      "transport": "fenced-json-fallback",
-      "lessons": 0,
-      "conversationUrl": "https://app.replicated.rajistics.com/conversations/ac9f02dfe633481c97f9022cfcebc14f"
-    },
-    {
-      "id": "13f4db27cc3e47a58635bffc36da7ebc",
-      "arm": "Naive",
-      "task": "scrambled-path-5",
-      "score": 2,
-      "target": 2,
-      "status": "valid",
-      "sandbox": "PAUSED",
-      "transport": "trailing-json-fallback",
-      "lessons": 0,
-      "conversationUrl": "https://app.replicated.rajistics.com/conversations/13f4db27cc3e47a58635bffc36da7ebc"
-    },
-    {
-      "id": "5906755d68ea4883b9640ea0b3f2159e",
-      "arm": "Naive",
-      "task": "wheel-6",
-      "score": 4,
-      "target": 4,
-      "status": "valid",
-      "sandbox": "PAUSED",
-      "transport": "trailing-json-fallback",
-      "lessons": 0,
-      "conversationUrl": "https://app.replicated.rajistics.com/conversations/5906755d68ea4883b9640ea0b3f2159e"
-    },
-    {
-      "id": "da32d5a75f9f4637b6470a0c8804cd19",
-      "arm": "Managed",
-      "task": "cycle-5",
-      "score": 3,
-      "target": 3,
-      "status": "valid",
-      "sandbox": "PAUSED",
-      "transport": "exact-json",
-      "lessons": 0,
-      "conversationUrl": "https://app.replicated.rajistics.com/conversations/da32d5a75f9f4637b6470a0c8804cd19"
-    },
-    {
-      "id": "524c6c7129594cbc812bcee1af6111c4",
-      "arm": "Managed",
-      "task": "scrambled-path-5",
-      "score": 2,
-      "target": 2,
-      "status": "valid",
-      "sandbox": "PAUSED",
-      "transport": "fenced-json-fallback",
-      "lessons": 1,
-      "conversationUrl": "https://app.replicated.rajistics.com/conversations/524c6c7129594cbc812bcee1af6111c4"
-    },
-    {
-      "id": "b3c0af97f3af4d77aa85ad23b0a9d202",
-      "arm": "Managed",
-      "task": "wheel-6",
-      "score": 4,
-      "target": 4,
-      "status": "valid",
-      "sandbox": "PAUSED",
-      "transport": "fenced-json-fallback",
-      "lessons": 2,
-      "conversationUrl": "https://app.replicated.rajistics.com/conversations/b3c0af97f3af4d77aa85ad23b0a9d202"
-    },
-    {
-      "id": "b34bc3d136be42e4b5bb50da29d39433",
-      "arm": "Validation",
-      "task": "cycle-5",
-      "score": 3,
-      "target": 3,
-      "status": "valid",
-      "sandbox": "PAUSED",
-      "transport": "trailing-json-fallback",
-      "lessons": 0,
-      "conversationUrl": "https://app.replicated.rajistics.com/conversations/b34bc3d136be42e4b5bb50da29d39433"
-    }
+    {"id":"16ec807fe6134556ae023d84ad1b3f9d","arm":"Naive","task":"color-bipartite-8","score":2,"target":2,"status":"valid","sandbox":"PAUSED","transport":"fenced-json-fallback","lessons":0,"conversationUrl":"https://app.replicated.rajistics.com/conversations/16ec807fe6134556ae023d84ad1b3f9d"},
+    {"id":"9498ee78bd6d4ba1b595d63e1bcf49b5","arm":"Naive","task":"color-cycle-7","score":3,"target":3,"status":"valid","sandbox":"PAUSED","transport":"trailing-json-fallback","lessons":0,"conversationUrl":"https://app.replicated.rajistics.com/conversations/9498ee78bd6d4ba1b595d63e1bcf49b5"},
+    {"id":"db6459cde61f473d8ca6624e275ae4d3","arm":"Naive","task":"cover-campus","score":2,"target":2,"status":"valid","sandbox":"PAUSED","transport":"exact-json","lessons":0,"conversationUrl":"https://app.replicated.rajistics.com/conversations/db6459cde61f473d8ca6624e275ae4d3"},
+    {"id":"5da499e6edd64db08ce386cdf52398d8","arm":"Naive","task":"cover-grid","score":2,"target":2,"status":"valid","sandbox":"PAUSED","transport":"fenced-json-fallback","lessons":0,"conversationUrl":"https://app.replicated.rajistics.com/conversations/5da499e6edd64db08ce386cdf52398d8"},
+    {"id":"cd93339964d84cedb6e310cd1aa37db0","arm":"Naive","task":"pack-alpha","score":2,"target":2,"status":"valid","sandbox":"PAUSED","transport":"fenced-json-fallback","lessons":0,"conversationUrl":"https://app.replicated.rajistics.com/conversations/cd93339964d84cedb6e310cd1aa37db0"},
+    {"id":"0d8dee513b964884820724207cc16e09","arm":"Naive","task":"pack-beta","score":2,"target":2,"status":"valid","sandbox":"PAUSED","transport":"fenced-json-fallback","lessons":0,"conversationUrl":"https://app.replicated.rajistics.com/conversations/0d8dee513b964884820724207cc16e09"},
+    {"id":"9cc3a1a714754e37ac3cb0ee47bd8ac8","arm":"Managed","task":"color-bipartite-8","score":2,"target":2,"status":"valid","sandbox":"PAUSED","transport":"fenced-json-fallback","lessons":0,"conversationUrl":"https://app.replicated.rajistics.com/conversations/9cc3a1a714754e37ac3cb0ee47bd8ac8"},
+    {"id":"083e44938a6c41029f09fdb72507a849","arm":"Managed","task":"color-cycle-7","score":3,"target":3,"status":"valid","sandbox":"PAUSED","transport":"exact-json","lessons":1,"conversationUrl":"https://app.replicated.rajistics.com/conversations/083e44938a6c41029f09fdb72507a849"},
+    {"id":"adc1bcba7dac45c59c98c91e7a404fcf","arm":"Managed","task":"cover-campus","score":2,"target":2,"status":"valid","sandbox":"PAUSED","transport":"trailing-json-fallback","lessons":0,"conversationUrl":"https://app.replicated.rajistics.com/conversations/adc1bcba7dac45c59c98c91e7a404fcf"},
+    {"id":"0bdb141ede814e7c9ec7186685b7601b","arm":"Managed","task":"cover-grid","score":2,"target":2,"status":"valid","sandbox":"PAUSED","transport":"fenced-json-fallback","lessons":1,"conversationUrl":"https://app.replicated.rajistics.com/conversations/0bdb141ede814e7c9ec7186685b7601b"},
+    {"id":"2b819f1d58cf4484b78fba201798acb8","arm":"Managed","task":"pack-alpha","score":null,"target":2,"status":"invalid","sandbox":"PAUSED","transport":"trailing-json-fallback","lessons":0,"conversationUrl":"https://app.replicated.rajistics.com/conversations/2b819f1d58cf4484b78fba201798acb8"},
+    {"id":"91330f2ec077482b83ff1ba87932972d","arm":"Managed","task":"pack-beta","score":null,"target":2,"status":"invalid","sandbox":"PAUSED","transport":"fenced-json-fallback","lessons":0,"conversationUrl":"https://app.replicated.rajistics.com/conversations/91330f2ec077482b83ff1ba87932972d"},
+    {"id":"832cdfc8ec1a4eeaa2749499ce38a43b","arm":"Regression","task":"pack-alpha","score":2,"target":2,"status":"valid","sandbox":"PAUSED","transport":"trailing-json-fallback","lessons":0,"conversationUrl":"https://app.replicated.rajistics.com/conversations/832cdfc8ec1a4eeaa2749499ce38a43b"},
+    {"id":"2350802c7cd5451e99dd6e2df5d2c212","arm":"Regression","task":"pack-beta","score":2,"target":2,"status":"valid","sandbox":"PAUSED","transport":"fenced-json-fallback","lessons":1,"conversationUrl":"https://app.replicated.rajistics.com/conversations/2350802c7cd5451e99dd6e2df5d2c212"}
   ],
   "lessons": [
     {
-      "id": "lesson-7019dfc6",
-      "statement": "Odd cycles require a third color at the closing edge.",
-      "source": "managed / cycle-5",
-      "usedBy": ["scrambled-path-5", "wheel-6"],
-      "evidence": "Promoted only after the independent validator accepted a three-color solution."
+      "id": "lesson-130ed8196f507687",
+      "statement": "Complete bipartite graphs Km,n have chromatic number 2; color each partition uniformly.",
+      "source": "managed / color-bipartite-8",
+      "usedBy": ["color-cycle-7"],
+      "evidence": "Promoted only after the independent validator accepted the two-color candidate."
     },
     {
-      "id": "lesson-7a83b434",
-      "statement": "Order constrained vertices before low-degree leaves.",
-      "source": "managed / scrambled-path-5",
-      "usedBy": ["wheel-6"],
-      "evidence": "The lesson remained traceable to its source attempt and entered only the managed arm."
+      "id": "lesson-83b5cf1f3ddd59e9",
+      "statement": "When sets partition the universe, select all partition sets for minimal cover.",
+      "source": "managed / cover-campus",
+      "usedBy": ["cover-grid"],
+      "evidence": "Retrieved only after the source cover was independently validated."
+    },
+    {
+      "id": "lesson-fab37735105c2b23",
+      "statement": "When item weights sum to an exact multiple of capacity, pair complementary weights.",
+      "source": "regression / pack-alpha",
+      "usedBy": ["pack-beta"],
+      "evidence": "The corrected exact-ID candidate validated optimally before this lesson entered memory."
     }
   ],
   "incidents": [
@@ -155,8 +93,14 @@
     },
     {
       "title": "Retained runtime capacity",
-      "finding": "Eight finished sandboxes remained running and pushed the cluster to nine runtimes.",
-      "resolution": "Every completed lab sandbox now pauses and verifies PAUSED through the supported V1 API.",
+      "finding": "Finished sandboxes remained running and consumed nearly all demo capacity.",
+      "resolution": "Every completed sandbox pauses; every new launch is blocked at seven active runtimes.",
+      "state": "Resolved"
+    },
+    {
+      "title": "Placeholder identifier aliasing",
+      "finding": "Two agents copied item-a from the contract example instead of exact task ID a.",
+      "resolution": "Examples now use task-bound IDs; the two-conversation live regression validated 2/2.",
       "state": "Resolved"
     }
   ]
