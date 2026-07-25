@@ -1,0 +1,8 @@
+{
+  "id": "cycle-5",
+  "family": "graph-coloring",
+  "description": "Color a five-node cycle with as few colors as possible.",
+  "tags": ["graph-coloring", "cycle", "sparse"],
+  "nodes": ["0", "1", "2", "3", "4"],
+  "edges": [["0", "1"], ["1", "2"], ["2", "3"], ["3", "4"], ["4", "0"]]
+}

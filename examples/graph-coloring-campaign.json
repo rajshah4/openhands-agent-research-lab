@@ -1,0 +1,13 @@
+{
+  "id": "graph-coloring-demo",
+  "name": "Graph coloring research demo",
+  "policy": "managed",
+  "attempt_budget": 4,
+  "repository": "rajshah4/openhands-agent-research-lab",
+  "branch": "main",
+  "model": null,
+  "task_paths": [
+    "tasks/cycle-5.json",
+    "tasks/wheel-6.json"
+  ]
+}
