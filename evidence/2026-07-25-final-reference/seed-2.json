@@ -1,0 +1,791 @@
+{
+  "arms": {
+    "managed": {
+      "attempts": [
+        {
+          "candidate_hash": "fd4f27fe626146a760744d64bc29bd938b2c664458ad93f599ba28fff1775b01",
+          "contract": {
+            "next_gate": "validate",
+            "status": "done",
+            "summary": [
+              "K4,4 is a complete bipartite graph",
+              "All a-nodes assigned color 0",
+              "All b-nodes assigned color 1",
+              "2 colors used (optimal)",
+              "No adjacent nodes share a color"
+            ],
+            "transport": "exact-json",
+            "transport_compliant": true
+          },
+          "conversation": {
+            "conversation_id": "2d34fd64d1c54a569f771f116a55708f",
+            "execution_status": "finished",
+            "sandbox_id": "5RzjsEnShzvgF9uT4F7FXh",
+            "sandbox_status": "RUNNING",
+            "start_task_id": "e70d13a920954207b68d3931b3d4b8eb",
+            "terminal_status_recovered_from_events": false,
+            "ui_url": "https://app.replicated.rajistics.com/conversations/2d34fd64d1c54a569f771f116a55708f"
+          },
+          "duplicate_candidate": false,
+          "id": "attempt-0001-30fb0ce7",
+          "improved": true,
+          "outcome": "completed",
+          "promoted_lesson_id": "lesson-8f7a12bd8cf37bd9",
+          "retrieved_lesson_ids": [],
+          "sandbox_paused": true,
+          "scheduler_decision": {
+            "policy": "managed",
+            "policy_version": "1",
+            "rationale": "prioritized task coverage, then the weakest validated score, with relevant validated memory",
+            "retrieved_lesson_ids": [],
+            "task_id": "color-bipartite-8"
+          },
+          "sequence": 1,
+          "task_id": "color-bipartite-8",
+          "validation": {
+            "errors": [],
+            "score": 2.0,
+            "valid": true
+          },
+          "worker_kind": "openhands"
+        },
+        {
+          "candidate_hash": "37f373317a96f1b490a0ef48f71ac2aba76a02882ed9fb4640440f72bad27cef",
+          "contract": {
+            "next_gate": "validate",
+            "status": "done",
+            "summary": [
+              "Analyzed seven-node cycle graph structure",
+              "Applied alternating two-color pattern around cycle",
+              "Used third color for closing node to resolve parity conflict",
+              "Verified all adjacent nodes have different colors"
+            ],
+            "transport": "fenced-json-fallback",
+            "transport_compliant": false
+          },
+          "conversation": {
+            "conversation_id": "79ce2e78f1bc4c7cbf3315ec3da5966a",
+            "execution_status": "finished",
+            "sandbox_id": "7E0nMCDukp3L6fz6aRBF5k",
+            "sandbox_status": "RUNNING",
+            "start_task_id": "77a7ab2307a3445787d94055891b9c08",
+            "terminal_status_recovered_from_events": false,
+            "ui_url": "https://app.replicated.rajistics.com/conversations/79ce2e78f1bc4c7cbf3315ec3da5966a"
+          },
+          "duplicate_candidate": false,
+          "id": "attempt-0002-be22e435",
+          "improved": true,
+          "outcome": "completed",
+          "promoted_lesson_id": "lesson-9eeb153f6bfa78dd",
+          "retrieved_lesson_ids": [
+            "lesson-8f7a12bd8cf37bd9"
+          ],
+          "sandbox_paused": true,
+          "scheduler_decision": {
+            "policy": "managed",
+            "policy_version": "1",
+            "rationale": "prioritized task coverage, then the weakest validated score, with relevant validated memory",
+            "retrieved_lesson_ids": [
+              "lesson-8f7a12bd8cf37bd9"
+            ],
+            "task_id": "color-cycle-7"
+          },
+          "sequence": 2,
+          "task_id": "color-cycle-7",
+          "validation": {
+            "errors": [],
+            "score": 3.0,
+            "valid": true
+          },
+          "worker_kind": "openhands"
+        },
+        {
+          "candidate_hash": "e153b215e8d43ce4e19d1fc7ccf65aa98ff446f5c72ce100c6f76ab2b9620289",
+          "contract": {
+            "next_gate": "validate",
+            "status": "done",
+            "summary": [
+              "Analyzed 9 available sets for 6-element universe",
+              "Identified alpha and beta as perfect partition",
+              "Selected 2 sets covering all elements optimally",
+              "No other combination uses fewer sets"
+            ],
+            "transport": "fenced-json-fallback",
+            "transport_compliant": false
+          },
+          "conversation": {
+            "conversation_id": "ec32563f4ee44eaaba9a4ad590913052",
+            "execution_status": "finished",
+            "sandbox_id": "21bpYMjfULBweZm7nhDUP9",
+            "sandbox_status": "RUNNING",
+            "start_task_id": "54ae893e7c254f05ae4bbde46fde2367",
+            "terminal_status_recovered_from_events": false,
+            "ui_url": "https://app.replicated.rajistics.com/conversations/ec32563f4ee44eaaba9a4ad590913052"
+          },
+          "duplicate_candidate": false,
+          "id": "attempt-0003-e18e26c3",
+          "improved": true,
+          "outcome": "completed",
+          "promoted_lesson_id": "lesson-20b87dcae3573e8d",
+          "retrieved_lesson_ids": [],
+          "sandbox_paused": true,
+          "scheduler_decision": {
+            "policy": "managed",
+            "policy_version": "1",
+            "rationale": "prioritized task coverage, then the weakest validated score, with relevant validated memory",
+            "retrieved_lesson_ids": [],
+            "task_id": "cover-campus"
+          },
+          "sequence": 3,
+          "task_id": "cover-campus",
+          "validation": {
+            "errors": [],
+            "score": 2.0,
+            "valid": true
+          },
+          "worker_kind": "openhands"
+        },
+        {
+          "candidate_hash": "7f3c1e94b219a99fec25faab4b2726087ccb848e95e43d422b2a5285c1c4f8ac",
+          "contract": {
+            "next_gate": "validate",
+            "status": "done",
+            "summary": [
+              "Identified north and south as partition sets",
+              "Sets cover all 8 elements with no overlap",
+              "Optimal solution uses 2 sets",
+              "Applied partition-based coverage lesson"
+            ],
+            "transport": "trailing-json-fallback",
+            "transport_compliant": false
+          },
+          "conversation": {
+            "conversation_id": "779957c30b91449c876667154f7c0f72",
+            "execution_status": "finished",
+            "sandbox_id": "3RM1kEsdJAuGG18b3H1EOg",
+            "sandbox_status": "RUNNING",
+            "start_task_id": "ae875967b84e410ca4ab33f8a99532d7",
+            "terminal_status_recovered_from_events": false,
+            "ui_url": "https://app.replicated.rajistics.com/conversations/779957c30b91449c876667154f7c0f72"
+          },
+          "duplicate_candidate": false,
+          "id": "attempt-0004-f2c8d09d",
+          "improved": true,
+          "outcome": "completed",
+          "promoted_lesson_id": "lesson-af214d770fb2b72e",
+          "retrieved_lesson_ids": [
+            "lesson-20b87dcae3573e8d"
+          ],
+          "sandbox_paused": true,
+          "scheduler_decision": {
+            "policy": "managed",
+            "policy_version": "1",
+            "rationale": "prioritized task coverage, then the weakest validated score, with relevant validated memory",
+            "retrieved_lesson_ids": [
+              "lesson-20b87dcae3573e8d"
+            ],
+            "task_id": "cover-grid"
+          },
+          "sequence": 4,
+          "task_id": "cover-grid",
+          "validation": {
+            "errors": [],
+            "score": 2.0,
+            "valid": true
+          },
+          "worker_kind": "openhands"
+        },
+        {
+          "candidate_hash": "738453fa17973db30c83be8958178827806440a58b7b8bb63d53a762412f4dc2",
+          "contract": {
+            "next_gate": "validate",
+            "status": "done",
+            "summary": [
+              "Packed 4 items into 2 bins",
+              "Each bin uses full capacity of 10",
+              "Paired items a+c and b+d"
+            ],
+            "transport": "fenced-json-fallback",
+            "transport_compliant": false
+          },
+          "conversation": {
+            "conversation_id": "b3381e3a794d4cc09479bf84d972fcb0",
+            "execution_status": "finished",
+            "sandbox_id": "34kpAgM82Q5mgqBvLPCsZI",
+            "sandbox_status": "RUNNING",
+            "start_task_id": "77ba4c7c9aba4b669e0cf780a3e53223",
+            "terminal_status_recovered_from_events": false,
+            "ui_url": "https://app.replicated.rajistics.com/conversations/b3381e3a794d4cc09479bf84d972fcb0"
+          },
+          "duplicate_candidate": false,
+          "id": "attempt-0005-68c92286",
+          "improved": true,
+          "outcome": "completed",
+          "promoted_lesson_id": "lesson-e409de25c4419abe",
+          "retrieved_lesson_ids": [],
+          "sandbox_paused": true,
+          "scheduler_decision": {
+            "policy": "managed",
+            "policy_version": "1",
+            "rationale": "prioritized task coverage, then the weakest validated score, with relevant validated memory",
+            "retrieved_lesson_ids": [],
+            "task_id": "pack-alpha"
+          },
+          "sequence": 5,
+          "task_id": "pack-alpha",
+          "validation": {
+            "errors": [],
+            "score": 2.0,
+            "valid": true
+          },
+          "worker_kind": "openhands"
+        },
+        {
+          "candidate_hash": "738453fa17973db30c83be8958178827806440a58b7b8bb63d53a762412f4dc2",
+          "contract": {
+            "next_gate": "validate",
+            "status": "done",
+            "summary": [
+              "Paired items a(8) with c(2) in bin 1",
+              "Paired items b(8) with d(2) in bin 2",
+              "Achieved 2 bins with 100% utilization",
+              "Applied complementary weight pairing strategy"
+            ],
+            "transport": "fenced-json-fallback",
+            "transport_compliant": false
+          },
+          "conversation": {
+            "conversation_id": "c35db69866aa422d90892c5aa85017ec",
+            "execution_status": "finished",
+            "sandbox_id": "2Ez8yk18C6aH4KoFFG2gXd",
+            "sandbox_status": "RUNNING",
+            "start_task_id": "7c85c20c925140609a8297890c57355f",
+            "terminal_status_recovered_from_events": false,
+            "ui_url": "https://app.replicated.rajistics.com/conversations/c35db69866aa422d90892c5aa85017ec"
+          },
+          "duplicate_candidate": false,
+          "id": "attempt-0006-91a9f245",
+          "improved": true,
+          "outcome": "completed",
+          "promoted_lesson_id": "lesson-32528aad3688d466",
+          "retrieved_lesson_ids": [
+            "lesson-e409de25c4419abe"
+          ],
+          "sandbox_paused": true,
+          "scheduler_decision": {
+            "policy": "managed",
+            "policy_version": "1",
+            "rationale": "prioritized task coverage, then the weakest validated score, with relevant validated memory",
+            "retrieved_lesson_ids": [
+              "lesson-e409de25c4419abe"
+            ],
+            "task_id": "pack-beta"
+          },
+          "sequence": 6,
+          "task_id": "pack-beta",
+          "validation": {
+            "errors": [],
+            "score": 2.0,
+            "valid": true
+          },
+          "worker_kind": "openhands"
+        }
+      ],
+      "metrics": {
+        "aggregate_best_score": 13.0,
+        "attempts": 6,
+        "best_scores": {
+          "color-bipartite-8": 2.0,
+          "color-cycle-7": 3.0,
+          "cover-campus": 2.0,
+          "cover-grid": 2.0,
+          "pack-alpha": 2.0,
+          "pack-beta": 2.0
+        },
+        "coverage": 1.0,
+        "duplicate_experiments": 0,
+        "improvement_per_attempt": 1.0,
+        "improvements": 6,
+        "normalized_solution_quality": 1.0,
+        "problems_solved": 6,
+        "quality_auc": 0.5833333333333334,
+        "task_count": 6
+      },
+      "run_id": "multi-family-live-pilot-managed-20260725T222602Z-d3e7cc05",
+      "validated_lessons": [
+        {
+          "created_at": "2026-07-25T22:30:00.609424+00:00",
+          "evidence": "Sets alpha [1,2,3] and beta [4,5,6] perfectly partition universe [1,2,3,4,5,6] with zero overlap, achieving minimum coverage of 2 sets.",
+          "id": "lesson-20b87dcae3573e8d",
+          "source_attempt_id": "attempt-0003-e18e26c3",
+          "source_run_id": "multi-family-live-pilot-managed-20260725T222602Z-d3e7cc05",
+          "source_task_id": "cover-campus",
+          "statement": "When sets partition the universe without overlap, the optimal solution is those partition sets.",
+          "tags": [
+            "set-cover"
+          ]
+        },
+        {
+          "created_at": "2026-07-25T22:32:33.773616+00:00",
+          "evidence": "Items with weights 8,8,2,2 were paired as (8,2) and (8,2), filling two capacity-10 bins completely.",
+          "id": "lesson-32528aad3688d466",
+          "source_attempt_id": "attempt-0006-91a9f245",
+          "source_run_id": "multi-family-live-pilot-managed-20260725T222602Z-d3e7cc05",
+          "source_task_id": "pack-beta",
+          "statement": "Pairing heavy and light items achieves optimal bin utilization when their combined weights equal capacity.",
+          "tags": [
+            "bin-packing"
+          ]
+        },
+        {
+          "created_at": "2026-07-25T22:27:05.028114+00:00",
+          "evidence": "K4,4 bipartite graph colored with 2 colors by assigning color 0 to all a-partition nodes and color 1 to all b-partition nodes.",
+          "id": "lesson-8f7a12bd8cf37bd9",
+          "source_attempt_id": "attempt-0001-30fb0ce7",
+          "source_run_id": "multi-family-live-pilot-managed-20260725T222602Z-d3e7cc05",
+          "source_task_id": "color-bipartite-8",
+          "statement": "Complete bipartite graphs require exactly 2 colors: assign one color to each partition.",
+          "tags": [
+            "graph-coloring"
+          ]
+        },
+        {
+          "created_at": "2026-07-25T22:29:02.731524+00:00",
+          "evidence": "Seven-node odd cycle colored with 3 colors using alternating pattern (0,1,0,1,0,1) requiring third color (2) for final node to avoid conflict with both first and penultimate nodes.",
+          "id": "lesson-9eeb153f6bfa78dd",
+          "source_attempt_id": "attempt-0002-be22e435",
+          "source_run_id": "multi-family-live-pilot-managed-20260725T222602Z-d3e7cc05",
+          "source_task_id": "color-cycle-7",
+          "statement": "Odd-length cycles require exactly 3 colors due to parity constraint.",
+          "tags": [
+            "graph-coloring"
+          ]
+        },
+        {
+          "created_at": "2026-07-25T22:30:57.667192+00:00",
+          "evidence": "Sets north [a,b,c,d] and south [e,f,g,h] perfectly partition universe [a,b,c,d,e,f,g,h] with zero overlap, achieving minimum coverage of 2 sets.",
+          "id": "lesson-af214d770fb2b72e",
+          "source_attempt_id": "attempt-0004-f2c8d09d",
+          "source_run_id": "multi-family-live-pilot-managed-20260725T222602Z-d3e7cc05",
+          "source_task_id": "cover-grid",
+          "statement": "When two sets partition the universe into complementary halves, they form the optimal minimum set cover.",
+          "tags": [
+            "set-cover"
+          ]
+        },
+        {
+          "created_at": "2026-07-25T22:31:43.790201+00:00",
+          "evidence": "Items with weights 6,6,4,4 were paired as (6,4) and (6,4), filling two capacity-10 bins completely.",
+          "id": "lesson-e409de25c4419abe",
+          "source_attempt_id": "attempt-0005-68c92286",
+          "source_run_id": "multi-family-live-pilot-managed-20260725T222602Z-d3e7cc05",
+          "source_task_id": "pack-alpha",
+          "statement": "Pairing heavy and light items can achieve tight bin utilization when weights are complementary.",
+          "tags": [
+            "bin-packing"
+          ]
+        }
+      ]
+    },
+    "naive": {
+      "attempts": [
+        {
+          "candidate_hash": "fd4f27fe626146a760744d64bc29bd938b2c664458ad93f599ba28fff1775b01",
+          "contract": {
+            "next_gate": "validate",
+            "status": "done",
+            "summary": [
+              "Identified K4,4 as complete bipartite graph",
+              "Assigned color 0 to partition A (a1-a4)",
+              "Assigned color 1 to partition B (b1-b4)",
+              "Achieved optimal 2-coloring"
+            ],
+            "transport": "fenced-json-fallback",
+            "transport_compliant": false
+          },
+          "conversation": {
+            "conversation_id": "e3bb53bbf6c64549a90133c76360cb2f",
+            "execution_status": "finished",
+            "sandbox_id": "5gTSKSVcbtMkXpsyeTsa0w",
+            "sandbox_status": "RUNNING",
+            "start_task_id": "6913832314a848e8811de7e345f9f380",
+            "terminal_status_recovered_from_events": false,
+            "ui_url": "https://app.replicated.rajistics.com/conversations/e3bb53bbf6c64549a90133c76360cb2f"
+          },
+          "duplicate_candidate": false,
+          "id": "attempt-0001-44d50986",
+          "improved": true,
+          "outcome": "completed",
+          "promoted_lesson_id": "lesson-26815b446631cc7f",
+          "retrieved_lesson_ids": [],
+          "sandbox_paused": true,
+          "scheduler_decision": {
+            "policy": "round_robin",
+            "policy_version": "1",
+            "rationale": "selected the task with the fewest recorded attempts",
+            "retrieved_lesson_ids": [],
+            "task_id": "color-bipartite-8"
+          },
+          "sequence": 1,
+          "task_id": "color-bipartite-8",
+          "validation": {
+            "errors": [],
+            "score": 2.0,
+            "valid": true
+          },
+          "worker_kind": "openhands"
+        },
+        {
+          "candidate_hash": "37f373317a96f1b490a0ef48f71ac2aba76a02882ed9fb4640440f72bad27cef",
+          "contract": {
+            "next_gate": "validate",
+            "status": "done",
+            "summary": [
+              "Analyzed 7-node odd cycle structure",
+              "Applied alternating 2-color pattern to first 6 nodes",
+              "Used third color for cycle-closing node 6",
+              "Achieved optimal 3-coloring",
+              "All adjacency constraints satisfied"
+            ],
+            "transport": "fenced-json-fallback",
+            "transport_compliant": false
+          },
+          "conversation": {
+            "conversation_id": "bf321ea4ee814a0a8312c71a139d912f",
+            "execution_status": "finished",
+            "sandbox_id": "7hL4CdGYwBPPcKJtsuIPkf",
+            "sandbox_status": "RUNNING",
+            "start_task_id": "213c3f7db8664063b730880ceacc5dbd",
+            "terminal_status_recovered_from_events": false,
+            "ui_url": "https://app.replicated.rajistics.com/conversations/bf321ea4ee814a0a8312c71a139d912f"
+          },
+          "duplicate_candidate": false,
+          "id": "attempt-0002-35c6c695",
+          "improved": true,
+          "outcome": "completed",
+          "promoted_lesson_id": "lesson-a5fcc5858455e659",
+          "retrieved_lesson_ids": [],
+          "sandbox_paused": true,
+          "scheduler_decision": {
+            "policy": "round_robin",
+            "policy_version": "1",
+            "rationale": "selected the task with the fewest recorded attempts",
+            "retrieved_lesson_ids": [],
+            "task_id": "color-cycle-7"
+          },
+          "sequence": 2,
+          "task_id": "color-cycle-7",
+          "validation": {
+            "errors": [],
+            "score": 3.0,
+            "valid": true
+          },
+          "worker_kind": "openhands"
+        },
+        {
+          "candidate_hash": "e153b215e8d43ce4e19d1fc7ccf65aa98ff446f5c72ce100c6f76ab2b9620289",
+          "contract": {
+            "next_gate": "validate",
+            "status": "done",
+            "summary": [
+              "Universe has 6 elements: 1-6",
+              "Alpha covers 1,2,3 and beta covers 4,5,6",
+              "Optimal solution uses 2 sets",
+              "All elements covered with no redundancy"
+            ],
+            "transport": "fenced-json-fallback",
+            "transport_compliant": false
+          },
+          "conversation": {
+            "conversation_id": "af6a1fc563434a9cab37862120db5526",
+            "execution_status": "finished",
+            "sandbox_id": "4sx9mx8jdCzjN8fonFXizl",
+            "sandbox_status": "RUNNING",
+            "start_task_id": "79b15581b33d42d89cf660b9642d229d",
+            "terminal_status_recovered_from_events": false,
+            "ui_url": "https://app.replicated.rajistics.com/conversations/af6a1fc563434a9cab37862120db5526"
+          },
+          "duplicate_candidate": false,
+          "id": "attempt-0003-1302fb0c",
+          "improved": true,
+          "outcome": "completed",
+          "promoted_lesson_id": "lesson-4cff43bc033b8827",
+          "retrieved_lesson_ids": [],
+          "sandbox_paused": true,
+          "scheduler_decision": {
+            "policy": "round_robin",
+            "policy_version": "1",
+            "rationale": "selected the task with the fewest recorded attempts",
+            "retrieved_lesson_ids": [],
+            "task_id": "cover-campus"
+          },
+          "sequence": 3,
+          "task_id": "cover-campus",
+          "validation": {
+            "errors": [],
+            "score": 2.0,
+            "valid": true
+          },
+          "worker_kind": "openhands"
+        },
+        {
+          "candidate_hash": "7f3c1e94b219a99fec25faab4b2726087ccb848e95e43d422b2a5285c1c4f8ac",
+          "contract": {
+            "next_gate": "validate",
+            "status": "done",
+            "summary": [
+              "Identified 8-element universe a-h",
+              "Found north covers {a,b,c,d}",
+              "Found south covers {e,f,g,h}",
+              "Perfect partition requires 2 sets",
+              "Optimal solution: north and south"
+            ],
+            "transport": "trailing-json-fallback",
+            "transport_compliant": false
+          },
+          "conversation": {
+            "conversation_id": "3853da3ed6f44cfcab80b81ac17ad9a3",
+            "execution_status": "finished",
+            "sandbox_id": "67oS0KtxReqn0F1p7SYZMK",
+            "sandbox_status": "RUNNING",
+            "start_task_id": "32b46dccb5744d6da1f64421d2d64f3a",
+            "terminal_status_recovered_from_events": false,
+            "ui_url": "https://app.replicated.rajistics.com/conversations/3853da3ed6f44cfcab80b81ac17ad9a3"
+          },
+          "duplicate_candidate": false,
+          "id": "attempt-0004-59dceca1",
+          "improved": true,
+          "outcome": "completed",
+          "promoted_lesson_id": "lesson-f3cf4a75f1360435",
+          "retrieved_lesson_ids": [],
+          "sandbox_paused": true,
+          "scheduler_decision": {
+            "policy": "round_robin",
+            "policy_version": "1",
+            "rationale": "selected the task with the fewest recorded attempts",
+            "retrieved_lesson_ids": [],
+            "task_id": "cover-grid"
+          },
+          "sequence": 4,
+          "task_id": "cover-grid",
+          "validation": {
+            "errors": [],
+            "score": 2.0,
+            "valid": true
+          },
+          "worker_kind": "openhands"
+        },
+        {
+          "candidate_hash": "738453fa17973db30c83be8958178827806440a58b7b8bb63d53a762412f4dc2",
+          "contract": {
+            "next_gate": "validate",
+            "status": "done",
+            "summary": [
+              "Packed 4 items into 2 bins",
+              "Paired a+c and b+d",
+              "Achieved 100% bin utilization"
+            ],
+            "transport": "fenced-json-fallback",
+            "transport_compliant": false
+          },
+          "conversation": {
+            "conversation_id": "9479d51968ab4ba9bd3713dec28dd56a",
+            "execution_status": "finished",
+            "sandbox_id": "42ol7eOovjevkMIsHgggZ6",
+            "sandbox_status": "RUNNING",
+            "start_task_id": "061e30ecb3fd4d80b2ea55387446facb",
+            "terminal_status_recovered_from_events": false,
+            "ui_url": "https://app.replicated.rajistics.com/conversations/9479d51968ab4ba9bd3713dec28dd56a"
+          },
+          "duplicate_candidate": false,
+          "id": "attempt-0005-5b178bab",
+          "improved": true,
+          "outcome": "completed",
+          "promoted_lesson_id": "lesson-9fe9b5c855c69cbc",
+          "retrieved_lesson_ids": [],
+          "sandbox_paused": true,
+          "scheduler_decision": {
+            "policy": "round_robin",
+            "policy_version": "1",
+            "rationale": "selected the task with the fewest recorded attempts",
+            "retrieved_lesson_ids": [],
+            "task_id": "pack-alpha"
+          },
+          "sequence": 5,
+          "task_id": "pack-alpha",
+          "validation": {
+            "errors": [],
+            "score": 2.0,
+            "valid": true
+          },
+          "worker_kind": "openhands"
+        },
+        {
+          "candidate_hash": "738453fa17973db30c83be8958178827806440a58b7b8bb63d53a762412f4dc2",
+          "contract": {
+            "next_gate": "validate",
+            "status": "done",
+            "summary": [
+              "Packed 4 items into 2 bins",
+              "Bin 1: a(8) + c(2) = 10",
+              "Bin 2: b(8) + d(2) = 10",
+              "Both bins at full capacity",
+              "Optimal solution achieved"
+            ],
+            "transport": "fenced-json-fallback",
+            "transport_compliant": false
+          },
+          "conversation": {
+            "conversation_id": "8646733f477f4fc3b50b00dda526bd2a",
+            "execution_status": "finished",
+            "sandbox_id": "1nnBmJgkO0pUr9DPv5iAgB",
+            "sandbox_status": "RUNNING",
+            "start_task_id": "75c9fa0096ac47bfb10585f5dcad56e6",
+            "terminal_status_recovered_from_events": false,
+            "ui_url": "https://app.replicated.rajistics.com/conversations/8646733f477f4fc3b50b00dda526bd2a"
+          },
+          "duplicate_candidate": false,
+          "id": "attempt-0006-cafe03d8",
+          "improved": true,
+          "outcome": "completed",
+          "promoted_lesson_id": "lesson-ab8f10c9b298fb90",
+          "retrieved_lesson_ids": [],
+          "sandbox_paused": true,
+          "scheduler_decision": {
+            "policy": "round_robin",
+            "policy_version": "1",
+            "rationale": "selected the task with the fewest recorded attempts",
+            "retrieved_lesson_ids": [],
+            "task_id": "pack-beta"
+          },
+          "sequence": 6,
+          "task_id": "pack-beta",
+          "validation": {
+            "errors": [],
+            "score": 2.0,
+            "valid": true
+          },
+          "worker_kind": "openhands"
+        }
+      ],
+      "metrics": {
+        "aggregate_best_score": 13.0,
+        "attempts": 6,
+        "best_scores": {
+          "color-bipartite-8": 2.0,
+          "color-cycle-7": 3.0,
+          "cover-campus": 2.0,
+          "cover-grid": 2.0,
+          "pack-alpha": 2.0,
+          "pack-beta": 2.0
+        },
+        "coverage": 1.0,
+        "duplicate_experiments": 0,
+        "improvement_per_attempt": 1.0,
+        "improvements": 6,
+        "normalized_solution_quality": 1.0,
+        "problems_solved": 6,
+        "quality_auc": 0.5833333333333334,
+        "task_count": 6
+      },
+      "run_id": "multi-family-live-pilot-naive-20260725T222010Z-cc899cdd",
+      "validated_lessons": [
+        {
+          "created_at": "2026-07-25T22:21:01.877308+00:00",
+          "evidence": "K4,4 was colored with 2 colors by assigning color 0 to all nodes in partition A and color 1 to all nodes in partition B, satisfying all edge constraints.",
+          "id": "lesson-26815b446631cc7f",
+          "source_attempt_id": "attempt-0001-44d50986",
+          "source_run_id": "multi-family-live-pilot-naive-20260725T222010Z-cc899cdd",
+          "source_task_id": "color-bipartite-8",
+          "statement": "Complete bipartite graphs have chromatic number 2; assign one color to each partition.",
+          "tags": [
+            "graph-coloring"
+          ]
+        },
+        {
+          "created_at": "2026-07-25T22:23:15.512286+00:00",
+          "evidence": "Sets alpha [1,2,3] and beta [4,5,6] cover universe [1,2,3,4,5,6] with no overlap, achieving the minimum of 2 sets.",
+          "id": "lesson-4cff43bc033b8827",
+          "source_attempt_id": "attempt-0003-1302fb0c",
+          "source_run_id": "multi-family-live-pilot-naive-20260725T222010Z-cc899cdd",
+          "source_task_id": "cover-campus",
+          "statement": "When sets partition the universe with no overlap, the optimal solution uses exactly those disjoint sets.",
+          "tags": [
+            "set-cover"
+          ]
+        },
+        {
+          "created_at": "2026-07-25T22:25:02.025034+00:00",
+          "evidence": "Items with weights 6,6,4,4 packed into two capacity-10 bins by pairing each 6-weight item with a 4-weight item, achieving perfect utilization.",
+          "id": "lesson-9fe9b5c855c69cbc",
+          "source_attempt_id": "attempt-0005-5b178bab",
+          "source_run_id": "multi-family-live-pilot-naive-20260725T222010Z-cc899cdd",
+          "source_task_id": "pack-alpha",
+          "statement": "When total weight divides evenly by capacity, pair complementary items to minimize bins.",
+          "tags": [
+            "bin-packing"
+          ]
+        },
+        {
+          "created_at": "2026-07-25T22:22:19.593570+00:00",
+          "evidence": "A 7-node odd cycle requires exactly 3 colors. Alternating 2 colors covers 6 nodes, but the 7th node closing the cycle is adjacent to nodes with both colors.",
+          "id": "lesson-a5fcc5858455e659",
+          "source_attempt_id": "attempt-0002-35c6c695",
+          "source_run_id": "multi-family-live-pilot-naive-20260725T222010Z-cc899cdd",
+          "source_task_id": "color-cycle-7",
+          "statement": "Odd cycles have chromatic number 3; use alternating colors for n-1 nodes and a third color for the closing node.",
+          "tags": [
+            "graph-coloring"
+          ]
+        },
+        {
+          "created_at": "2026-07-25T22:26:02.613732+00:00",
+          "evidence": "Packed items totaling weight 20 into 2 bins of capacity 10 by pairing each large item (weight 8) with a small item (weight 2) to reach exact capacity.",
+          "id": "lesson-ab8f10c9b298fb90",
+          "source_attempt_id": "attempt-0006-cafe03d8",
+          "source_run_id": "multi-family-live-pilot-naive-20260725T222010Z-cc899cdd",
+          "source_task_id": "pack-beta",
+          "statement": "Pairing large items with complementary small items that sum to bin capacity maximizes utilization and minimizes bin count.",
+          "tags": [
+            "bin-packing"
+          ]
+        },
+        {
+          "created_at": "2026-07-25T22:24:16.545252+00:00",
+          "evidence": "north and south perfectly partition the 8-element universe into two disjoint sets of 4 elements each, requiring only 2 sets.",
+          "id": "lesson-f3cf4a75f1360435",
+          "source_attempt_id": "attempt-0004-59dceca1",
+          "source_run_id": "multi-family-live-pilot-naive-20260725T222010Z-cc899cdd",
+          "source_task_id": "cover-grid",
+          "statement": "When sets partition the universe, the partition provides the minimum cover.",
+          "tags": [
+            "set-cover"
+          ]
+        }
+      ]
+    }
+  },
+  "comparison": {
+    "attempt_budget": 6,
+    "campaign_id": "multi-family-live-pilot",
+    "created_at": "2026-07-25T22:32:33.777870+00:00",
+    "id": "multi-family-live-pilot-comparison-20260725T222010Z-5d5ecc3e",
+    "matched_configuration": {
+      "branch": "main",
+      "model": null,
+      "repository": "rajshah4/openhands-agent-research-lab",
+      "task_ids": [
+        "color-bipartite-8",
+        "color-cycle-7",
+        "cover-campus",
+        "cover-grid",
+        "pack-alpha",
+        "pack-beta"
+      ]
+    },
+    "task_count": 6,
+    "worker_kind": "OpenHandsWorker"
+  },
+  "generated_at": "2026-07-25T22:39:36.709221+00:00",
+  "schema_version": 1
+}

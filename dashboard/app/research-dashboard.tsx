@@ -139,6 +139,12 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
             >
               View the public repository <span aria-hidden="true">↗</span>
             </a>
+            <a
+              href="https://github.com/rajshah4/openhands-agent-research-lab/tree/main/evidence/2026-07-25-final-reference"
+              className="text-action"
+            >
+              Download final evidence <span aria-hidden="true">↗</span>
+            </a>
           </div>
         </div>
 
@@ -192,7 +198,7 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
           <small>all passing</small>
         </div>
         <div>
-          <span>Recent live attempts</span>
+          <span>Post-fix live attempts</span>
           <strong>
             {snapshot.proof.validAttempts}/{snapshot.proof.liveAttempts}
           </strong>
@@ -248,13 +254,13 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
           <section className="section comparison">
             <div className="section-heading">
               <div>
-                <p className="eyebrow">Matched live pilot</p>
+                <p className="eyebrow">Three matched live seeds</p>
                 <h2>Same budget. Different organization.</h2>
               </div>
               <p>
-                Both arms used the same six tasks and budget. The validator
-                exposed two managed prompt-contract failures that a confidence
-                score would have missed.
+                Each seed used the same six tasks and budget per arm. All 36
+                post-fix conversations produced independently valid candidates
+                and released their runtime capacity.
               </p>
             </div>
             <div className="comparison-grid">
@@ -292,11 +298,12 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
               })}
               <article className="finding-card">
                 <span className="finding-label">Honest finding</span>
-                <strong>Validation found a prompt defect, then proved its fix.</strong>
+                <strong>Reliability is proven. Quality separation is not.</strong>
                 <p>
-                  Placeholder item IDs invalidated two managed candidates. A
-                  corrected two-conversation regression then validated 2/2 at
-                  the optimal score.
+                  Naive and managed both reached every target on these small
+                  tasks. The managed arm exercised validated retrieval nine
+                  times, but harder tasks are required to measure its quality
+                  advantage.
                 </p>
               </article>
             </div>
@@ -308,7 +315,7 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
         <section className="section" id="live-agents">
           <div className="section-heading agents-heading">
             <div>
-              <p className="eyebrow">Experiment ledger</p>
+              <p className="eyebrow">Representative experiment ledger</p>
               <h2>Every agent leaves a verifiable trail.</h2>
             </div>
             <div className="filter-row" aria-label="Filter experiments">
@@ -444,19 +451,19 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
       <section className="section next-gate">
         <div>
           <p className="eyebrow">Next proof gate</p>
-          <h2>Observable scale, without overwhelming the demo cluster.</h2>
+          <h2>Move from reliable orchestration to discriminating research.</h2>
         </div>
         <ol>
           <li>
-            <span>1</span>
-            Repeat the live comparison across three matched seeds.
+            <span>✓</span>
+            Three matched live seeds completed with 36/36 valid attempts.
           </li>
           <li>
-            <span>2</span>
+            <span>1</span>
             Add harder instances that separate model strategy quality.
           </li>
           <li>
-            <span>3</span>
+            <span>2</span>
             Add application-owned PostgreSQL only when controllers become
             concurrent.
           </li>

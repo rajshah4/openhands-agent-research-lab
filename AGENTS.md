@@ -50,6 +50,8 @@ PYTHONPATH=src python3 -m compileall -q src tests
 
 ## Scope
 
-Stage 1 supports graph-coloring tasks and a single controller. Read
-`docs/design.md` and `docs/live-validation.md` before expanding the scheduler,
-storage backend, or Enterprise integration.
+The reference implementation supports graph coloring, set cover, and bin
+packing with a single controller. Read `docs/design.md`,
+`docs/live-validation.md`, and
+`docs/build-your-own-research-organization.md` before expanding the scheduler,
+storage backend, benchmark registry, or Enterprise integration.

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-25T21:57:00Z",
+  "generatedAt": "2026-07-25T22:45:27Z",
   "environment": {
     "name": "Rajistics Replicated",
     "version": "0.24.0",
@@ -16,27 +16,27 @@
   },
   "proof": {
     "tests": 27,
-    "liveAttempts": 14,
-    "validAttempts": 12,
+    "liveAttempts": 36,
+    "validAttempts": 36,
     "invalidLessons": 0,
     "tasks": 12,
     "targetTasks": 20
   },
-  "comparisonTaskCount": 6,
+  "comparisonTaskCount": 18,
   "comparison": {
     "naive": {
-      "solved": 6,
+      "solved": 18,
       "quality": 1,
       "qualityAuc": 0.583,
       "duplicates": 0,
       "retrievedLessons": 0
     },
     "managed": {
-      "solved": 4,
-      "quality": 0.667,
-      "qualityAuc": 0.5,
+      "solved": 18,
+      "quality": 1,
+      "qualityAuc": 0.583,
       "duplicates": 0,
-      "retrievedLessons": 2
+      "retrievedLessons": 9
     }
   },
   "agents": [

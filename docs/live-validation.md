@@ -276,3 +276,49 @@ One fresh end-to-end validation then confirmed:
 This closes the retained-sandbox capacity leak for research-lab initiated
 conversations while preserving their OpenHands conversation history and local
 evidence.
+
+## Stage 3 final post-fix reference
+
+Date: 2026-07-25
+
+Three fresh matched comparisons were run after the task-bound identifier fix.
+Each replicate used six public tasks per arm across graph coloring, set cover,
+and bin packing. The arms used the same repository, branch, worker backend,
+model configuration, timeouts, and six-attempt budget. Their stores were
+isolated.
+
+| Aggregate metric | Naive | Managed |
+| --- | ---: | ---: |
+| Attempts | 18 | 18 |
+| Independently valid | 18/18 | 18/18 |
+| Problems solved | 18/18 | 18/18 |
+| Mean normalized solution quality | 1.000 | 1.000 |
+| Mean quality AUC | 0.583 | 0.583 |
+| Retrieved validated lessons | 0 | 9 |
+| Duplicate experiments | 0 | 0 |
+
+Operational result:
+
+- 36/36 conversations produced independently valid candidates.
+- 36/36 improving attempts were recorded.
+- 36/36 sandboxes reached the verified `PAUSED` state.
+- No invalid lesson was promoted.
+- Final preflight: 0 active, 148 paused, 6 missing, launch gate open.
+- Contract transport: 2 exact JSON, 21 fenced-JSON fallback, 13 trailing-JSON
+  fallback.
+
+Comparison IDs:
+
+- `multi-family-live-pilot-comparison-20260725T220810Z-994beb58`
+- `multi-family-live-pilot-comparison-20260725T222010Z-5d5ecc3e`
+- `multi-family-live-pilot-comparison-20260725T223247Z-8a7fd212`
+
+Conclusion:
+
+The production-shaped orchestration path is reliable across repeated live
+conversations, validated memory crosses conversation boundaries, and capacity
+is released without deleting conversation history. The six-task live benchmark
+does not separate organization quality because both arms reach every target.
+The next live gate is a harder benchmark where retrieved techniques can alter
+solution quality. Multi-controller work should introduce an application-owned
+database behind `ResearchStore`, not manipulate OpenHands internal tables.

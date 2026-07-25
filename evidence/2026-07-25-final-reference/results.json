@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-25T22:45:27Z",
+  "environment": {
+    "name": "Rajistics Replicated",
+    "openhands_enterprise_version": "0.24.0",
+    "repository": "rajshah4/openhands-agent-research-lab",
+    "branch": "main",
+    "prompt_fix_revision": "830015a",
+    "worker_kind": "OpenHandsWorker"
+  },
+  "experiment": {
+    "campaign_id": "multi-family-live-pilot",
+    "replicates": 3,
+    "arms": [
+      "naive",
+      "managed"
+    ],
+    "tasks_per_arm_per_replicate": 6,
+    "attempts_per_arm_per_replicate": 6,
+    "new_conversation_concurrency": 1,
+    "runtime_limit": 10,
+    "launch_lock_at": 7
+  },
+  "comparisons": [
+    {
+      "seed": 1,
+      "id": "multi-family-live-pilot-comparison-20260725T220810Z-994beb58",
+      "naive": {
+        "problems_solved": 6,
+        "normalized_solution_quality": 1.0,
+        "quality_auc": 0.5833333333333334
+      },
+      "managed": {
+        "problems_solved": 6,
+        "normalized_solution_quality": 1.0,
+        "quality_auc": 0.5833333333333334,
+        "retrieved_lessons": 3
+      },
+      "valid_attempts": 12,
+      "attempts": 12,
+      "sandboxes_paused": 12
+    },
+    {
+      "seed": 2,
+      "id": "multi-family-live-pilot-comparison-20260725T222010Z-5d5ecc3e",
+      "naive": {
+        "problems_solved": 6,
+        "normalized_solution_quality": 1.0,
+        "quality_auc": 0.5833333333333334
+      },
+      "managed": {
+        "problems_solved": 6,
+        "normalized_solution_quality": 1.0,
+        "quality_auc": 0.5833333333333334,
+        "retrieved_lessons": 3
+      },
+      "valid_attempts": 12,
+      "attempts": 12,
+      "sandboxes_paused": 12
+    },
+    {
+      "seed": 3,
+      "id": "multi-family-live-pilot-comparison-20260725T223247Z-8a7fd212",
+      "naive": {
+        "problems_solved": 6,
+        "normalized_solution_quality": 1.0,
+        "quality_auc": 0.5833333333333334
+      },
+      "managed": {
+        "problems_solved": 6,
+        "normalized_solution_quality": 1.0,
+        "quality_auc": 0.5833333333333334,
+        "retrieved_lessons": 3
+      },
+      "valid_attempts": 12,
+      "attempts": 12,
+      "sandboxes_paused": 12
+    }
+  ],
+  "aggregate": {
+    "attempts": 36,
+    "valid_attempts": 36,
+    "improving_attempts": 36,
+    "sandboxes_paused": 36,
+    "naive": {
+      "problems_solved": 18,
+      "opportunities": 18,
+      "mean_normalized_solution_quality": 1.0,
+      "mean_quality_auc": 0.5833333333333334,
+      "retrieved_lessons": 0
+    },
+    "managed": {
+      "problems_solved": 18,
+      "opportunities": 18,
+      "mean_normalized_solution_quality": 1.0,
+      "mean_quality_auc": 0.5833333333333334,
+      "retrieved_lessons": 9
+    },
+    "contract_transport": {
+      "exact_json": 2,
+      "fenced_json_fallback": 21,
+      "trailing_json_fallback": 13
+    },
+    "invalid_lessons_promoted": 0
+  },
+  "final_capacity": {
+    "active": 0,
+    "runtime_limit": 10,
+    "launch_allowed": true,
+    "visible_status_counts": {
+      "PAUSED": 148,
+      "MISSING": 6
+    }
+  },
+  "controlled_offline_reference": {
+    "campaign_id": "multi-family-scale",
+    "tasks_per_arm": 12,
+    "naive_normalized_solution_quality": 0.6696428571428571,
+    "managed_normalized_solution_quality": 0.8888888888888888
+  },
+  "interpretation": {
+    "supported": [
+      "The bounded OpenHands execution, validation, retrieval, evidence, and automatic-pause paths completed reliably across three matched replicates.",
+      "Validated memory crossed conversation boundaries without a separate database.",
+      "Independent validation prevented invalid output from entering shared memory."
+    ],
+    "not_supported": [
+      "The six small live tasks do not demonstrate a managed quality advantage because both arms reached every target.",
+      "The sequential single-controller run does not establish multi-controller database concurrency."
+    ],
+    "next_gate": "Use harder live tasks where retrieved techniques can change solution quality; add an application-owned PostgreSQL store only when controllers become concurrent."
+  }
+}
