@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-07-25",
+  "comparison_scope": "sequential trusted-agent infrastructure comparison",
+  "common_configuration": {
+    "sandbox_grouping_strategy": "FEWEST_CONVERSATIONS",
+    "controller_poll_seconds": 5,
+    "runtime_limit": 10,
+    "launch_lock_at": 7,
+    "repository": "rajshah4/openhands-agent-research-lab",
+    "branch": "main"
+  },
+  "cap_4": {
+    "attempts": 5,
+    "valid_candidates": 5,
+    "duplicate_candidates": 0,
+    "sandboxes": 2,
+    "conversations_per_sandbox_observed": 2.5,
+    "new_sandbox_share": 0.4,
+    "startup_seconds": {
+      "mean": 10.646,
+      "median": 10.677,
+      "minimum": 10.577,
+      "maximum": 10.701
+    },
+    "attempt_seconds": {
+      "mean": 52.081,
+      "median": 50.469,
+      "minimum": 45.986,
+      "maximum": 61.755,
+      "sum": 260.406
+    }
+  },
+  "cap_6": {
+    "attempts": 7,
+    "valid_candidates": 7,
+    "duplicate_candidates": 1,
+    "sandboxes": 2,
+    "conversations_per_sandbox_observed": 3.5,
+    "new_sandbox_share": 0.2857,
+    "startup_seconds": {
+      "mean": 10.671,
+      "median": 10.651,
+      "minimum": 10.576,
+      "maximum": 10.82
+    },
+    "attempt_seconds": {
+      "mean": 51.855,
+      "median": 51.238,
+      "minimum": 42.772,
+      "maximum": 62.583,
+      "sum": 362.987
+    },
+    "first_sandbox_id": "7f75DQBvPTisvIWsdB3yrm",
+    "first_sandbox_conversations": 6,
+    "rollover_sandbox_id": "5s8ytFBTrc4PYQ6n87JpRa",
+    "rollover_after_conversations": 6
+  },
+  "matched_first_four": {
+    "cap_4_startup_mean_seconds": 10.632527,
+    "cap_6_startup_mean_seconds": 10.632824,
+    "startup_change_percent": 0.0028,
+    "cap_4_attempt_mean_seconds": 53.604843,
+    "cap_6_attempt_mean_seconds": 50.154072,
+    "attempt_change_percent": -6.4374,
+    "interpretation": "Mixed per-task results and model-dominated execution; do not attribute the mean change to the cap without repeated runs."
+  },
+  "capacity_effect": {
+    "observed_conversations_per_sandbox_change_percent": 40.0,
+    "configured_capacity_change_percent": 50.0,
+    "five_or_six_conversation_batch_sandboxes_cap_4": 2,
+    "five_or_six_conversation_batch_sandboxes_cap_6": 1
+  },
+  "final_state": {
+    "cap_6_active": true,
+    "test_sandboxes_paused": true,
+    "running_runtime_pods": 1,
+    "unhealthy_pods": 0
+  },
+  "limitations": [
+    "Sequential execution only; this does not validate six simultaneous agents in one sandbox.",
+    "Five-second polling limits startup timing resolution.",
+    "Model execution variance dominates these short end-to-end attempt times.",
+    "The cap is a Kubernetes deployment override rather than durable Replicated configuration."
+  ]
+}
