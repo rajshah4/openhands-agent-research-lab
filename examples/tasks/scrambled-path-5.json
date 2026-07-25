@@ -1,0 +1,9 @@
+{
+  "id": "scrambled-path-5",
+  "family": "graph-coloring",
+  "description": "Color a five-node path whose input order is adversarial for naive greedy coloring.",
+  "tags": ["graph-coloring", "path", "ordering"],
+  "target_score": 2,
+  "nodes": ["0", "1", "2", "3", "4"],
+  "edges": [["0", "1"], ["0", "3"], ["2", "4"], ["3", "4"]]
+}

@@ -22,12 +22,16 @@ class WorkerBackend(Protocol):
     ) -> WorkerExecution: ...
 
 
-def _greedy_coloring(task: TaskSpec) -> dict[str, int]:
+def _greedy_coloring(task: TaskSpec, *, use_validated_memory: bool) -> dict[str, int]:
     adjacency: dict[str, set[str]] = {node: set() for node in task.nodes}
     for left, right in task.edges:
         adjacency[left].add(right)
         adjacency[right].add(left)
-    order = sorted(task.nodes, key=lambda node: (-len(adjacency[node]), node))
+    order = (
+        sorted(task.nodes, key=lambda node: (-len(adjacency[node]), node))
+        if use_validated_memory
+        else list(task.nodes)
+    )
     assignments: dict[str, int] = {}
     for node in order:
         used = {assignments[neighbor] for neighbor in adjacency[node] if neighbor in assignments}
@@ -52,7 +56,13 @@ class LocalHeuristicWorker:
         on_lifecycle: Callable[[str, dict[str, Any]], None],
     ) -> WorkerExecution:
         on_lifecycle("worker_started", {"worker_kind": "local"})
-        assignments = _greedy_coloring(task)
+        use_validated_memory = any(
+            "high-degree" in lesson.statement.lower() for lesson in lessons
+        )
+        assignments = _greedy_coloring(
+            task,
+            use_validated_memory=use_validated_memory,
+        )
         contract = {
             "status": "done",
             "candidate": {"assignments": assignments},
@@ -70,7 +80,14 @@ class LocalHeuristicWorker:
         execution = WorkerExecution(
             final_text=json.dumps(contract, sort_keys=True),
             worker_kind="local",
-            metadata={"algorithm": "largest-degree-first"},
+            metadata={
+                "algorithm": (
+                    "largest-degree-first"
+                    if use_validated_memory
+                    else "input-order-greedy"
+                ),
+                "used_validated_memory": use_validated_memory,
+            },
         )
         on_lifecycle("final_response_ready", {"worker_kind": "local"})
         return execution

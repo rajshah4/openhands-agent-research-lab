@@ -19,6 +19,7 @@ class TaskSpec:
     tags: tuple[str, ...]
     nodes: tuple[str, ...]
     edges: tuple[tuple[str, str], ...]
+    target_score: float | None = None
 
     @classmethod
     def from_path(cls, path: Path) -> "TaskSpec":
@@ -30,6 +31,11 @@ class TaskSpec:
             tags=tuple(str(tag) for tag in data.get("tags", [])),
             nodes=tuple(str(node) for node in data["nodes"]),
             edges=tuple((str(edge[0]), str(edge[1])) for edge in data["edges"]),
+            target_score=(
+                float(data["target_score"])
+                if data.get("target_score") is not None
+                else None
+            ),
         )
 
     def to_dict(self) -> dict[str, Any]:

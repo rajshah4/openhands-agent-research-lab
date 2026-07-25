@@ -8,7 +8,7 @@ pool of workers explores candidates, deterministic validators decide what
 improved, and only evidence-backed lessons become memory for future attempts.
 It does not depend on Kaggle competition solutions or disputed solution dumps.
 
-## What Stage 1 proves
+## What the current stages prove
 
 - OpenHands conversations are first-class, isolated worker attempts.
 - The application owns scheduling, deterministic validation, and promotion.
@@ -17,6 +17,8 @@ It does not depend on Kaggle competition solutions or disputed solution dumps.
 - Storage is replaceable. The included filesystem store is a single-writer
   development backend; production stores implement the same interface.
 - The entire vertical slice can be tested offline before spending agent budget.
+- Naive and managed organizations can be compared with isolated stores and the
+  same tasks, worker, model configuration, and attempt budget.
 
 ## Architecture
 
@@ -55,6 +57,15 @@ Run the offline test suite:
 
 ```bash
 PYTHONPATH=src python3 -m unittest discover -s tests -v
+```
+
+Run the matched offline comparison:
+
+```bash
+PYTHONPATH=src python3 -m research_lab.cli compare \
+  --campaign examples/graph-coloring-campaign.json \
+  --store .lab-comparison \
+  --worker local
 ```
 
 Validate configuration for a live OpenHands run without creating a sandbox:
@@ -102,7 +113,11 @@ Stage 1 is an offline-tested vertical slice. Stage 2 has also passed against the
 Rajistics OpenHands Enterprise 0.24.0 Replicated deployment, including
 cross-conversation retrieval of a validated lesson. Two intermediate failed
 attempts were retained and led to hardened contract-envelope and final-event
-indexing behavior. The next gate is the matched naive-versus-managed experiment.
+indexing behavior. Stage 3 adds the matched naive-versus-managed harness and a
+deterministic offline result: managed memory improves normalized solution quality
+from 0.889 to 1.000 under the same four-attempt budget. Duplicate work remains
+tied, identifying experiment diversification as the next scheduler improvement.
 
 See [the design](docs/design.md), [the framing record](FRAMING.md), and the
-[live validation log](docs/live-validation.md).
+[live validation log](docs/live-validation.md). The metric definitions and
+comparison limits are in [the matched-comparison note](docs/matched-comparison.md).

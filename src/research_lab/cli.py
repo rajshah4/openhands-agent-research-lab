@@ -8,6 +8,7 @@ from dataclasses import replace
 from pathlib import Path
 
 from .domain import CampaignSpec
+from .comparison import MatchedComparisonRunner
 from .openhands import (
     OpenHandsAPIError,
     OpenHandsClient,
@@ -110,6 +111,32 @@ def command_run(args: argparse.Namespace) -> int:
     return 0
 
 
+def _worker(args: argparse.Namespace) -> LocalHeuristicWorker | OpenHandsWorker:
+    if args.worker == "openhands":
+        if not args.live:
+            raise ValueError(
+                "OpenHands execution creates real conversations; pass --live after preflight"
+            )
+        return OpenHandsWorker(
+            _client(args),
+            start_timeout_seconds=args.start_timeout,
+            execution_timeout_seconds=args.execution_timeout,
+            poll_seconds=args.poll_seconds,
+        )
+    return LocalHeuristicWorker()
+
+
+def command_compare(args: argparse.Namespace) -> int:
+    campaign = _campaign(args)
+    comparison_id, _, report = MatchedComparisonRunner(
+        root=args.store.resolve(),
+        worker=_worker(args),
+    ).run(campaign)
+    print(report)
+    print(f"Artifacts: {args.store.resolve() / 'comparisons' / comparison_id}")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Run bounded, validated research campaigns with OpenHands workers."
@@ -141,6 +168,18 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument("--execution-timeout", type=int, default=1800)
     run.add_argument("--poll-seconds", type=int, default=10)
     run.set_defaults(func=command_run)
+
+    compare = subparsers.add_parser(
+        "compare",
+        help="run isolated naive and managed arms with a matched fixed budget",
+    )
+    common(compare)
+    compare.add_argument("--store", type=Path, default=Path(".lab-comparison"))
+    compare.add_argument("--live", action="store_true")
+    compare.add_argument("--start-timeout", type=int, default=600)
+    compare.add_argument("--execution-timeout", type=int, default=1800)
+    compare.add_argument("--poll-seconds", type=int, default=10)
+    compare.set_defaults(func=command_compare)
     return parser
 
 

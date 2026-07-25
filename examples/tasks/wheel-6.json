@@ -3,6 +3,7 @@
   "family": "graph-coloring",
   "description": "Color a five-node cycle plus a central hub with as few colors as possible.",
   "tags": ["graph-coloring", "wheel", "hub"],
+  "target_score": 4,
   "nodes": ["0", "1", "2", "3", "4", "5"],
   "edges": [
     ["0", "1"], ["1", "2"], ["2", "3"], ["3", "4"], ["4", "0"],

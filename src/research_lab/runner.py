@@ -99,7 +99,13 @@ class CampaignRunner:
         for sequence in range(1, campaign.attempt_budget + 1):
             attempts = self.store.list_attempts(run_id)
             task, decision = self.scheduler.choose(campaign.tasks, attempts, self.store)
-            lessons = self.store.find_lessons(task.tags, limit=3)
+            available_lessons = self.store.find_lessons(task.tags, limit=3)
+            selected_lesson_ids = set(decision.retrieved_lesson_ids)
+            lessons = [
+                lesson
+                for lesson in available_lessons
+                if lesson.id in selected_lesson_ids
+            ]
             attempt_id = f"attempt-{sequence:04d}-{uuid.uuid4().hex[:8]}"
             started_at = utc_now()
 
@@ -213,7 +219,7 @@ class CampaignRunner:
         prior_hashes = {
             attempt.get("candidate_hash")
             for attempt in attempts_before
-            if attempt.get("candidate_hash")
+            if attempt.get("candidate_hash") and attempt.get("task_id") == task.id
         }
         prior_best = _best_score(attempts_before, task.id)
         improved = bool(
@@ -286,6 +292,7 @@ def build_report(
         f"- Attempts recorded: {len(attempts)}",
         f"- Valid candidates: {len(valid)}",
         f"- Duplicate candidates: {len(duplicates)}",
+        f"- Normalized solution quality: {_normalized_quality(campaign, attempts):.3f}",
         "",
         "## Task results",
         "",
@@ -334,3 +341,22 @@ def build_report(
         ]
     )
     return "\n".join(lines) + "\n"
+
+
+def _normalized_quality(
+    campaign: CampaignSpec,
+    attempts: list[dict[str, Any]],
+) -> float:
+    """Return mean target/best score, with unsolved tasks contributing zero."""
+    qualities: list[float] = []
+    for task in campaign.tasks:
+        best = _best_score(attempts, task.id)
+        if best is None:
+            qualities.append(0.0)
+        elif task.target_score is None:
+            qualities.append(1.0)
+        elif best <= 0:
+            qualities.append(0.0)
+        else:
+            qualities.append(min(1.0, task.target_score / best))
+    return sum(qualities) / len(qualities)
