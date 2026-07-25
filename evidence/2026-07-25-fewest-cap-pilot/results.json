@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-07-25",
+  "environment": {
+    "name": "Rajistics Replicated",
+    "enterprise_server_image": "images.r9.all-hands.dev/proxy/openhands/ghcr.io/openhands/enterprise-server:cloud-1.46.2",
+    "openhands_sdk": "1.36.0",
+    "sandbox_grouping_strategy": "FEWEST_CONVERSATIONS",
+    "max_conversations_per_sandbox": 4,
+    "runtime_limit": 10,
+    "launch_lock_at": 7
+  },
+  "result": {
+    "conversations": 5,
+    "valid_candidates": 5,
+    "duplicate_candidates": 0,
+    "sandboxes_used": 2,
+    "automatic_rollover_observed": true,
+    "rollover_after_conversations": 4,
+    "final_user_visible_active_sandboxes": 0,
+    "final_running_runtime_pods": 1,
+    "final_unhealthy_pods": 0
+  },
+  "sandboxes": [
+    {
+      "id": "7leaYOpahJUNk1y4PK8Gyh",
+      "conversation_count": 4,
+      "final_status": "PAUSED"
+    },
+    {
+      "id": "1KiDBcML3xeGFhAtHoIgZg",
+      "conversation_count": 1,
+      "final_status": "PAUSED"
+    }
+  ],
+  "attempts": [
+    {
+      "sequence": 1,
+      "task_id": "color-bipartite-8",
+      "conversation_id": "b53ba136576343ecade1a21743106b07",
+      "sandbox_id": "7leaYOpahJUNk1y4PK8Gyh",
+      "valid": true,
+      "score": 2
+    },
+    {
+      "sequence": 2,
+      "task_id": "color-cycle-7",
+      "conversation_id": "95bbfd7bf12b4488b6bb2f92174e5f4c",
+      "sandbox_id": "7leaYOpahJUNk1y4PK8Gyh",
+      "valid": true,
+      "score": 3
+    },
+    {
+      "sequence": 3,
+      "task_id": "cover-campus",
+      "conversation_id": "531e86a8e87b406894a04daf1ec97412",
+      "sandbox_id": "7leaYOpahJUNk1y4PK8Gyh",
+      "valid": true,
+      "score": 2
+    },
+    {
+      "sequence": 4,
+      "task_id": "cover-grid",
+      "conversation_id": "2249f68632b247ddbd442bb2b9042d5d",
+      "sandbox_id": "7leaYOpahJUNk1y4PK8Gyh",
+      "valid": true,
+      "score": 2
+    },
+    {
+      "sequence": 5,
+      "task_id": "color-bipartite-8",
+      "conversation_id": "ed2942cf27344d5182ea70590b36d843",
+      "sandbox_id": "1KiDBcML3xeGFhAtHoIgZg",
+      "valid": true,
+      "score": 2
+    }
+  ],
+  "configuration": {
+    "grouping_setting_surface": "supported Enterprise personal setting",
+    "conversation_cap_env": "OH_APP_CONVERSATION_MAX_NUM_CONVERSATIONS_PER_SANDBOX",
+    "conversation_cap_durable_in_replicated": false,
+    "conversation_cap_note": "Live Kubernetes deployment override; may be replaced by an application upgrade or redeploy."
+  }
+}
