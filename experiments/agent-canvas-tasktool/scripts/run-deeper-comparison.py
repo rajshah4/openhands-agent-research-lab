@@ -108,7 +108,15 @@ def clean_agent_settings(settings: dict[str, Any], *, concurrency: int, task_too
     return agent
 
 
-def case_prompt(case: dict[str, Any]) -> str:
+def case_prompt(
+    case: dict[str, Any], *, inject_contract_failure: bool = False
+) -> str:
+    if inject_contract_failure:
+        return (
+            f"CASE_ID={case['case_id']}\n"
+            "This is an intentional contract-failure injection. Do not inspect files or call "
+            f"tools. Return exactly `INTENTIONAL_FAILURE {case['case_id']}` and stop."
+        )
     symbols = ", ".join(case["symbols"])
     return (
         f"CASE_ID={case['case_id']}\n"
@@ -120,9 +128,11 @@ def case_prompt(case: dict[str, Any]) -> str:
     )
 
 
-def parent_prompt(mode: str) -> str:
+def parent_prompt(mode: str, *, failure_case: str | None = None) -> str:
     instructions = "\n\n".join(
-        f"Delegation {index + 1}:\n{case_prompt(case)}" for index, case in enumerate(CASES)
+        f"Delegation {index + 1}:\n"
+        f"{case_prompt(case, inject_contract_failure=case['case_id'] == failure_case)}"
+        for index, case in enumerate(CASES)
     )
     return (
         f"Run a matched {mode} native TaskToolSet experiment. In your next assistant step, issue "
@@ -360,13 +370,14 @@ def run_parent_mode(
     mode: str,
     concurrency: int,
     timeout_seconds: int,
+    failure_case: str | None,
 ) -> dict[str, Any]:
     started = time.monotonic()
     conversation_id = create_conversation(
         base,
         key,
         settings,
-        prompt=parent_prompt(mode),
+        prompt=parent_prompt(mode, failure_case=failure_case),
         workspace=workspace,
         concurrency=concurrency,
         task_tool=True,
@@ -375,8 +386,9 @@ def run_parent_mode(
     trajectory = events(base, key, conversation_id)
     final = final_response(base, key, conversation_id)
     task_summary = task_event_summary(trajectory)
-    return {
+    result = {
         "mode": mode,
+        "injected_contract_failure": failure_case,
         "conversation_ids": [conversation_id],
         "execution_statuses": [record.get("execution_status")],
         "harness_wall_seconds": round(time.monotonic() - started, 3),
@@ -388,6 +400,12 @@ def run_parent_mode(
         ),
         **task_summary,
     }
+    if failure_case:
+        result["expected_failure_observed"] = all(
+            item["valid"] == (item["case_id"] != failure_case)
+            for item in task_summary["child_validations"]
+        )
+    return result
 
 
 def run_external_mode(
@@ -397,6 +415,7 @@ def run_external_mode(
     workspace: Path,
     *,
     timeout_seconds: int,
+    failure_case: str | None,
 ) -> dict[str, Any]:
     started = time.monotonic()
     with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
@@ -406,7 +425,9 @@ def run_external_mode(
                 base,
                 key,
                 settings,
-                prompt=case_prompt(case),
+                prompt=case_prompt(
+                    case, inject_contract_failure=case["case_id"] == failure_case
+                ),
                 workspace=workspace,
                 concurrency=1,
                 task_tool=False,
@@ -429,8 +450,9 @@ def run_external_mode(
         for case, final in zip(CASES, finals, strict=True)
     ]
     costs = [cost_summary(record) for record in records]
-    return {
+    result = {
         "mode": "external",
+        "injected_contract_failure": failure_case,
         "conversation_ids": conversation_ids,
         "execution_statuses": [record.get("execution_status") for record in records],
         "harness_wall_seconds": round(time.monotonic() - started, 3),
@@ -452,6 +474,12 @@ def run_external_mode(
         "first_action_to_last_observation_seconds": None,
         "action_timestamp_spread_seconds": None,
     }
+    if failure_case:
+        result["expected_failure_observed"] = all(
+            item["valid"] == (item["case_id"] != failure_case)
+            for item in validations
+        )
+    return result
 
 
 def parse_args() -> argparse.Namespace:
@@ -468,6 +496,11 @@ def parse_args() -> argparse.Namespace:
         "--mode", choices=("sequential", "parallel", "external"), required=True
     )
     parser.add_argument("--timeout-seconds", type=int, default=900)
+    parser.add_argument(
+        "--inject-contract-failure",
+        choices=tuple(case["case_id"] for case in CASES),
+        help="Make one child return a known-invalid contract for failure-boundary testing.",
+    )
     parser.add_argument("--output", type=Path)
     return parser.parse_args()
 
@@ -499,6 +532,7 @@ def main() -> int:
             settings,
             args.workspace,
             timeout_seconds=args.timeout_seconds,
+            failure_case=args.inject_contract_failure,
         )
     else:
         result = run_parent_mode(
@@ -509,6 +543,7 @@ def main() -> int:
             mode=args.mode,
             concurrency=1 if args.mode == "sequential" else 4,
             timeout_seconds=args.timeout_seconds,
+            failure_case=args.inject_contract_failure,
         )
     result["server"] = {
         "version": server.get("version"),
@@ -521,6 +556,8 @@ def main() -> int:
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(serialized, encoding="utf-8")
     print(serialized, end="")
+    if args.inject_contract_failure:
+        return 0 if result.get("expected_failure_observed") else 1
     return 0 if result.get("all_children_valid") else 1
 
 

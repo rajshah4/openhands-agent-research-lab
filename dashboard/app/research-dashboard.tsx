@@ -150,6 +150,16 @@ type Snapshot = {
         strictContracts: number;
         conversationRecords: number;
       };
+      failureInjection: {
+        wallSeconds: number;
+        modelCost: number;
+        modelCalls: number;
+        taskActions: number;
+        taskObservations: number;
+        healthyContracts: number;
+        injectedFailuresDetected: number;
+        parentFinished: boolean;
+      };
     };
   };
   scaleStudy: Record<
@@ -765,6 +775,9 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
       tradeoff: "Highest container count and startup churn",
       concurrency: "Six jobs total: four run in four sandboxes; two wait for an agent slot",
       cost: `$${snapshot.replicatedPatterns.isolatedFour.totalCost.toFixed(3)} total for 18 measured attempts`,
+      enterprise: "Yes for the tested self-hosted boundary",
+      recovery: "Retry one conversation; sandbox failure stays local",
+      management: "Clearest ownership and audit trail; most runtimes to operate",
       status: "Measured",
     },
     {
@@ -776,6 +789,9 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
       tradeoff: "Shared compute and a larger failure boundary",
       concurrency: "Six jobs total: four run in one sandbox; two wait for an agent slot",
       cost: `$${snapshot.replicatedPatterns.groupedFour.totalCost.toFixed(3)} total for 18 measured attempts`,
+      enterprise: "Yes for built-in grouped placement",
+      recovery: "Retry one conversation; recycle the cell after shared-runtime trouble",
+      management: "Separate histories with bounded infrastructure",
       status: "Measured",
     },
     {
@@ -787,6 +803,9 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
       tradeoff: "Less runtime isolation than Enterprise conversations",
       concurrency: "Logical agents share one backend; size the backend for the workload",
       cost: `$${snapshot.canvasPilot.matchedDeployment.totalModelCost.toFixed(3)} total for 18 matched attempts`,
+      enterprise: "No",
+      recovery: "Retry one record; backend or workspace failure can affect the group",
+      management: "Independent records, but the application owns trust and capacity controls",
       status: "Compared",
     },
     {
@@ -798,6 +817,9 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
       tradeoff: "Passed in Agent Canvas; the tested Enterprise profile still omitted the task tool",
       concurrency: "Four read-only delegates ran concurrently; shared writes can race",
       cost: `$${snapshot.agentCanvasTaskTool.deeperComparison.parallel.modelCost.toFixed(3)} for four matched Canvas tasks`,
+      enterprise: "No",
+      recovery: "Parent or controller identifies and reissues the failed child",
+      management: "One compact record; weakest child-level audit and handoff",
       status: "Canvas validated · OHE gap",
     },
   ];
@@ -1141,6 +1163,19 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
               model path, so the speedup was about 1.5× rather than 4×.
             </p>
           </article>
+          <article>
+            <span className="implementation-status tested">Failure injection</span>
+            <h3>One invalid child did not prevent its three siblings from completing</h3>
+            <p>
+              The parent finished after{" "}
+              {snapshot.agentCanvasTaskTool.deeperComparison.failureInjection.wallSeconds.toFixed(1)}
+              {" "}seconds with all{" "}
+              {snapshot.agentCanvasTaskTool.deeperComparison.failureInjection.taskObservations}
+              {" "}observations. The controller accepted{" "}
+              {snapshot.agentCanvasTaskTool.deeperComparison.failureInjection.healthyContracts}
+              {" "}healthy contracts and isolated the one injected failure for retry.
+            </p>
+          </article>
         </div>
         <p className="architecture-note">
           <strong>Recommended hybrid:</strong> let an external scheduler and
@@ -1168,6 +1203,37 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
             infrastructure overhead.
           </p>
         </div>
+        <div className="implementation-grid">
+          <article className="implementation-card">
+            <span className="implementation-status tested">Enterprise is optional</span>
+            <h3>Orchestration does not require Enterprise</h3>
+            <p>
+              An external scheduler, durable ledger, contract validator, and
+              Canvas or SDK workers can coordinate the campaign. This is the
+              simplest choice for one trusted team willing to own those
+              controls.
+            </p>
+          </article>
+          <article className="implementation-card">
+            <span className="implementation-status tested">Enterprise boundary</span>
+            <h3>Enterprise provides operational boundaries</h3>
+            <p>
+              Choose it when self-hosting, separate conversation records,
+              sandbox lifecycle, access controls, grouped placement, and
+              operator visibility are requirements you do not want to rebuild.
+            </p>
+          </article>
+          <article className="implementation-card">
+            <span className="implementation-status tested">Conversation boundary</span>
+            <h3>A conversation is a unit of ownership and recovery</h3>
+            <p>
+              Use fewer conversations when specialists are short-lived and
+              trusted. Use first-class conversations when work needs its own
+              retry, history, permissions, human handoff, or service-level
+              objective.
+            </p>
+          </article>
+        </div>
         <div className="workflow">
           {[
             ["01", "Trust", "Can these agents safely share a filesystem and compute?"],
@@ -1188,12 +1254,12 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
             <thead>
               <tr>
                 <th>Pattern</th>
+                <th>Need Enterprise?</th>
                 <th>Agent record</th>
                 <th>Runtime boundary</th>
-                <th>Isolation</th>
+                <th>Failure and retry scope</th>
+                <th>Manageability</th>
                 <th>Best fit</th>
-                <th>Concurrency requirement</th>
-                <th>Cost evidence</th>
                 <th>Main tradeoff</th>
                 <th>Evidence</th>
               </tr>
@@ -1202,12 +1268,12 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
               {patterns.map((pattern) => (
                 <tr key={pattern.name}>
                   <td><strong>{pattern.name}</strong></td>
+                  <td>{pattern.enterprise}</td>
                   <td>{pattern.record}</td>
                   <td>{pattern.runtime}</td>
-                  <td>{pattern.isolation}</td>
+                  <td>{pattern.recovery}</td>
+                  <td>{pattern.management}</td>
                   <td>{pattern.use}</td>
-                  <td>{pattern.concurrency}</td>
-                  <td>{pattern.cost}</td>
                   <td>{pattern.tradeoff}</td>
                   <td><span className="arm-chip managed">{pattern.status}</span></td>
                 </tr>

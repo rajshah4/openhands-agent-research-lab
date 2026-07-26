@@ -161,6 +161,16 @@
         "deterministicValid": 3,
         "strictContracts": 3,
         "conversationRecords": 4
+      },
+      "failureInjection": {
+        "wallSeconds": 299.615,
+        "modelCost": 0.46321395,
+        "modelCalls": 25,
+        "taskActions": 4,
+        "taskObservations": 4,
+        "healthyContracts": 3,
+        "injectedFailuresDetected": 1,
+        "parentFinished": true
       }
     }
   },

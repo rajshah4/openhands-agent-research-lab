@@ -1,0 +1,79 @@
+{
+  "action_timestamp_spread_seconds": 0.003,
+  "all_children_valid": false,
+  "all_contracts_valid": false,
+  "child_validations": [
+    {
+      "case_id": "scheduler",
+      "case_id_present": true,
+      "contract_valid": true,
+      "missing": [],
+      "valid": true
+    },
+    {
+      "case_id": "store",
+      "case_id_present": false,
+      "contract_valid": false,
+      "missing": [
+        "src/research_lab/store.py",
+        "FileResearchStore",
+        "controller_lock",
+        "_atomic_write_text"
+      ],
+      "valid": false
+    },
+    {
+      "case_id": "runner",
+      "case_id_present": true,
+      "contract_valid": true,
+      "missing": [],
+      "valid": true
+    },
+    {
+      "case_id": "canvas",
+      "case_id_present": true,
+      "contract_valid": true,
+      "missing": [],
+      "valid": true
+    }
+  ],
+  "completed_at": "2026-07-26T13:33:42.550296+00:00",
+  "conversation_ids": [
+    "fbaa7fcc-f0ce-4e27-b3a3-9cd367396557"
+  ],
+  "cost": {
+    "by_scope": {
+      "condenser": 0.0,
+      "default": 0.09599265,
+      "task:task_00000001": 0.12258105,
+      "task:task_00000002": 0.0106653,
+      "task:task_00000003": 0.1020207,
+      "task:task_00000004": 0.13195425
+    },
+    "model_calls": 25,
+    "total": 0.46321395
+  },
+  "execution_statuses": [
+    "finished"
+  ],
+  "expected_failure_observed": true,
+  "final_contract_present": true,
+  "first_action_to_last_observation_seconds": 268.534,
+  "harness_wall_seconds": 300.455,
+  "injected_contract_failure": "store",
+  "mode": "parallel",
+  "record_wall_seconds": 299.615,
+  "server": {
+    "sdk_version": "1.36.1",
+    "tools_version": "1.36.1",
+    "version": "1.36.1"
+  },
+  "task_actions": 4,
+  "task_ids": [
+    "task_00000004",
+    "task_00000002",
+    "task_00000003",
+    "task_00000001"
+  ],
+  "task_observations": 4
+}

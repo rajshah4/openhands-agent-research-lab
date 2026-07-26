@@ -87,6 +87,13 @@ test("includes the Agent Canvas deployment evidence", async () => {
   assert.match(source, /33\.4% faster than sequential delegation/);
   assert.match(source, /Four first-class Canvas conversations/);
   assert.match(source, /Recommended hybrid/);
+  assert.match(source, /One invalid child did not prevent its three siblings from completing/);
+  assert.match(source, /Orchestration does not require Enterprise/);
+  assert.match(source, /Enterprise provides operational boundaries/);
+  assert.match(source, /A conversation is a unit of ownership and recovery/);
+  assert.match(source, /Need Enterprise\?/);
+  assert.match(source, /Failure and retry scope/);
+  assert.match(source, /Manageability/);
   assert.match(source, /validate the task\s+tool separately on OpenHands Cloud/i);
   assert.match(source, /Choosing an execution pattern/);
   assert.match(source, /NeuroGolf scaling planner/);
@@ -111,4 +118,8 @@ test("includes the Agent Canvas deployment evidence", async () => {
   assert.match(snapshot, /"wallSeconds": 333\.91/);
   assert.match(snapshot, /"wallSeconds": 374\.36/);
   assert.match(snapshot, /"modelCost": 0\.5064957/);
+  assert.match(snapshot, /"failureInjection"/);
+  assert.match(snapshot, /"wallSeconds": 299\.615/);
+  assert.match(snapshot, /"healthyContracts": 3/);
+  assert.match(snapshot, /"injectedFailuresDetected": 1/);
 });
