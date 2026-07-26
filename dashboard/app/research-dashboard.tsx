@@ -714,6 +714,120 @@ function OverviewGuide({ snapshot }: { snapshot: Snapshot }) {
           that concurrency.
         </div>
       </section>
+
+      <section className="section implementation-section">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">Where the orchestration lived</p>
+            <h2>OpenHands ran the agents; our application ran the research organization.</h2>
+          </div>
+          <p>
+            The experiments were not an all-in-one OpenHands feature. I used
+            controller code outside the agent runtime to decide what should
+            run, verify the result, and preserve campaign state. OpenHands
+            supplied the execution and lifecycle layer.
+          </p>
+        </div>
+        <div className="implementation-grid">
+          <article className="implementation-card">
+            <span className="implementation-status tested">Application-owned</span>
+            <h3>Campaign policy and evidence</h3>
+            <p>
+              Task registry, scheduling, coverage, attempt ledger, retrieved
+              lessons, output contracts, deterministic validation, promotion,
+              admission control, retry policy, and cleanup decisions.
+            </p>
+          </article>
+          <article className="implementation-card">
+            <span className="implementation-status tested">OpenHands-owned</span>
+            <h3>Agent execution and runtime lifecycle</h3>
+            <p>
+              Model and tool loop, conversations, native subagents, workspaces,
+              sandbox creation or grouping, event history, usage metadata, and
+              pause controls.
+            </p>
+          </article>
+          <article className="implementation-card">
+            <span className="implementation-status pilot">Human-owned</span>
+            <h3>Objectives and final authority</h3>
+            <p>
+              Benchmark design, risk boundaries, stopping rules, review of
+              unusual failures, release approval, and the final Kaggle
+              submission remain human decisions.
+            </p>
+          </article>
+        </div>
+        <p className="architecture-note">
+          <strong>Practical interpretation:</strong> most of the organizational
+          intelligence was application code outside OpenHands; most of the
+          agent-execution mechanics were inside OpenHands. The controller could
+          itself run as an OpenHands parent or automation, but its durable
+          ledger and independent validators should remain application-owned.
+        </p>
+      </section>
+
+      <section className="section comparison">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">Comparison with public NeuroGolf solutions</p>
+            <h2>Top teams built similar control loops themselves around general coding agents.</h2>
+          </div>
+          <p>
+            The reviewed writeups describe custom schedulers, task files,
+            checkpoint state, validators, and promotion gates around Codex,
+            ChatGPT, or Claude Code. Their competitive advantage came mainly
+            from domain context and validation—not from a packaged multi-agent
+            runtime.
+          </p>
+        </div>
+        <div className="implementation-grid">
+          <article className="implementation-card">
+            <span className="implementation-status tested">Third place</span>
+            <h3>Custom files and Codex/ChatGPT handoffs</h3>
+            <p>
+              The team maintained promoted history, rejected attempts, retry
+              state, negative knowledge, task ZIPs, and local checks, then
+              merged the UI and local histories after each attempt.
+            </p>
+          </article>
+          <article className="implementation-card">
+            <span className="implementation-status tested">Ninth place</span>
+            <h3>A custom resumable Codex scheduler</h3>
+            <p>
+              A bounded worker pool used one persistent session per task,
+              backup and restore, strict validation, checkpoint files, and a
+              serialized step for consolidating proven techniques.
+            </p>
+          </article>
+          <article className="implementation-card">
+            <span className="implementation-status tested">Agent-management lesson</span>
+            <h3>External task ownership prevented agent drift</h3>
+            <p>
+              One public postmortem found that agents changed tasks based on
+              local ROI. Restricting each worker to one task workspace restored
+              global coverage control.
+            </p>
+          </article>
+        </div>
+        <p className="architecture-note">
+          <strong>Where OpenHands helps:</strong> it can replace custom process,
+          sandbox, conversation, event, pause, and operator-visibility glue.
+          It does not replace the NeuroGolf task context, ONNX builders,
+          adversarial validators, scheduling policy, or promotion logic that
+          separated the strongest teams.
+        </p>
+        <div className="planner-sources">
+          <a href="https://www.kaggle.com/competitions/neurogolf-2026/writeups/3rd-place-solution-writeup">
+            Third-place writeup ↗
+          </a>
+          <a href="https://www.kaggle.com/competitions/neurogolf-2026/writeups/9th-place-solution">
+            Ninth-place writeup ↗
+          </a>
+          <a href="https://www.kaggle.com/competitions/neurogolf-2026/writeups/155th-place-what-i-learned-about-managing-ai-codi">
+            Agent-management postmortem ↗
+          </a>
+        </div>
+      </section>
     </>
   );
 }

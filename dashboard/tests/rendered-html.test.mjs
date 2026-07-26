@@ -54,6 +54,12 @@ test("renders the NeuroGolf experiment for a new reader", async () => {
   assert.match(html, /The same control path can run NeuroGolf workers/);
   assert.match(html, /This test focused on multi-agent orchestration/);
   assert.match(html, /OpenHands can orchestrate this campaign as the worker execution layer/);
+  assert.match(html, /OpenHands ran the agents; our application ran the research organization/);
+  assert.match(html, /most of the organizational intelligence was application code outside OpenHands/);
+  assert.match(html, /Top teams built similar control loops themselves around general coding agents/);
+  assert.match(html, /A custom resumable Codex scheduler/);
+  assert.match(html, /External task ownership prevented agent drift/);
+  assert.match(html, /it can replace custom process,\s+sandbox, conversation, event, pause, and operator-visibility glue/);
   assert.match(html, /multi-controller and API load tests/);
   assert.doesNotMatch(html, /Supporting live-systems check|These are real OpenHands runs/);
   assert.doesNotMatch(html, /full competition solver is not/);

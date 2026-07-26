@@ -8,6 +8,37 @@ competition's ONNX workload or claim a competitive Kaggle score.
 That distinction matters. “Production-grade orchestration” and “top Kaggle
 solver” are separate claims, and both need evidence.
 
+## What OpenHands did and what the application did
+
+Most of the campaign intelligence in these experiments lived in the external
+research-lab application:
+
+- task registry and ownership;
+- naive and managed scheduling policies;
+- coverage and capacity decisions;
+- immutable attempt and lifecycle ledger;
+- retrieval of validated lessons;
+- worker output contracts;
+- deterministic candidate validation and lesson promotion;
+- timeout, retry, reconciliation and cleanup policy; and
+- campaign reports and the dashboard.
+
+OpenHands supplied the execution plane:
+
+- model and tool execution;
+- first-class conversations and native TaskToolSet children;
+- workspaces and sandbox provisioning or grouping;
+- durable conversation events and usage metadata;
+- runtime pause controls; and
+- operator-visible conversation records in Enterprise.
+
+The experiments were therefore not “all inside OpenHands.” The controller
+launched and supervised OpenHands through supported APIs. That controller could
+itself be packaged as an OpenHands parent or automation, but the durable
+campaign ledger and independent validators should remain application-owned.
+The useful boundary is: **OpenHands runs workers; the domain application runs
+the research organization.**
+
 ## What public NeuroGolf teams actually built
 
 Public writeups and licensed repositories converge on a recognizable pattern:
@@ -39,6 +70,70 @@ frozen installation could not build `pyeda==0.29` on that platform, and the
 repository's scratch tooling produced 24 type diagnostics. This is a useful
 reality check: competition-quality research code can be excellent at the
 domain problem without being a turnkey production service.
+
+The reviewed writeups largely describe custom infrastructure around
+general-purpose coding agents rather than a packaged multi-agent platform:
+
+- The third-place team used Codex and ChatGPT with task-local JSONL histories,
+  retry state, negative knowledge, task ZIP handoffs and a common local
+  validation path.
+- The ninth-place solution built a bounded scheduler around `codex exec` and
+  `codex exec resume`, retaining one session per task, transactional
+  backup/restore, checkpoint files and a serialized technique-consolidation
+  step.
+- The agent-management postmortem found that agents sometimes abandoned their
+  assigned task based on local ROI. The effective correction was to expose
+  only one task workspace while keeping task selection external.
+- The 301st-place workflow used parallel task owners but serialized ZIP
+  integration, differential auditing, full-archive auditing and submission.
+
+This means the architecture is not foreign to successful competition teams.
+They independently recreated many of the same control-plane concepts.
+
+## Would OpenHands have helped those teams?
+
+Potentially, but primarily as an operational advantage:
+
+- supported conversation and runtime APIs instead of shell-process supervision;
+- stable conversation, sandbox and event identifiers;
+- bounded shared or isolated sandboxes;
+- operator-visible histories and human handoff;
+- pause, reuse and cleanup controls;
+- better failure classification and lifecycle recovery; and
+- a path from one researcher's machine to a managed or self-hosted team
+  deployment.
+
+OpenHands would not automatically provide the parts that drove leaderboard
+performance:
+
+- accurate ARC transformation understanding;
+- compact ONNX representation ideas;
+- high-quality task context and donor-solution retrieval;
+- generated, adversarial and metamorphic validation;
+- candidate quarantine and score calculation;
+- scheduling priorities and stopping rules; or
+- the serialized 400-task release audit.
+
+For a single expert optimizing locally, a custom Codex scheduler can be faster
+to change and more tightly fitted to the competition. A platform introduces
+API lifecycle, runtime startup and operational conventions. Its advantage
+grows when runs must be unattended, shared by a team, audited, isolated,
+recovered after failures, or scaled beyond one workstation.
+
+The practical competition architecture is therefore hybrid:
+
+```text
+NeuroGolf domain controller
+  - task queue, context, validators, ledger, promotion
+       |
+OpenHands execution plane
+  - first-class work-cell owners
+  - 2–4 native specialists inside trusted cells
+  - grouped or isolated sandboxes as required
+       |
+single-writer release audit
+  - rebuild, rescore, quarantine, package, submit
+```
 
 ## Parity matrix
 
@@ -116,4 +211,3 @@ scored archive, the correct claim is:
 
 > We reproduced and stress-tested the multi-agent research organization used by
 > serious NeuroGolf teams. The domain-solving layer is the next benchmark.
-
