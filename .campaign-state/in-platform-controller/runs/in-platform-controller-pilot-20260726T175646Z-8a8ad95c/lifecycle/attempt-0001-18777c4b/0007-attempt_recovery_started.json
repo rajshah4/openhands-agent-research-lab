@@ -1,0 +1,12 @@
+{
+  "attempt_id": "attempt-0001-18777c4b",
+  "id": "0007-attempt_recovery_started",
+  "kind": "attempt_recovery_started",
+  "payload": {
+    "prior_lifecycle_events": 6,
+    "sequence": 1
+  },
+  "recorded_at": "2026-07-26T17:58:49.706724+00:00",
+  "run_id": "in-platform-controller-pilot-20260726T175646Z-8a8ad95c",
+  "schema_version": 1
+}
