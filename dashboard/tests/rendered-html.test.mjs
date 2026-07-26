@@ -35,9 +35,11 @@ test("renders the NeuroGolf experiment for a new reader", async () => {
   assert.match(html, /reproduced the organization behind a 400-task agent campaign/i);
   assert.match(html, /NeuroGolf teams used many coding agents/);
   assert.match(html, />Planner</);
-  assert.match(html, /I ran the same six problems two ways, three times/);
-  assert.match(html, /The six live problems were too easy/);
-  assert.match(html, /This separates the orchestration proof/);
+  assert.match(html, /One campaign coordinated 400 task owners and 9,600 attempts/);
+  assert.match(html, /Supporting live-systems check/);
+  assert.match(html, /verified the loop with real OpenHands agents/);
+  assert.match(html, /not a quality or generalization result/);
+  assert.match(html, /The main scale result is a matched campaign/);
   assert.match(html, /Separate runtime for each agent/);
   assert.match(html, /One runtime, four active agents/);
   assert.match(html, /One runtime, six active agents/);

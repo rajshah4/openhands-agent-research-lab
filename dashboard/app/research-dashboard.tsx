@@ -566,6 +566,14 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
 
       <section className="proof-strip" aria-label="Proof summary">
         <div>
+          <span>Large orchestration run</span>
+          <strong>{formatNumber(snapshot.portfolioScale.totalAttempts)}</strong>
+          <small>{snapshot.portfolioScale.tasks} task owners, fully covered</small>
+          <div className="mini-meter">
+            <span style={{ width: pct(1) }} />
+          </div>
+        </div>
+        <div>
           <span>Automated code checks</span>
           <strong>{snapshot.proof.tests}</strong>
           <small>all passed</small>
@@ -578,17 +586,9 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
           <small>checked by code</small>
         </div>
         <div>
-          <span>Bad lessons shared</span>
-          <strong>{snapshot.proof.invalidLessons}</strong>
-          <small>failed answers stay out</small>
-        </div>
-        <div>
-          <span>Scale simulation</span>
-          <strong>{snapshot.portfolioScale.tasks}</strong>
-          <small>task owners, fully covered</small>
-          <div className="mini-meter">
-            <span style={{ width: pct(1) }} />
-          </div>
+          <span>Attempts per task</span>
+          <strong>{snapshot.portfolioScale.exactAttemptsPerTask}</strong>
+          <small>for every one of the 400 tasks</small>
         </div>
       </section>
 
@@ -622,25 +622,70 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
               ))}
             </div>
             <p className="architecture-note">
-              The live test now covers 37 OpenHands conversations. The larger
-              deterministic run covers 400 task owners and 9,600 attempts. In
-              both cases the controller chooses the work, records ownership,
-              passes only validated lessons, checks the result, and preserves
-              the evidence. This separates the orchestration proof from the
-              still-open question of building a competitive ONNX solver.
+              The main scale result is a matched campaign with 400 task owners
+              and 9,600 attempts. Every task received exactly 12 attempts, with
+              unique ownership records and no missing work. The live
+              Replicated test is smaller because it answers a different
+              question: whether the same control loop works with real
+              OpenHands conversations, model calls, sandboxes, and cleanup.
             </p>
+          </section>
+
+          <section className="section implementation-section scale-lead">
+            <div className="section-heading">
+              <div>
+                <p className="eyebrow">The main orchestration result</p>
+                <h2>One campaign coordinated 400 task owners and 9,600 attempts.</h2>
+              </div>
+              <p>
+                This is the workload that tests the organization: coverage,
+                repeated experiments, validated memory, immutable evidence,
+                reporting, and restart-safe ownership across the shape of the
+                full NeuroGolf challenge.
+              </p>
+            </div>
+            <div className="implementation-grid">
+              <article className="implementation-card">
+                <span className="implementation-status tested">Complete coverage</span>
+                <h3>400/400 tasks received work</h3>
+                <p>
+                  Both matched organizations completed{" "}
+                  {formatNumber(snapshot.portfolioScale.attemptsPerArm)} attempts.
+                  No task was starved while the scheduler revisited promising work.
+                </p>
+              </article>
+              <article className="implementation-card">
+                <span className="implementation-status tested">Balanced ownership</span>
+                <h3>Exactly 12 attempts per task</h3>
+                <p>
+                  All attempt IDs and sequences were unique. The ledger retained
+                  enough state to explain who tried what and what each later
+                  attempt was allowed to remember.
+                </p>
+              </article>
+              <article className="implementation-card">
+                <span className="implementation-status pilot">Claim boundary</span>
+                <h3>Complex organization, controlled workers</h3>
+                <p>
+                  Deterministic workers made the expected result knowable. This
+                  proves orchestration scale, not that 400 model agents solved
+                  the real ONNX competition.
+                </p>
+              </article>
+            </div>
           </section>
 
           <section className="section comparison">
             <div className="section-heading">
               <div>
-                <p className="eyebrow">What I tested</p>
-                <h2>I ran the same six problems two ways, three times.</h2>
+                <p className="eyebrow">Supporting live-systems check</p>
+                <h2>Before scaling, I verified the loop with real OpenHands agents.</h2>
               </div>
               <p>
-                The first group started fresh on every problem. The second
-                group could read lessons from earlier valid answers. Both
-                groups used the same model, problems, and number of attempts.
+                Six deliberately small, independently checkable problems were
+                run with and without shared memory, three times each. They
+                tested the live APIs and runtime lifecycle—not difficult
+                reasoning or generalization.
               </p>
             </div>
             <div className="comparison-grid">
@@ -677,14 +722,14 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
                 );
               })}
               <article className="finding-card">
-                <span className="finding-label">What happened</span>
-                <strong>The six live problems were too easy.</strong>
+                <span className="finding-label">Why keep this result</span>
+                <strong>It proves the large design connects to real OpenHands infrastructure.</strong>
                 <p>
                   Both groups solved all 18 problems. The managed agents used
-                  nine earlier lessons, but they did not score better. I would
-                  not claim a quality win from this benchmark. It does show
-                  that the agents, checks, memory, records, and cleanup worked
-                  across 36 live conversations.
+                  nine earlier lessons but did not score better. This is not a
+                  quality or generalization result. It verifies conversation
+                  creation, model execution, validation, records, shared
+                  memory, sandbox placement, and cleanup across 36 live runs.
                 </p>
               </article>
             </div>
