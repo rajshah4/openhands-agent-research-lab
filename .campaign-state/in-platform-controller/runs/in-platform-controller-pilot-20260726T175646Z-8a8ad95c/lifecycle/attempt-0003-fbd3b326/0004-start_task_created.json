@@ -1,0 +1,11 @@
+{
+  "attempt_id": "attempt-0003-fbd3b326",
+  "id": "0004-start_task_created",
+  "kind": "start_task_created",
+  "payload": {
+    "start_task_id": "6b2f0818c80a44dabbdaf7d34ed03ede"
+  },
+  "recorded_at": "2026-07-26T18:06:06.721565+00:00",
+  "run_id": "in-platform-controller-pilot-20260726T175646Z-8a8ad95c",
+  "schema_version": 1
+}
