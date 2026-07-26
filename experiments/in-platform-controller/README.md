@@ -153,3 +153,12 @@ path remains in the repo as reproducible evidence, but it is not the
 recommended controller path on this Replicated build. The prompt preset binds
 the run to the creating user and uses the generated SDK workspace lifecycle,
 which is the current supported route for Git, secret, and callback handling.
+
+The first prompt-preset run exposed a second Replicated version-alignment gap:
+the automation service advertised SDK `1.33.0`, while the installed agent
+server emitted the `1.36` event contract. SDK `1.33.0` rejected the
+`extended_content` field before the controller command ran. The contained
+`automation/patch-preset-sdk.sh` helper preserves the user-bound generated
+preset but replaces only its setup script with `automation/setup-compat.sh`,
+which pins the SDK packages to `1.36.0`. This is an experiment-local
+compatibility overlay, not a database edit or an installation-wide patch.
