@@ -427,6 +427,29 @@ dd {
   max-width: 900px;
 }
 
+.deployment-illustration {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  margin: 42px 0 0;
+  overflow: hidden;
+}
+
+.deployment-illustration img {
+  display: block;
+  height: auto;
+  width: 100%;
+}
+
+.deployment-illustration figcaption {
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.65;
+  margin: 0;
+  padding: 16px 20px;
+}
+
 .comparison {
   background: #ebe9e2;
   max-width: none;

@@ -531,6 +531,18 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
             </article>
           ))}
         </div>
+        <figure className="deployment-illustration">
+          <img
+            src="/sandbox-placement.png"
+            alt="Isolated placement uses four sandboxes for four agent conversations, while grouped placement keeps four separate conversations inside one shared sandbox."
+          />
+          <figcaption>
+            The conversations remain separate OpenHands records in both
+            approaches. Grouping changes the runtime boundary: trusted agents
+            share compute and a filesystem instead of creating one container
+            for every conversation.
+          </figcaption>
+        </figure>
       </section>
 
       <section className="section">

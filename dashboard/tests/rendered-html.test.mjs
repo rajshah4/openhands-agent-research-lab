@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { stat } from "node:fs/promises";
 import test from "node:test";
 
 async function render() {
@@ -23,6 +24,11 @@ async function render() {
 }
 
 test("renders the NeuroGolf experiment for a new reader", async () => {
+  const illustration = await stat(
+    new URL("../public/sandbox-placement.png", import.meta.url),
+  );
+  assert.ok(illustration.size > 0);
+
   const response = await render();
   assert.equal(response.status, 200);
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
