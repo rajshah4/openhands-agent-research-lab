@@ -3,9 +3,11 @@ Run exactly one bounded NeuroGolf research-controller tick from the cloned
 
 Use the cloned repository path supplied in the repository context. Do not edit
 code, inspect or print secrets, create a pull request, or perform any additional
-research. From the repository root, run:
+research. From the repository root, run exactly:
 
 ```bash
+git fetch origin main
+git checkout -B main origin/main
 OPENHANDS_API_KEY="$OPENHANDS_API_KEY" \
   python3 experiments/in-platform-controller/automation/preset_tick.py
 ```

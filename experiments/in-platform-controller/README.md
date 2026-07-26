@@ -123,6 +123,8 @@ prompt-preset endpoint. OpenHands supplies the repository checkout, Git
 authentication, stored secrets, SDK workspace, completion callback, and
 sandbox cleanup. The prompt only invokes
 `automation/preset_tick.py`; it does not make controller decisions.
+It explicitly refreshes `origin/main` first because a reused Enterprise
+sandbox can retain an older repository checkout.
 
 `automation/preset_tick.py`:
 
