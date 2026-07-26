@@ -11,7 +11,7 @@ The pilot is intentionally bounded for a small installation:
 - The controller refuses launches at seven active sandboxes.
 - One clean sandbox is seeded before grouping is enabled.
 - Sequential reuse is proven before concurrency is attempted.
-- Concurrent testing is limited to two conversations.
+- The original pilot limits concurrent testing to two conversations.
 - The shared sandbox is paused once, after every conversation is terminal.
 
 ## Why seed the sandbox first
@@ -74,3 +74,35 @@ boundary. Use one sandbox per conversation for untrusted code, different
 tenants, or work requiring strong isolation.
 
 See [results-2026-07-25.md](results-2026-07-25.md) for the live result.
+
+## Concurrent stress extension
+
+The original pilot intentionally stopped at two concurrent workers. The
+rate-aware stress runner extends that boundary to between two and six trusted
+workers only when explicitly invoked:
+
+```bash
+PYTHONPATH=src python3 \
+  experiments/enterprise-sandbox-grouping/scripts/run-concurrent.py \
+  --campaign examples/multi-family-live-pilot.json \
+  --store .lab/concurrent-six \
+  --concurrency 6 \
+  --env-file /path/to/install_replicate/.env \
+  --live
+```
+
+The runner:
+
+- seeds one eligible sandbox before launching the remaining followers;
+- globally paces API requests and retries bounded HTTP 429 responses;
+- keeps all conversation histories and validators independent;
+- calculates actual ready-to-terminal concurrency from lifecycle events;
+- pauses every observed sandbox after all workers finish.
+
+This is a throughput stress test, not the normal interactive configuration.
+See the
+[six-worker evidence](../../evidence/2026-07-25-concurrent-six-runtime/README.md)
+and the
+[four-worker comparison](../../evidence/2026-07-25-concurrency-four-vs-six/README.md)
+for the measured latency, throughput, resource use, and API-rate-limit
+tradeoffs.

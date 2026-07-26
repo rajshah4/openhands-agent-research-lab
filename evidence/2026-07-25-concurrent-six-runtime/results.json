@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-07-25",
+  "configuration": {
+    "sandbox_grouping_strategy": "FEWEST_CONVERSATIONS",
+    "max_conversations_per_sandbox": 6,
+    "runtime_cpu_limit": "1",
+    "runtime_memory_limit": "2Gi",
+    "runtime_limit": 10,
+    "launch_lock_at": 7
+  },
+  "naive_parallel_launch": {
+    "result": "failed_before_full_runtime_load",
+    "ready_conversations": 3,
+    "create_failures_http_429": 3,
+    "seed_poll_failure_http_429": true,
+    "runtime_restarts": 0,
+    "unhealthy_pods": 0,
+    "cleanup_status": "PAUSED"
+  },
+  "rate_aware_launch": {
+    "attempts": 6,
+    "valid_candidates": 6,
+    "failed_attempts": 0,
+    "sandbox_id": "1HXjaQTFWCJR1Nsx0KgiSP",
+    "max_observed_concurrency": 6,
+    "http_429_retries_recovered": 36,
+    "wall_seconds_with_cleanup": 200.05,
+    "sandbox_final_status": "PAUSED",
+    "runtime_restarts": 0,
+    "unhealthy_pods": 0,
+    "final_running_runtime_pods": 1
+  },
+  "performance": {
+    "sequential": {
+      "attempts": 6,
+      "valid_candidates": 6,
+      "batch_wall_seconds": 307.127,
+      "throughput_tasks_per_hour": 70.33,
+      "mean_attempt_seconds": 51.185,
+      "median_attempt_seconds": 51.071,
+      "maximum_attempt_seconds": 62.583
+    },
+    "concurrent": {
+      "attempts": 6,
+      "valid_candidates": 6,
+      "batch_wall_seconds": 199.551,
+      "throughput_tasks_per_hour": 108.24,
+      "mean_attempt_seconds": 121.814,
+      "median_attempt_seconds": 132.112,
+      "maximum_attempt_seconds": 187.461
+    },
+    "batch_wall_change_percent": -35.03,
+    "throughput_change_percent": 53.9,
+    "mean_attempt_latency_change_percent": 137.99
+  },
+  "runtime_observations": {
+    "physical_runtime": "runtime-oksipfbgbqfbfnty",
+    "peak_observed_cpu_millicores": 104,
+    "peak_observed_memory_mib": 456,
+    "memory_limit_mib": 2048
+  },
+  "conversations": [
+    {
+      "task_id": "color-cycle-7",
+      "conversation_id": "1b2b1fc3a17048ccbf582f72876ac9d1",
+      "sandbox_id": "1HXjaQTFWCJR1Nsx0KgiSP",
+      "valid": true,
+      "score": 3
+    },
+    {
+      "task_id": "color-bipartite-8",
+      "conversation_id": "423001f8b9224abfb4a650e728201196",
+      "sandbox_id": "1HXjaQTFWCJR1Nsx0KgiSP",
+      "valid": true,
+      "score": 2
+    },
+    {
+      "task_id": "cover-campus",
+      "conversation_id": "5a089325974f4712bf8b255b7b35cf59",
+      "sandbox_id": "1HXjaQTFWCJR1Nsx0KgiSP",
+      "valid": true,
+      "score": 2
+    },
+    {
+      "task_id": "cover-grid",
+      "conversation_id": "759a97881e5f4aa8a095fa17d82967a6",
+      "sandbox_id": "1HXjaQTFWCJR1Nsx0KgiSP",
+      "valid": true,
+      "score": 2
+    },
+    {
+      "task_id": "pack-alpha",
+      "conversation_id": "c4da38d517494625a3373598e7db2c77",
+      "sandbox_id": "1HXjaQTFWCJR1Nsx0KgiSP",
+      "valid": true,
+      "score": 2
+    },
+    {
+      "task_id": "pack-beta",
+      "conversation_id": "ba28043235b74b29b889669f049dc701",
+      "sandbox_id": "1HXjaQTFWCJR1Nsx0KgiSP",
+      "valid": true,
+      "score": 2
+    }
+  ],
+  "limitations": [
+    "The benchmark tasks are short and model-wait-heavy.",
+    "The result does not establish safety for six simultaneous compilation, browser, or test-heavy agents.",
+    "The Enterprise API rate limit was reached even with client-side pacing.",
+    "The conversation cap remains a Kubernetes deployment override rather than durable Replicated configuration."
+  ]
+}

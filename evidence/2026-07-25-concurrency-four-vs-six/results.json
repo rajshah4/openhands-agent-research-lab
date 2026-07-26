@@ -1,0 +1,161 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-07-25",
+  "configuration": {
+    "sandbox_grouping_strategy": "FEWEST_CONVERSATIONS",
+    "max_conversations_per_sandbox": 6,
+    "active_dispatch_limit_under_test": 4,
+    "runtime_cpu_limit": "1",
+    "runtime_memory_limit": "2Gi"
+  },
+  "sequential_four_baseline": {
+    "attempts": 4,
+    "valid_candidates": 4,
+    "batch_wall_seconds": 200.622,
+    "throughput_tasks_per_hour": 71.78,
+    "mean_attempt_seconds": 50.153,
+    "median_attempt_seconds": 47.631,
+    "maximum_attempt_seconds": 62.581
+  },
+  "concurrent_four_runs": [
+    {
+      "run": 1,
+      "attempts": 4,
+      "valid_candidates": 4,
+      "sandbox_id": "72ZU0xLVsKGt3NJCx2bp6z",
+      "physical_runtime": "runtime-epomytedjjzmhnbh",
+      "max_observed_concurrency": 4,
+      "batch_wall_seconds": 230.414,
+      "wall_seconds_with_cleanup": 230.926,
+      "throughput_tasks_per_hour": 62.50,
+      "mean_attempt_seconds": 124.837,
+      "median_attempt_seconds": 101.952,
+      "maximum_attempt_seconds": 230.414,
+      "http_429_retries_recovered": 9,
+      "sandbox_final_status": "PAUSED"
+    },
+    {
+      "run": 2,
+      "attempts": 4,
+      "valid_candidates": 4,
+      "sandbox_id": "42lKU1cln2R22XVx66PfE3",
+      "physical_runtime": "runtime-auykccjyqkkedsfk",
+      "max_observed_concurrency": 4,
+      "batch_wall_seconds": 123.069,
+      "wall_seconds_with_cleanup": 123.565,
+      "throughput_tasks_per_hour": 117.01,
+      "mean_attempt_seconds": 75.271,
+      "median_attempt_seconds": 71.934,
+      "maximum_attempt_seconds": 110.965,
+      "http_429_retries_recovered": 0,
+      "sandbox_final_status": "PAUSED"
+    }
+  ],
+  "concurrent_four_aggregate": {
+    "attempts": 8,
+    "valid_candidates": 8,
+    "average_batch_wall_seconds": 176.742,
+    "effective_throughput_tasks_per_hour": 81.48,
+    "mean_attempt_seconds": 100.054,
+    "median_attempt_seconds": 86.973,
+    "maximum_attempt_seconds": 230.414,
+    "average_http_429_retries_per_run": 4.5,
+    "throughput_change_vs_sequential_percent": 13.51,
+    "batch_wall_change_vs_sequential_percent": -11.90,
+    "mean_latency_change_vs_sequential_percent": 99.50
+  },
+  "concurrent_six_reference": {
+    "attempts": 6,
+    "valid_candidates": 6,
+    "batch_wall_seconds": 199.551,
+    "throughput_tasks_per_hour": 108.24,
+    "mean_attempt_seconds": 121.814,
+    "maximum_attempt_seconds": 187.461,
+    "http_429_retries_recovered": 36
+  },
+  "runtime_observations": {
+    "peak_observed_cpu_millicores": 107,
+    "peak_observed_memory_mib": 436,
+    "memory_limit_mib": 2048,
+    "runtime_restarts": 0,
+    "unhealthy_pods": 0
+  },
+  "conversations": [
+    {
+      "run": 1,
+      "task_id": "color-cycle-7",
+      "conversation_id": "c6e1132e12f4477c8311373dbd839aed",
+      "sandbox_id": "72ZU0xLVsKGt3NJCx2bp6z",
+      "valid": true,
+      "score": 3
+    },
+    {
+      "run": 1,
+      "task_id": "color-bipartite-8",
+      "conversation_id": "98767457e8ac4eb39df8411f3aa67354",
+      "sandbox_id": "72ZU0xLVsKGt3NJCx2bp6z",
+      "valid": true,
+      "score": 2
+    },
+    {
+      "run": 1,
+      "task_id": "cover-campus",
+      "conversation_id": "3678e5c904264964988fbe0e935a6c7e",
+      "sandbox_id": "72ZU0xLVsKGt3NJCx2bp6z",
+      "valid": true,
+      "score": 2
+    },
+    {
+      "run": 1,
+      "task_id": "cover-grid",
+      "conversation_id": "38f14806a60f40a59b9407c1bfeaa839",
+      "sandbox_id": "72ZU0xLVsKGt3NJCx2bp6z",
+      "valid": true,
+      "score": 2
+    },
+    {
+      "run": 2,
+      "task_id": "color-cycle-7",
+      "conversation_id": "281f52ff1e924ff49da2600da39549fd",
+      "sandbox_id": "42lKU1cln2R22XVx66PfE3",
+      "valid": true,
+      "score": 3
+    },
+    {
+      "run": 2,
+      "task_id": "color-bipartite-8",
+      "conversation_id": "e4a0fefad5ba4400a96d8424d29f063e",
+      "sandbox_id": "42lKU1cln2R22XVx66PfE3",
+      "valid": true,
+      "score": 2
+    },
+    {
+      "run": 2,
+      "task_id": "cover-campus",
+      "conversation_id": "31da2bb3eb9f410aacdb368b30e5159f",
+      "sandbox_id": "42lKU1cln2R22XVx66PfE3",
+      "valid": true,
+      "score": 2
+    },
+    {
+      "run": 2,
+      "task_id": "cover-grid",
+      "conversation_id": "bca2abde91c3452e9db00a0d6e8ccbc6",
+      "sandbox_id": "42lKU1cln2R22XVx66PfE3",
+      "valid": true,
+      "score": 2
+    }
+  ],
+  "decision": {
+    "sandbox_capacity": 6,
+    "default_batch_dispatch_limit": 4,
+    "interactive_dispatch_limit": 2,
+    "six_active_agents": "opt-in for trusted latency-tolerant batches"
+  },
+  "limitations": [
+    "The four-agent result contains two live repetitions and remains sensitive to model-response variance.",
+    "The six-agent reference contains two additional tasks and is not an equal-size batch.",
+    "The benchmark tasks are short and model-wait-heavy.",
+    "The result does not establish safety for simultaneous compilation, browser, or test-heavy agents."
+  ]
+}
