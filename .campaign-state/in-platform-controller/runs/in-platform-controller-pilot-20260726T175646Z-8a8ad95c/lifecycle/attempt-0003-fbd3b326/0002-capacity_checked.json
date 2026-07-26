@@ -1,0 +1,22 @@
+{
+  "attempt_id": "attempt-0003-fbd3b326",
+  "id": "0002-capacity_checked",
+  "kind": "capacity_checked",
+  "payload": {
+    "active": 1,
+    "available_before_limit": 9,
+    "launch_allowed": true,
+    "launch_lock_at": 7,
+    "observed_sandboxes": 231,
+    "runtime_limit": 10,
+    "scope": "authenticated-user-visible-sandboxes",
+    "status_counts": {
+      "MISSING": 6,
+      "PAUSED": 224,
+      "RUNNING": 1
+    }
+  },
+  "recorded_at": "2026-07-26T18:06:04.501506+00:00",
+  "run_id": "in-platform-controller-pilot-20260726T175646Z-8a8ad95c",
+  "schema_version": 1
+}
