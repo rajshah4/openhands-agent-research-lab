@@ -1,0 +1,12 @@
+{
+  "attempt_id": "attempt-0001-18777c4b",
+  "id": "0012-sandbox_pause_requested",
+  "kind": "sandbox_pause_requested",
+  "payload": {
+    "conversation_id": "51e844ee080041bc999420d4837ddda9",
+    "sandbox_id": "3Vkmr5jzsm2hDLjmpKz7ab"
+  },
+  "recorded_at": "2026-07-26T18:00:29.937234+00:00",
+  "run_id": "in-platform-controller-pilot-20260726T175646Z-8a8ad95c",
+  "schema_version": 1
+}
