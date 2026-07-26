@@ -1,0 +1,407 @@
+{
+  "campaign": {
+    "attempt_budget": 4,
+    "branch": "main",
+    "id": "in-platform-controller-pilot",
+    "model": null,
+    "name": "Replicated in-platform controller pilot",
+    "policy": "managed",
+    "repository": "rajshah4/openhands-agent-research-lab",
+    "tasks": [
+      {
+        "description": "Color a dense twelve-node graph whose tempting matched pairs are absent.",
+        "edges": [
+          [
+            "p1",
+            "q2"
+          ],
+          [
+            "p1",
+            "q3"
+          ],
+          [
+            "p1",
+            "q4"
+          ],
+          [
+            "p1",
+            "q5"
+          ],
+          [
+            "p1",
+            "q6"
+          ],
+          [
+            "p2",
+            "q1"
+          ],
+          [
+            "p2",
+            "q3"
+          ],
+          [
+            "p2",
+            "q4"
+          ],
+          [
+            "p2",
+            "q5"
+          ],
+          [
+            "p2",
+            "q6"
+          ],
+          [
+            "p3",
+            "q1"
+          ],
+          [
+            "p3",
+            "q2"
+          ],
+          [
+            "p3",
+            "q4"
+          ],
+          [
+            "p3",
+            "q5"
+          ],
+          [
+            "p3",
+            "q6"
+          ],
+          [
+            "p4",
+            "q1"
+          ],
+          [
+            "p4",
+            "q2"
+          ],
+          [
+            "p4",
+            "q3"
+          ],
+          [
+            "p4",
+            "q5"
+          ],
+          [
+            "p4",
+            "q6"
+          ],
+          [
+            "p5",
+            "q1"
+          ],
+          [
+            "p5",
+            "q2"
+          ],
+          [
+            "p5",
+            "q3"
+          ],
+          [
+            "p5",
+            "q4"
+          ],
+          [
+            "p5",
+            "q6"
+          ],
+          [
+            "p6",
+            "q1"
+          ],
+          [
+            "p6",
+            "q2"
+          ],
+          [
+            "p6",
+            "q3"
+          ],
+          [
+            "p6",
+            "q4"
+          ],
+          [
+            "p6",
+            "q5"
+          ]
+        ],
+        "family": "graph-coloring",
+        "id": "color-01-crown-12",
+        "nodes": [
+          "p1",
+          "q1",
+          "p2",
+          "q2",
+          "p3",
+          "q3",
+          "p4",
+          "q4",
+          "p5",
+          "q5",
+          "p6",
+          "q6"
+        ],
+        "payload": {},
+        "tags": [
+          "graph-coloring",
+          "dense",
+          "hard-transfer"
+        ],
+        "target_score": 2.0
+      },
+      {
+        "description": "Cover eighteen signals using a small selection from overlapping constellations.",
+        "edges": [],
+        "family": "set-cover",
+        "id": "cover-01-constellations",
+        "nodes": [],
+        "payload": {
+          "sets": {
+            "atlas": [
+              "e01",
+              "e02",
+              "e03",
+              "e04",
+              "e05",
+              "e06"
+            ],
+            "beacon": [
+              "e07",
+              "e08",
+              "e09",
+              "e10",
+              "e11",
+              "e12"
+            ],
+            "cipher": [
+              "e13",
+              "e14",
+              "e15",
+              "e16",
+              "e17",
+              "e18"
+            ],
+            "drift": [
+              "e01",
+              "e02",
+              "e07",
+              "e08",
+              "e13",
+              "e14"
+            ],
+            "ember": [
+              "e03",
+              "e04",
+              "e09",
+              "e10",
+              "e15",
+              "e16"
+            ],
+            "fable": [
+              "e05",
+              "e06",
+              "e11",
+              "e12",
+              "e17",
+              "e18"
+            ],
+            "glint": [
+              "e01",
+              "e06",
+              "e08",
+              "e11",
+              "e14",
+              "e17"
+            ],
+            "harbor": [
+              "e02",
+              "e05",
+              "e07",
+              "e12",
+              "e13",
+              "e18"
+            ]
+          },
+          "universe": [
+            "e01",
+            "e02",
+            "e03",
+            "e04",
+            "e05",
+            "e06",
+            "e07",
+            "e08",
+            "e09",
+            "e10",
+            "e11",
+            "e12",
+            "e13",
+            "e14",
+            "e15",
+            "e16",
+            "e17",
+            "e18"
+          ]
+        },
+        "tags": [
+          "set-cover",
+          "overlap",
+          "hard-transfer"
+        ],
+        "target_score": 3.0
+      },
+      {
+        "description": "Pack twelve scrambled complementary items into capacity-ten bins.",
+        "edges": [],
+        "family": "bin-packing",
+        "id": "pack-01-pairs-12",
+        "nodes": [],
+        "payload": {
+          "capacity": 10,
+          "items": {
+            "amber": 8,
+            "birch": 3,
+            "coral": 6,
+            "dune": 2,
+            "elm": 7,
+            "frost": 4,
+            "gale": 8,
+            "heath": 3,
+            "iris": 6,
+            "jade": 2,
+            "kelp": 7,
+            "lumen": 4
+          }
+        },
+        "tags": [
+          "bin-packing",
+          "complementary",
+          "hard-transfer"
+        ],
+        "target_score": 6.0
+      },
+      {
+        "description": "Color an eleven-node triangle-free graph with a coupled shadow layer.",
+        "edges": [
+          [
+            "v0",
+            "v1"
+          ],
+          [
+            "v1",
+            "v2"
+          ],
+          [
+            "v2",
+            "v3"
+          ],
+          [
+            "v3",
+            "v4"
+          ],
+          [
+            "v4",
+            "v0"
+          ],
+          [
+            "u0",
+            "v1"
+          ],
+          [
+            "u0",
+            "v4"
+          ],
+          [
+            "u1",
+            "v0"
+          ],
+          [
+            "u1",
+            "v2"
+          ],
+          [
+            "u2",
+            "v1"
+          ],
+          [
+            "u2",
+            "v3"
+          ],
+          [
+            "u3",
+            "v2"
+          ],
+          [
+            "u3",
+            "v4"
+          ],
+          [
+            "u4",
+            "v3"
+          ],
+          [
+            "u4",
+            "v0"
+          ],
+          [
+            "w",
+            "u0"
+          ],
+          [
+            "w",
+            "u1"
+          ],
+          [
+            "w",
+            "u2"
+          ],
+          [
+            "w",
+            "u3"
+          ],
+          [
+            "w",
+            "u4"
+          ]
+        ],
+        "family": "graph-coloring",
+        "id": "color-02-mycielski-11",
+        "nodes": [
+          "v0",
+          "v1",
+          "v2",
+          "v3",
+          "v4",
+          "u0",
+          "u1",
+          "u2",
+          "u3",
+          "u4",
+          "w"
+        ],
+        "payload": {},
+        "tags": [
+          "graph-coloring",
+          "shadow-layer",
+          "hard-transfer"
+        ],
+        "target_score": 4.0
+      }
+    ]
+  },
+  "created_at": "2026-07-26T17:56:46.108549+00:00",
+  "id": "in-platform-controller-pilot-20260726T175646Z-8a8ad95c",
+  "scheduler": {
+    "name": "managed",
+    "version": "1"
+  },
+  "schema_version": 1,
+  "storage_contract": "single-controller-file-lock"
+}
