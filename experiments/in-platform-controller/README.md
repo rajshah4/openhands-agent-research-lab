@@ -4,6 +4,9 @@ This experiment moves the research-lab controller from an operator workstation
 into the OpenHands Enterprise deployment. OpenHands then owns both the
 controller's execution schedule and the worker conversations it coordinates.
 
+See [`results-2026-07-26.md`](results-2026-07-26.md) for the live Replicated
+results, compatibility findings, and production-readiness boundary.
+
 The experiment compares two controller placements while keeping the campaign,
 worker API, validator, Git ledger, model profile, capacity guard, and attempt
 budget fixed.
