@@ -752,22 +752,21 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
         <div className="section-heading">
           <div>
             <p className="eyebrow">OpenHands multi-agent deployment options</p>
-            <h1>How the available execution patterns differ.</h1>
+            <h1>Four ways to organize agent execution.</h1>
           </div>
           <p>
-            Scheduling decides who does the work. Deployment decides what those
-            workers share. OpenHands supports several useful boundaries; the
-            right one depends on trust, audit needs, failure isolation, and
-            infrastructure budget.
+            The scheduler can assign the same work through four different
+            execution structures. The choice determines whether agents receive
+            separate records, separate sandboxes, or a shared working
+            environment.
           </p>
         </div>
         <div className="workflow">
           {[
-            ["01", "Trust", "Can these agents safely share a filesystem and compute?"],
-            ["02", "Record", "Does every agent need its own conversation history?"],
-            ["03", "Failure", "How much work may fail together?"],
-            ["04", "Capacity", "How many sandboxes can the cluster sustain?"],
-            ["05", "Lifecycle", "Who drains, pauses, and recycles each runtime?"],
+            ["01", "Enterprise isolated", "Each agent has its own OpenHands conversation and sandbox."],
+            ["02", "Enterprise grouped", "Agents keep separate conversations while trusted work shares a sandbox."],
+            ["03", "Agent Canvas", "Several agents share one lighter agent backend, workspace, and trust boundary."],
+            ["04", "Subagents", "One parent conversation delegates work inside its own context and sandbox."],
           ].map(([number, title, copy]) => (
             <article className="workflow-step" key={number}>
               <span>{number}</span>
@@ -782,58 +781,18 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
             alt="Isolated placement uses four sandboxes for four agent conversations, while grouped placement keeps four separate conversations inside one shared sandbox."
           />
           <figcaption>
-            The conversations remain separate OpenHands records in both
-            approaches. Grouping changes the runtime boundary: trusted agents
-            share compute and a filesystem instead of creating one container
-            for every conversation.
+            The first two patterns use first-class Enterprise conversations.
+            Grouping changes only their runtime boundary: trusted agents share
+            compute and a filesystem instead of creating one sandbox for every
+            conversation.
           </figcaption>
         </figure>
-      </section>
-
-      <section className="section">
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow">Structure and trade-offs</p>
-            <h2>The same scheduler can use four OpenHands execution patterns.</h2>
-          </div>
-          <p>
-            These can use the same external task registry, scheduler,
-            validators, and experiment ledger. Placement does not have to
-            change the research protocol.
-          </p>
-        </div>
-        <div className="agent-table-wrap">
-          <table className="agent-table">
-            <thead>
-              <tr>
-                <th>Pattern</th>
-                <th>Agent record</th>
-                <th>Runtime boundary</th>
-                <th>Isolation</th>
-                <th>Best fit</th>
-                <th>Concurrency requirement</th>
-                <th>Cost evidence</th>
-                <th>Main tradeoff</th>
-                <th>Evidence</th>
-              </tr>
-            </thead>
-            <tbody>
-              {patterns.map((pattern) => (
-                <tr key={pattern.name}>
-                  <td><strong>{pattern.name}</strong></td>
-                  <td>{pattern.record}</td>
-                  <td>{pattern.runtime}</td>
-                  <td>{pattern.isolation}</td>
-                  <td>{pattern.use}</td>
-                  <td>{pattern.concurrency}</td>
-                  <td>{pattern.cost}</td>
-                  <td>{pattern.tradeoff}</td>
-                  <td><span className="arm-chip managed">{pattern.status}</span></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <p className="architecture-note">
+          <strong>What we measured:</strong> live tests covered Enterprise
+          isolated conversations, Enterprise grouped conversations, and Agent
+          Canvas. Subagents are included as an available structure, but were
+          not part of the matched performance study.
+        </p>
       </section>
 
       <section className="section implementation-section">
@@ -990,6 +949,68 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
           The two-job queue is intentional admission control, not unused
           sandbox capacity. Infrastructure cost was not measured.
         </p>
+      </section>
+
+      <section className="section">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">Choosing an execution pattern</p>
+            <h2>Use trust and operational requirements to choose the boundary.</h2>
+          </div>
+          <p>
+            All four patterns can use the same external task registry,
+            scheduler, validators, and experiment ledger. The execution choice
+            changes isolation, agent records, failure boundaries, and
+            infrastructure overhead.
+          </p>
+        </div>
+        <div className="workflow">
+          {[
+            ["01", "Trust", "Can these agents safely share a filesystem and compute?"],
+            ["02", "Record", "Does every agent need its own conversation history?"],
+            ["03", "Failure", "How much work may fail together?"],
+            ["04", "Capacity", "How many sandboxes can the cluster sustain?"],
+            ["05", "Lifecycle", "Who drains, pauses, and recycles each runtime?"],
+          ].map(([number, title, copy]) => (
+            <article className="workflow-step" key={number}>
+              <span>{number}</span>
+              <h3>{title}</h3>
+              <p>{copy}</p>
+            </article>
+          ))}
+        </div>
+        <div className="agent-table-wrap">
+          <table className="agent-table">
+            <thead>
+              <tr>
+                <th>Pattern</th>
+                <th>Agent record</th>
+                <th>Runtime boundary</th>
+                <th>Isolation</th>
+                <th>Best fit</th>
+                <th>Concurrency requirement</th>
+                <th>Cost evidence</th>
+                <th>Main tradeoff</th>
+                <th>Evidence</th>
+              </tr>
+            </thead>
+            <tbody>
+              {patterns.map((pattern) => (
+                <tr key={pattern.name}>
+                  <td><strong>{pattern.name}</strong></td>
+                  <td>{pattern.record}</td>
+                  <td>{pattern.runtime}</td>
+                  <td>{pattern.isolation}</td>
+                  <td>{pattern.use}</td>
+                  <td>{pattern.concurrency}</td>
+                  <td>{pattern.cost}</td>
+                  <td>{pattern.tradeoff}</td>
+                  <td><span className="arm-chip managed">{pattern.status}</span></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </section>
     </>
   );

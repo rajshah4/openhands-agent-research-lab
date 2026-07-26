@@ -75,6 +75,13 @@ test("includes the Agent Canvas deployment evidence", async () => {
   assert.match(source, /Those waiting jobs\s+did not have sandboxes yet/);
   assert.match(source, /Removing the queue increased contention and did not produce a wall-time win/);
   assert.doesNotMatch(source, /simultaneous sandbox(?:es)? · .* queued/);
+  assert.match(source, /Four ways to organize agent execution/);
+  assert.match(source, /Enterprise isolated/);
+  assert.match(source, /Enterprise grouped/);
+  assert.match(source, /Agent Canvas/);
+  assert.match(source, /Subagents/);
+  assert.match(source, /Subagents are included as an available structure, but were\s+not part of the matched performance study/);
+  assert.match(source, /Choosing an execution pattern/);
   assert.match(source, /NeuroGolf scaling planner/);
   assert.match(source, /One sandbox per active agent/);
   assert.match(source, /Four agents per shared sandbox/);
