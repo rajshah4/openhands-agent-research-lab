@@ -65,6 +65,37 @@ type Snapshot = {
       controllerRetries: number;
     }
   >;
+  canvasPilot: {
+    clusterProvisionMinutes: number;
+    coldStartSeconds: {
+      first: number;
+      recreated: number;
+    };
+    sharedLoadSix: {
+      attempts: number;
+      valid: number;
+      wallSeconds: number;
+      peakCpuMillis: number;
+      peakMemoryMib: number;
+      modelCost: number;
+      restarts: number;
+    };
+    matchedDeployment: {
+      attempts: number;
+      valid: number;
+      meanBatchWallSeconds: number;
+      replicatedMeanBatchWallSeconds: number;
+      effectiveThroughput: number;
+      replicatedEffectiveThroughput: number;
+      totalModelCost: number;
+      replicatedTotalModelCost: number;
+    };
+    estimatedDailyInfrastructure: {
+      publicListPrice: number;
+      afterApplicableFreeTierLow: number;
+      afterApplicableFreeTierHigh: number;
+    };
+  };
   scaleStudy: Record<
     "isolatedQueue" | "longLivedShared" | "boundedCells",
     {
@@ -688,7 +719,7 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
       use: "Tightly coupled trusted work and lightweight demonstrations",
       tradeoff: "Less runtime isolation than Enterprise conversations",
       concurrency: "Logical agents share one backend; size the backend for the workload",
-      cost: "Not measured in the matched Replicated cost study",
+      cost: `$${snapshot.canvasPilot.matchedDeployment.totalModelCost.toFixed(3)} total for 18 matched attempts`,
       status: "Compared",
     },
     {
@@ -770,7 +801,7 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
                 <th>Isolation</th>
                 <th>Best fit</th>
                 <th>Concurrency requirement</th>
-                <th>Measured model cost</th>
+                <th>Cost evidence</th>
                 <th>Main tradeoff</th>
                 <th>Evidence</th>
               </tr>
@@ -792,6 +823,78 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
             </tbody>
           </table>
         </div>
+      </section>
+
+      <section className="section implementation-section">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">Agent Canvas on Kubernetes</p>
+            <h2>We measured setup time, shared-agent load, model cost, and estimated cluster cost.</h2>
+          </div>
+          <p>
+            This was one trusted-team Agent Canvas backend on GKE Autopilot:
+            one StatefulSet pod and one 20 GiB persistent volume. It is a
+            lighter trust model than Enterprise, not a tenant-isolated
+            replacement for it.
+          </p>
+        </div>
+        <div className="implementation-grid">
+          <article className="implementation-card">
+            <span className="implementation-status tested">Setup effort</span>
+            <h3>{snapshot.canvasPilot.clusterProvisionMinutes} minutes to provision the cluster</h3>
+            <p>
+              Cold workload startup took{" "}
+              {Math.floor(snapshot.canvasPilot.coldStartSeconds.first / 60)}:
+              {String(snapshot.canvasPilot.coldStartSeconds.first % 60).padStart(2, "0")}
+              {" "}on the first cluster and{" "}
+              {Math.floor(snapshot.canvasPilot.coldStartSeconds.recreated / 60)}:
+              {String(snapshot.canvasPilot.coldStartSeconds.recreated % 60).padStart(2, "0")}
+              {" "}after recreation.
+            </p>
+          </article>
+          <article className="implementation-card">
+            <span className="implementation-status tested">Six-agent load</span>
+            <h3>{snapshot.canvasPilot.sharedLoadSix.wallSeconds} seconds in one shared pod</h3>
+            <p>
+              {snapshot.canvasPilot.sharedLoadSix.valid}/
+              {snapshot.canvasPilot.sharedLoadSix.attempts} attempts validated;
+              peak use was {snapshot.canvasPilot.sharedLoadSix.peakCpuMillis}m
+              CPU and {snapshot.canvasPilot.sharedLoadSix.peakMemoryMib} MiB,
+              with {snapshot.canvasPilot.sharedLoadSix.restarts} restarts.
+            </p>
+            <dl>
+              <div><dt>Model cost</dt><dd>${snapshot.canvasPilot.sharedLoadSix.modelCost.toFixed(4)} for the phase</dd></div>
+            </dl>
+          </article>
+          <article className="implementation-card">
+            <span className="implementation-status tested">Matched comparison</span>
+            <h3>{snapshot.canvasPilot.matchedDeployment.meanBatchWallSeconds.toFixed(1)} seconds per Canvas batch</h3>
+            <p>
+              The matched Replicated batches averaged{" "}
+              {snapshot.canvasPilot.matchedDeployment.replicatedMeanBatchWallSeconds.toFixed(1)}
+              {" "}seconds. Both completed{" "}
+              {snapshot.canvasPilot.matchedDeployment.valid}/
+              {snapshot.canvasPilot.matchedDeployment.attempts} valid attempts,
+              and reported model cost was effectively tied.
+            </p>
+            <dl>
+              <div><dt>Canvas throughput</dt><dd>{snapshot.canvasPilot.matchedDeployment.effectiveThroughput.toFixed(2)} tasks/hour</dd></div>
+              <div><dt>Replicated throughput</dt><dd>{snapshot.canvasPilot.matchedDeployment.replicatedEffectiveThroughput.toFixed(2)} tasks/hour</dd></div>
+            </dl>
+          </article>
+        </div>
+        <p className="architecture-note">
+          <strong>Estimated infrastructure cost:</strong> about $
+          {snapshot.canvasPilot.estimatedDailyInfrastructure.publicListPrice.toFixed(2)}
+          /day at public list prices, including the cluster management fee, or
+          about $
+          {snapshot.canvasPilot.estimatedDailyInfrastructure.afterApplicableFreeTierLow.toFixed(2)}
+          –$
+          {snapshot.canvasPilot.estimatedDailyInfrastructure.afterApplicableFreeTierHigh.toFixed(2)}
+          /day if the applicable GKE free-tier cluster credit is available.
+          This is a resource-based estimate from the pilot configuration, not a
+          cloud invoice.
+        </p>
       </section>
 
       <section className="section implementation-section">

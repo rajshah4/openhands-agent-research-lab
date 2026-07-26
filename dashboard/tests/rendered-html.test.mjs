@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { stat } from "node:fs/promises";
+import { readFile, stat } from "node:fs/promises";
 import test from "node:test";
 
 async function render() {
@@ -58,4 +58,21 @@ test("renders the NeuroGolf experiment for a new reader", async () => {
   assert.doesNotMatch(html, /Supporting live-systems check|These are real OpenHands runs/);
   assert.doesNotMatch(html, /full competition solver is not/);
   assert.doesNotMatch(html, /codex-preview|Your site is taking shape/);
+});
+
+test("includes the Agent Canvas deployment evidence", async () => {
+  const source = await readFile(
+    new URL("../app/research-dashboard.tsx", import.meta.url),
+    "utf8",
+  );
+  const snapshot = await readFile(
+    new URL("../data/snapshot.json", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(source, /We measured setup time, shared-agent load, model cost, and estimated cluster cost/);
+  assert.match(source, /resource-based estimate from the pilot configuration, not a/);
+  assert.match(snapshot, /"clusterProvisionMinutes": 8/);
+  assert.match(snapshot, /"wallSeconds": 113/);
+  assert.match(snapshot, /"effectiveThroughput": 153\.55/);
 });

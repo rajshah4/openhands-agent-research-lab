@@ -77,6 +77,37 @@
       "controllerRetries": 0
     }
   },
+  "canvasPilot": {
+    "clusterProvisionMinutes": 8,
+    "coldStartSeconds": {
+      "first": 160,
+      "recreated": 198
+    },
+    "sharedLoadSix": {
+      "attempts": 6,
+      "valid": 6,
+      "wallSeconds": 113,
+      "peakCpuMillis": 265,
+      "peakMemoryMib": 707,
+      "modelCost": 0.1588,
+      "restarts": 0
+    },
+    "matchedDeployment": {
+      "attempts": 18,
+      "valid": 18,
+      "meanBatchWallSeconds": 140.7,
+      "replicatedMeanBatchWallSeconds": 270.5,
+      "effectiveThroughput": 153.55,
+      "replicatedEffectiveThroughput": 79.86,
+      "totalModelCost": 0.6024,
+      "replicatedTotalModelCost": 0.6084
+    },
+    "estimatedDailyInfrastructure": {
+      "publicListPrice": 3.08,
+      "afterApplicableFreeTierLow": 0.66,
+      "afterApplicableFreeTierHigh": 0.68
+    }
+  },
   "scaleStudy": {
     "isolatedQueue": {
       "valid": 12,
