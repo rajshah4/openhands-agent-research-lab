@@ -181,6 +181,37 @@ type Snapshot = {
     speedup: number;
     liveRecoveryConversations: number;
   };
+  controllerLoad: {
+    enterpriseExternal: {
+      valid: number;
+      attempts: number;
+      activeWorkers: number;
+      queuedWorkers: number;
+      sandboxes: number;
+      wallSeconds: number;
+      throughput: number;
+      modelCost: number;
+      retries: number;
+    };
+    enterpriseAutomation: {
+      acceptedWorkers: number;
+      acceptedValid: number;
+      acceptedAttempts: number;
+      acceptedWallSeconds: number;
+      acceptedSandboxes: number;
+      rejectedWorkers: number;
+      rejectedValid: number;
+      rejectedAttempts: number;
+      rejectedWallSeconds: number;
+    };
+    canvasResume: {
+      controllerProcesses: number;
+      valid: number;
+      attempts: number;
+      firstSeconds: number;
+      resumedSeconds: number;
+    };
+  };
   portfolioScale: {
     tasks: number;
     attemptsPerArm: number;
@@ -1442,6 +1473,139 @@ function RobustnessGuide({ snapshot }: { snapshot: Snapshot }) {
             </article>
           ))}
         </div>
+      </section>
+
+      <section className="section controller-section">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">Where the controller runs</p>
+            <h2>OpenHands ran the workers. One controller kept the campaign organized.</h2>
+          </div>
+          <p>
+            The controller selected work, enforced the active-agent limit,
+            checked outputs, recorded evidence, resumed interrupted work, and
+            paused finished sandboxes. We tested it outside Enterprise, inside
+            an Enterprise automation, and beside Agent Canvas.
+          </p>
+        </div>
+
+        <div className="controller-map" role="img" aria-label="A single controller uses a file ledger and Git checkpoints, then assigns bounded work cells to OpenHands Enterprise, Agent Canvas, or native subagents. Multiple controllers require database leases.">
+          <div className="controller-source">
+            <span className="controller-kicker">Durable campaign memory</span>
+            <strong>Files + Git checkpoints</strong>
+            <small>4,800 attempts · 24,013 records · restartable</small>
+          </div>
+          <span className="controller-arrow" aria-hidden="true">→</span>
+          <div className="controller-owner">
+            <span className="controller-kicker">One lifecycle owner</span>
+            <strong>Controller</strong>
+            <small>claim · admit · validate · resume · pause</small>
+          </div>
+          <span className="controller-arrow" aria-hidden="true">→</span>
+          <div className="controller-workers">
+            <span>Enterprise conversations</span>
+            <span>Agent Canvas cells</span>
+            <span>Native subagents</span>
+          </div>
+        </div>
+
+        <div className="controller-boundary">
+          <article>
+            <span className="implementation-status tested">Tested boundary</span>
+            <h3>One controller can use files and Git</h3>
+            <p>
+              A file lock prevents a second writer. Immutable lifecycle records
+              preserve the audit trail, and Git checkpoints make a scheduled
+              controller tick restartable without depending on agent memory.
+            </p>
+          </article>
+          <article>
+            <span className="implementation-status next">Scale-out boundary</span>
+            <h3>Several controllers need database leases</h3>
+            <p>
+              When controller replicas or tenants can claim work at the same
+              time, use an application-owned transactional database for leases,
+              idempotent claims, and heartbeats. Do not use OpenHands internal
+              PostgreSQL tables as the campaign API.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section className="section implementation-section">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">Controller load tests</p>
+            <h2>What passed, and where we reduced concurrency.</h2>
+          </div>
+          <p>
+            A campaign can contain hundreds of agents without running hundreds
+            at once. The controller keeps the backlog durable and admits a
+            tested number of workers into each cell.
+          </p>
+        </div>
+        <div className="controller-results">
+          <article>
+            <span className="implementation-status tested">Enterprise · external service</span>
+            <h3>{snapshot.controllerLoad.enterpriseExternal.valid}/{snapshot.controllerLoad.enterpriseExternal.attempts} independently valid</h3>
+            <p>
+              {snapshot.controllerLoad.enterpriseExternal.activeWorkers} active
+              conversations and {snapshot.controllerLoad.enterpriseExternal.queuedWorkers}
+              {" "}queued in one grouped sandbox. The batch took{" "}
+              {snapshot.controllerLoad.enterpriseExternal.wallSeconds.toFixed(1)}
+              {" "}seconds at{" "}
+              {snapshot.controllerLoad.enterpriseExternal.throughput.toFixed(2)}
+              {" "}tasks/hour, with{" "}
+              {snapshot.controllerLoad.enterpriseExternal.retries} API retries.
+            </p>
+          </article>
+          <article>
+            <span className="implementation-status pilot">Enterprise · in-platform automation</span>
+            <h3>{snapshot.controllerLoad.enterpriseAutomation.acceptedValid}/{snapshot.controllerLoad.enterpriseAutomation.acceptedAttempts} passed at {snapshot.controllerLoad.enterpriseAutomation.acceptedWorkers} workers</h3>
+            <p>
+              The accepted cell used{" "}
+              {snapshot.controllerLoad.enterpriseAutomation.acceptedSandboxes}
+              {" "}sandbox and took{" "}
+              {snapshot.controllerLoad.enterpriseAutomation.acceptedWallSeconds.toFixed(1)}
+              {" "}seconds. A {snapshot.controllerLoad.enterpriseAutomation.rejectedWorkers}-worker
+              test finished at the automation layer, but only{" "}
+              {snapshot.controllerLoad.enterpriseAutomation.rejectedValid}/
+              {snapshot.controllerLoad.enterpriseAutomation.rejectedAttempts}
+              {" "}child outputs were independently verifiable, so we rejected
+              it as the default.
+            </p>
+          </article>
+          <article>
+            <span className="implementation-status tested">Agent Canvas · adjacent controller</span>
+            <h3>{snapshot.controllerLoad.canvasResume.valid}/{snapshot.controllerLoad.canvasResume.attempts} valid across {snapshot.controllerLoad.canvasResume.controllerProcesses} controller processes</h3>
+            <p>
+              A second process resumed the same run instead of creating a new
+              campaign. The two attempts took{" "}
+              {snapshot.controllerLoad.canvasResume.firstSeconds.toFixed(1)}
+              {" "}and{" "}
+              {snapshot.controllerLoad.canvasResume.resumedSeconds.toFixed(1)}
+              {" "}seconds.
+            </p>
+          </article>
+          <article>
+            <span className="implementation-status tested">Native subagents · inside a cell</span>
+            <h3>4/4 strict contracts in Canvas</h3>
+            <p>
+              Native delegation is useful for two to four trusted specialists
+              sharing one parent workspace. It does not replace the durable
+              campaign controller because child tasks do not independently own
+              the queue, leases, or long-term experiment record.
+            </p>
+          </article>
+        </div>
+        <p className="architecture-note">
+          <strong>Recommended production shape:</strong> run the durable
+          controller as a small Enterprise service for sustained campaigns, or
+          as a two-child in-platform automation for bounded scheduled work.
+          Agent Canvas can use the same controller beside one trusted shared
+          backend. In every case, queue excess work and validate results outside
+          the agent.
+        </p>
       </section>
 
       <section className="section implementation-section">

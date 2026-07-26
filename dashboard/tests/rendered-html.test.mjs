@@ -102,6 +102,15 @@ test("includes the Agent Canvas deployment evidence", async () => {
   assert.match(source, /Manageability/);
   assert.match(source, /validate the task\s+tool separately on OpenHands Cloud/i);
   assert.match(source, /Choosing an execution pattern/);
+  assert.match(source, /OpenHands ran the workers\. One controller kept the campaign organized/);
+  assert.match(source, /One controller can use files and Git/);
+  assert.match(source, /Several controllers need database leases/);
+  assert.match(source, /Do not use OpenHands internal\s+PostgreSQL tables as the campaign API/);
+  assert.match(source, /What passed, and where we reduced concurrency/);
+  assert.match(source, /Enterprise · external service/);
+  assert.match(source, /Enterprise · in-platform automation/);
+  assert.match(source, /Agent Canvas · adjacent controller/);
+  assert.match(source, /Native subagents · inside a cell/);
   assert.match(source, /NeuroGolf scaling planner/);
   assert.match(source, /One sandbox per active agent/);
   assert.match(source, /Four agents per shared sandbox/);
@@ -128,4 +137,8 @@ test("includes the Agent Canvas deployment evidence", async () => {
   assert.match(snapshot, /"wallSeconds": 299\.615/);
   assert.match(snapshot, /"healthyContracts": 3/);
   assert.match(snapshot, /"injectedFailuresDetected": 1/);
+  assert.match(snapshot, /"controllerLoad"/);
+  assert.match(snapshot, /"throughput": 100\.56/);
+  assert.match(snapshot, /"acceptedValid": 2/);
+  assert.match(snapshot, /"rejectedValid": 3/);
 });

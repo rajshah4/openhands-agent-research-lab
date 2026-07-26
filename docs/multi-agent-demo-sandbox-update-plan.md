@@ -65,3 +65,35 @@ not a signal that a sandbox has safe remaining capacity.
 - pause only after the whole cell drains;
 - use isolated placement for untrusted or cross-tenant work.
 
+## Controller lesson to add
+
+The demo should show that orchestration and placement are separate choices.
+OpenHands runs the agents, while one small controller owns the campaign:
+
+```text
+files + Git checkpoint
+        |
+        v
+single controller
+        |
+        +-- Enterprise conversations
+        +-- Agent Canvas work cells
+        `-- bounded native subagents
+```
+
+For the demo, files plus Git are enough because one controller owns claims and
+checkpoints. The tested ledger handled 4,800 attempts and 24,013 parseable
+records, and a second controller process resumed the same Canvas run. If the
+demo later introduces multiple controller replicas or tenants that can claim
+work concurrently, add application-owned database leases rather than using
+OpenHands internal tables.
+
+The customer-facing examples should include both Enterprise controller
+placements:
+
+- an external V1 controller service for sustained campaigns, tested at four
+  active conversations with two queued in one grouped sandbox;
+- an in-platform prompt automation for bounded scheduled cells, accepted at
+  two child conversations. The four-child automation completed, but only 3/4
+  child contracts were independently verifiable, so it should be retained as
+  failure evidence rather than the default.

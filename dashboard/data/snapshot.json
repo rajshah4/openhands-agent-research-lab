@@ -202,11 +202,42 @@
   },
   "robustness": {
     "attempts": 4800,
-    "elapsedSeconds": 19.08,
+    "elapsedSeconds": 8.44,
     "records": 24013,
     "storeMb": 94,
-    "speedup": 29.86,
+    "speedup": 67.51,
     "liveRecoveryConversations": 1
+  },
+  "controllerLoad": {
+    "enterpriseExternal": {
+      "valid": 6,
+      "attempts": 6,
+      "activeWorkers": 4,
+      "queuedWorkers": 2,
+      "sandboxes": 1,
+      "wallSeconds": 216.6,
+      "throughput": 100.56,
+      "modelCost": 0.23421722,
+      "retries": 0
+    },
+    "enterpriseAutomation": {
+      "acceptedWorkers": 2,
+      "acceptedValid": 2,
+      "acceptedAttempts": 2,
+      "acceptedWallSeconds": 229.9,
+      "acceptedSandboxes": 1,
+      "rejectedWorkers": 4,
+      "rejectedValid": 3,
+      "rejectedAttempts": 4,
+      "rejectedWallSeconds": 442.1
+    },
+    "canvasResume": {
+      "controllerProcesses": 2,
+      "valid": 2,
+      "attempts": 2,
+      "firstSeconds": 33.3,
+      "resumedSeconds": 25.6
+    }
   },
   "portfolioScale": {
     "tasks": 400,

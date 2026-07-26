@@ -723,6 +723,124 @@ dd {
   max-width: 900px;
 }
 
+.controller-section {
+  background: #ebe9e2;
+  max-width: none;
+}
+
+.controller-section > * {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 1365px;
+}
+
+.controller-map {
+  align-items: stretch;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: minmax(220px, 1fr) auto minmax(210px, 0.8fr) auto minmax(240px, 1fr);
+  margin-top: 34px;
+}
+
+.controller-source,
+.controller-owner,
+.controller-workers {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  min-height: 150px;
+  padding: 22px;
+}
+
+.controller-owner {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: white;
+}
+
+.controller-kicker {
+  color: var(--green);
+  display: block;
+  font: 600 9px var(--mono);
+  text-transform: uppercase;
+}
+
+.controller-source strong,
+.controller-owner strong {
+  display: block;
+  font-size: 25px;
+  letter-spacing: -0.035em;
+  margin: 32px 0 8px;
+}
+
+.controller-source small,
+.controller-owner small {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.controller-owner small {
+  color: #aebabc;
+}
+
+.controller-arrow {
+  align-self: center;
+  color: var(--green);
+  font: 600 24px var(--mono);
+}
+
+.controller-workers {
+  display: grid;
+  gap: 8px;
+}
+
+.controller-workers span {
+  align-items: center;
+  background: var(--green-soft);
+  border-radius: 7px;
+  color: #0d6840;
+  display: flex;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 10px 12px;
+}
+
+.controller-boundary {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr 1fr;
+  margin-top: 16px;
+}
+
+.controller-boundary article,
+.controller-results article {
+  background: rgba(251, 250, 246, 0.76);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 22px;
+}
+
+.controller-boundary h3,
+.controller-results h3 {
+  font-size: 22px;
+  letter-spacing: -0.03em;
+  margin: 24px 0 12px;
+}
+
+.controller-boundary p,
+.controller-results p {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.65;
+  margin-bottom: 0;
+}
+
+.controller-results {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(2, 1fr);
+}
+
 .deployment-illustration {
   background: var(--panel);
   border: 1px solid var(--line);
@@ -1500,6 +1618,7 @@ footer > div:last-child {
   .comparison-grid,
   .memory-grid,
   .implementation-grid,
+  .controller-results,
   .planner-requirements {
     grid-template-columns: 1fr 1fr;
   }
@@ -1586,6 +1705,9 @@ footer > div:last-child {
   .compact-metrics,
   .compact-details-grid,
   .subagent-findings,
+  .controller-map,
+  .controller-boundary,
+  .controller-results,
   .comparison-grid,
   .memory-grid,
   .implementation-grid,
@@ -1594,6 +1716,11 @@ footer > div:last-child {
   .planner-comparison,
   .planner-requirements {
     grid-template-columns: 1fr;
+  }
+
+  .controller-arrow {
+    justify-self: center;
+    transform: rotate(90deg);
   }
 
   .pattern-card + .pattern-card,
