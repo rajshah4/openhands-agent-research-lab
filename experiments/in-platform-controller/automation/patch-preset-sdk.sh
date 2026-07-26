@@ -16,6 +16,7 @@ curl -fsS \
 mkdir -p "${work_dir}/preset"
 tar -xzf "${work_dir}/preset.tar.gz" -C "${work_dir}/preset"
 cp "${script_dir}/setup-compat.sh" "${work_dir}/preset/setup.sh"
+cp "${script_dir}/prompt.txt" "${work_dir}/preset/prompt.txt"
 chmod 755 "${work_dir}/preset/setup.sh"
 tar -czf "${work_dir}/patched.tar.gz" -C "${work_dir}/preset" .
 
