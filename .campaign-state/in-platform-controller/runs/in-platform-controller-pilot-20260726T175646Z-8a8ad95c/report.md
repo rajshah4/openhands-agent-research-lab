@@ -3,7 +3,7 @@
 - Campaign: Replicated in-platform controller pilot
 - Scheduler: managed
 - Attempt budget: 4
-- Attempts recorded: 2
+- Attempts recorded: 3
 - Valid candidates: 1
 - Duplicate candidates: 0
 - Normalized solution quality: 0.250
@@ -13,7 +13,7 @@
 | Task | Attempts | Best score |
 | --- | ---: | ---: |
 | color-01-crown-12 | 1 | 2 |
-| cover-01-constellations | 0 | none |
+| cover-01-constellations | 1 | none |
 | pack-01-pairs-12 | 0 | none |
 | color-02-mycielski-11 | 1 | none |
 
@@ -23,6 +23,7 @@
 | ---: | --- | --- | --- | --- | ---: | --- | --- | --- |
 | 1 | color-01-crown-12 | openhands | completed | yes | 2 | yes | no | [open](https://app.replicated.rajistics.com/conversations/51e844ee080041bc999420d4837ddda9) |
 | 2 | color-02-mycielski-11 | None | failed | no | — | no | no | — |
+| 3 | cover-01-constellations | None | failed | no | — | no | no | — |
 
 This report is derived from immutable attempt records. Worker claims are
 not treated as validation evidence.
