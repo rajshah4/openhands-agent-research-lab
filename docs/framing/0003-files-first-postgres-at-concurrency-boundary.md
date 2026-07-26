@@ -4,7 +4,8 @@ Date: 2026-07-25
 
 ## Status
 
-Accepted after the multi-family scale milestone.
+Accepted after the multi-family scale milestone; amended after the 4,800-attempt
+resilience test.
 
 ## Context
 
@@ -42,8 +43,15 @@ evidence and reproducibility.
 ## Consequences
 
 - The current solution has no separate database to install, back up, or expose.
-- A controller restart can recover from the append-only lifecycle and attempt
-  ledger, but two controllers must not share one file-store root.
+- A controller restart cannot erase completed evidence, but the current runner
+  does not yet reconcile and resume an interrupted run automatically.
+- Two controllers must not share responsibility for one campaign through the
+  file store: the matched test duplicated 100/100 task decisions and
+  candidates.
+- A 4,800-attempt run fit in 94 MB with no corrupt JSON, but the current runner
+  took 569.78 seconds because it reparses the full ledger before every attempt.
+  Maintain an indexed in-memory run view before using this path for the full
+  campaign.
 - The dashboard remains safe to publish because it receives a sanitized
   snapshot rather than privileged runtime access.
 - Production adopters have an explicit scale boundary instead of an accidental

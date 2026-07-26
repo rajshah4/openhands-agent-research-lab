@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "date": "2026-07-25",
+  "stress": {
+    "attempt_budget": 4800,
+    "attempts_completed": 4800,
+    "json_files_parsed": 24013,
+    "unique_attempt_ids": 4800,
+    "unique_sequences": 4800,
+    "total_files": 24014,
+    "disk_mebibytes_rounded": 94,
+    "real_seconds": 569.78,
+    "user_seconds": 209.59,
+    "system_seconds": 252.71,
+    "corrupt_json_files": 0
+  },
+  "competing_controllers": {
+    "controllers": 2,
+    "attempts_per_controller": 100,
+    "same_task_at_same_sequence": 100,
+    "same_candidate_at_same_sequence": 100,
+    "shared_claim_records": 0
+  },
+  "termination_and_restart": {
+    "durable_completed_attempts_before_restart": 34,
+    "durable_lifecycle_events_before_restart": 137,
+    "unfinished_selected_attempts": 1,
+    "automatic_resume": false,
+    "new_run_attempts": 100,
+    "overlap_compared": 34,
+    "same_task_in_overlap": 33,
+    "same_candidate_in_overlap": 31
+  },
+  "conclusion": {
+    "file_volume_viable": true,
+    "current_runner_scales_linearly": false,
+    "multi_controller_coordination": false,
+    "automatic_restart_recovery": false,
+    "external_database_required_for_single_controller": false,
+    "application_owned_transactional_store_required_for_concurrent_controllers": true
+  }
+}

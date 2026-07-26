@@ -98,7 +98,7 @@ therefore needs event-driven status, a substantially higher tested API budget,
 or sharded control planes. Increasing Kubernetes capacity alone does not solve
 the application API boundary.
 
-## Production architecture
+## Production architecture at 100-agent scale
 
 ```text
 400-task registry
@@ -136,9 +136,18 @@ single-writer promotion pipeline
   - submission budget and quarantine
 ```
 
-Do not use Git as the runtime queue and do not write to OpenHands internal
-database tables. Git remains the release and audit layer. The research
-application owns PostgreSQL and object storage.
+This is the target when several controllers must claim work concurrently. Do
+not use Git as the runtime queue and do not write to OpenHands internal
+database tables. Git remains the release and audit layer. At this scale the
+research application owns PostgreSQL and object storage.
+
+For the current four-active-sandbox deployment, an application-owned database
+is not required yet. The 4,800-attempt resilience test showed that the
+files-first ledger fit in 94 MB and retained 24,013 parseable JSON records
+without corruption. Before using it for the full campaign, add automatic
+single-controller restart reconciliation and replace full-ledger reparsing
+with an indexed in-memory run view. Keep exactly one controller responsible
+for campaign ownership.
 
 ## OpenHands product gap
 
@@ -157,4 +166,3 @@ sandbox-targeting lease:
 The next scale gate is not 100 agents. It is a matched 24-job test after the
 rollover failure is fixed, followed by two explicitly leased shared cells
 running in parallel.
-
