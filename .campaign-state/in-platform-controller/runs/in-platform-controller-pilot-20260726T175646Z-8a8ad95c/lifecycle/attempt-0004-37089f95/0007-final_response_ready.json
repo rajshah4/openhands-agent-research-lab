@@ -1,0 +1,13 @@
+{
+  "attempt_id": "attempt-0004-37089f95",
+  "id": "0007-final_response_ready",
+  "kind": "final_response_ready",
+  "payload": {
+    "conversation_id": "f8cba25f06474b548f758b2bb1e52d0b",
+    "event_count": 319,
+    "present": true
+  },
+  "recorded_at": "2026-07-26T18:10:14.572805+00:00",
+  "run_id": "in-platform-controller-pilot-20260726T175646Z-8a8ad95c",
+  "schema_version": 1
+}
