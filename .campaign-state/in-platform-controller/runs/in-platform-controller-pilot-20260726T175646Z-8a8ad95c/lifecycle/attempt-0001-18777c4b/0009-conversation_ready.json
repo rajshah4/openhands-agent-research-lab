@@ -1,0 +1,14 @@
+{
+  "attempt_id": "attempt-0001-18777c4b",
+  "id": "0009-conversation_ready",
+  "kind": "conversation_ready",
+  "payload": {
+    "conversation_id": "51e844ee080041bc999420d4837ddda9",
+    "sandbox_id": "3Vkmr5jzsm2hDLjmpKz7ab",
+    "start_task_id": "6d5783203c9d421e9a77c74bcae9a418",
+    "ui_url": "https://app.replicated.rajistics.com/conversations/51e844ee080041bc999420d4837ddda9"
+  },
+  "recorded_at": "2026-07-26T17:58:51.780286+00:00",
+  "run_id": "in-platform-controller-pilot-20260726T175646Z-8a8ad95c",
+  "schema_version": 1
+}
