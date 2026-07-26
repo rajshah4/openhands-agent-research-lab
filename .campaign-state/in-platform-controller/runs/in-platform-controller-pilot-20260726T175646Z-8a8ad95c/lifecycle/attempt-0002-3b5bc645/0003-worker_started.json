@@ -1,0 +1,11 @@
+{
+  "attempt_id": "attempt-0002-3b5bc645",
+  "id": "0003-worker_started",
+  "kind": "worker_started",
+  "payload": {
+    "worker_kind": "openhands"
+  },
+  "recorded_at": "2026-07-26T18:02:01.092940+00:00",
+  "run_id": "in-platform-controller-pilot-20260726T175646Z-8a8ad95c",
+  "schema_version": 1
+}
