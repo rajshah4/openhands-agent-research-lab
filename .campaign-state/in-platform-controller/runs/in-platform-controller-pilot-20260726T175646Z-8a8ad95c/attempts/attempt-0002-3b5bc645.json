@@ -1,0 +1,35 @@
+{
+  "conversation": {},
+  "failure": {
+    "message": "conversation 039d96eb833b44ff92badf006ef0547e sandbox is MISSING",
+    "type": "OpenHandsAPIError"
+  },
+  "final_response": null,
+  "finished_at": "2026-07-26T18:03:10.745740+00:00",
+  "id": "attempt-0002-3b5bc645",
+  "metadata": {},
+  "outcome": "failed",
+  "retrieved_lesson_ids": [
+    "lesson-b300e088230f5291"
+  ],
+  "run_id": "in-platform-controller-pilot-20260726T175646Z-8a8ad95c",
+  "scheduler_decision": {
+    "policy": "managed",
+    "policy_version": "1",
+    "rationale": "prioritized task coverage, balanced attempt ownership, then the weakest validated score, with relevant validated memory",
+    "retrieved_lesson_ids": [
+      "lesson-b300e088230f5291"
+    ],
+    "task_id": "color-02-mycielski-11"
+  },
+  "schema_version": 1,
+  "sequence": 2,
+  "started_at": "2026-07-26T18:01:58.774067+00:00",
+  "task_id": "color-02-mycielski-11",
+  "validation": {
+    "errors": [],
+    "score": null,
+    "valid": false
+  },
+  "worker_kind": null
+}
