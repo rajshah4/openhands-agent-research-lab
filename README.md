@@ -186,7 +186,8 @@ shows how the same control loop fits Enterprise automations, Agent Canvas on
 Kubernetes, and bounded native subagents.
 The [controller load report](experiments/controller-load/results-2026-07-26.md)
 records the 4,800-attempt ledger test, the Enterprise failure and recovery
-sequence, the final 6/6 four-active load, and the two-tick Canvas resume test.
+sequence, the final 6/6 four-active external-controller load, the accepted
+two-child in-platform automation cell, and the two-tick Canvas resume test.
 The [Kaggle parity review](docs/kaggle-neurogolf-parity-review.md) separates
 what is now proven from the ONNX workload, adversarial validation, artifact
 quarantine, and submission gate still required. The

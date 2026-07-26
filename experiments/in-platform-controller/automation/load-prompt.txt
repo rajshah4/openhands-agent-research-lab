@@ -15,9 +15,9 @@ OPENHANDS_API_KEY="$OPENHANDS_API_KEY" \
     --store .lab-in-platform-controller-load \
     --no-repository \
     --model litellm_proxy/us.anthropic.claude-haiku-4-5-20251001-v1:0 \
-    --concurrency 4 \
-    --dispatch-limit 4 \
-    --workload-size 4 \
+    --concurrency 2 \
+    --dispatch-limit 2 \
+    --workload-size 2 \
     --expected-sandboxes 1 \
     --require-grouping-strategy FEWEST_CONVERSATIONS \
     --request-interval 0.75 \

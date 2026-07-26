@@ -68,7 +68,7 @@ The main files are:
 - `run_tick.py`: reconcile state and run one bounded attempt;
 - `automation/setup-compat.sh`: version-pinned SDK compatibility for the tested
   Replicated installation.
-- `automation/register-load-preset.sh`: register a dormant four-worker
+- `automation/register-load-preset.sh`: register a dormant two-worker
   in-platform load cell whose outer automation owns cleanup.
 
 Registering the example does not enable an hourly production schedule:
@@ -91,6 +91,12 @@ Production rules:
 - if controller and workers share a sandbox, the outer automation owns cleanup;
 - pace V1 reads and record retry counts;
 - queue work above the tested sandbox and API limits.
+
+On the tested Replicated build, an external controller passed with four active
+children in one grouped sandbox. The in-platform prompt automation passed with
+two active children; its four-active diagnostic produced only 3/4 independently
+verifiable contracts even though the automation status was `COMPLETED`. Start
+in-platform cells at two and queue the remainder.
 
 Use one sandbox per conversation for different tenants, untrusted code, or
 separate credentials. Use bounded sandbox grouping for trusted work cells when

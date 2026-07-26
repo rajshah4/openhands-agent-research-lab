@@ -186,7 +186,7 @@ compatibility overlay, not a database edit or an installation-wide patch.
 
 `automation/register-load-preset.sh` registers a separate dormant prompt
 automation for the combined controller-and-worker load test. Its prompt starts
-four V1 worker conversations, expects the automation parent and children to
+two V1 worker conversations, expects the automation parent and children to
 share one eligible sandbox, validates every result, and passes
 `--defer-sandbox-cleanup`. The stored automation must keep
 `keep_alive: false`; the outer automation service pauses the shared sandbox
