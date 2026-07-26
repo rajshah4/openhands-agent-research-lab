@@ -1,14 +1,104 @@
 import unittest
 
 from research_lab.openhands import (
+    OpenHandsAPIError,
     OpenHandsClient,
+    ResilientRequester,
     latest_agent_text,
     sanitize_metadata,
+    streaming_agent_text,
     terminal_status_from_events,
 )
 
 
 class OpenHandsHelpersTests(unittest.TestCase):
+    def test_retries_transient_get_failures_and_records_metrics(self) -> None:
+        calls = 0
+
+        def requester(method, url, headers, body=None, timeout=60):
+            nonlocal calls
+            calls += 1
+            if calls == 1:
+                raise OpenHandsAPIError(
+                    "GET /api/v1/users/me -> HTTP 401: BearerTokenError"
+                )
+            if calls == 2:
+                raise OpenHandsAPIError(
+                    "GET /api/v1/users/me -> HTTP 503: unavailable"
+                )
+            return {"id": "user-1"}
+
+        delays = []
+        client = OpenHandsClient(
+            "https://example.test",
+            "not-logged",
+            requester=requester,
+            sleeper=delays.append,
+        )
+        self.assertEqual(client.preflight(), {"id": "user-1"})
+        self.assertEqual(calls, 3)
+        self.assertEqual(delays, [1.0, 2.0])
+        self.assertEqual(
+            client.retry_metrics(),
+            {
+                "rate_limit": 0,
+                "transient_auth": 1,
+                "server": 1,
+                "transport": 0,
+            },
+        )
+
+    def test_does_not_retry_ambiguous_conversation_create_failure(self) -> None:
+        calls = 0
+
+        def requester(method, url, headers, body=None, timeout=60):
+            nonlocal calls
+            calls += 1
+            raise OpenHandsAPIError(
+                "POST /api/v1/app-conversations -> HTTP 503: unavailable"
+            )
+
+        client = OpenHandsClient(
+            "https://example.test",
+            "not-logged",
+            requester=requester,
+            sleeper=lambda _: None,
+        )
+        with self.assertRaises(OpenHandsAPIError):
+            client.start_conversation(
+                prompt="test",
+                title="test",
+                repository=None,
+                branch=None,
+                model=None,
+            )
+        self.assertEqual(calls, 1)
+
+    def test_retries_rejected_rate_limited_post(self) -> None:
+        calls = 0
+
+        def requester(method, url, headers, body=None, timeout=60):
+            nonlocal calls
+            calls += 1
+            if calls == 1:
+                raise OpenHandsAPIError(
+                    "POST /api/v1/app-conversations -> HTTP 429: busy"
+                )
+            return {"id": "start-1"}
+
+        requester_with_retries = ResilientRequester(
+            requester,
+            sleeper=lambda _: None,
+        )
+        result = requester_with_retries(
+            "POST",
+            "https://example.test/api/v1/app-conversations",
+            {},
+            body={},
+        )
+        self.assertEqual(result, {"id": "start-1"})
+        self.assertEqual(calls, 2)
+
     def test_sanitizes_secrets_but_keeps_token_usage(self) -> None:
         value = {
             "session_api_key": "secret",
@@ -48,6 +138,39 @@ class OpenHandsHelpersTests(unittest.TestCase):
             }
         ]
         self.assertEqual(latest_agent_text(events), "")
+        self.assertEqual(streaming_agent_text(events), '{"status":"do')
+
+    def test_final_response_recovers_terminal_streaming_text(self) -> None:
+        def requester(method, url, headers, body=None, timeout=60):
+            if "sort_order=TIMESTAMP_DESC" in url:
+                return {
+                    "items": [
+                        {
+                            "kind": "StreamingDeltaEvent",
+                            "source": "agent",
+                            "content": "}",
+                        },
+                        {
+                            "kind": "StreamingDeltaEvent",
+                            "source": "agent",
+                            "content": '{"status":"done"',
+                        },
+                    ]
+                }
+            return {"items": []}
+
+        client = OpenHandsClient(
+            "https://example.test",
+            "not-logged",
+            requester=requester,
+            sleeper=lambda _: None,
+        )
+        text, events = client.final_response("conversation-1")
+        self.assertEqual(text, '{"status":"done"}')
+        self.assertEqual(
+            events[-1]["kind"],
+            "ControllerRecoveredStreamingText",
+        )
 
     def test_wait_for_terminal_uses_durable_events(self) -> None:
         def requester(method, url, headers, body=None, timeout=60):
@@ -78,6 +201,53 @@ class OpenHandsHelpersTests(unittest.TestCase):
         self.assertEqual(record["execution_status"], "finished")
         self.assertTrue(recovered)
         self.assertEqual(len(events), 1)
+
+    def test_final_response_reads_descending_tail_when_head_is_truncated(self) -> None:
+        calls = []
+
+        def requester(method, url, headers, body=None, timeout=60):
+            calls.append(url)
+            if "sort_order=TIMESTAMP_DESC" in url:
+                return {
+                    "items": [
+                        {
+                            "kind": "MessageEvent",
+                            "source": "agent",
+                            "llm_message": {
+                                "content": [
+                                    {
+                                        "type": "text",
+                                        "text": '{"status":"done"}',
+                                    }
+                                ]
+                            },
+                        }
+                    ]
+                }
+            return {
+                "items": [
+                    {
+                        "kind": "StreamingDeltaEvent",
+                        "source": "agent",
+                    }
+                ]
+            }
+
+        client = OpenHandsClient(
+            "https://example.test",
+            "not-logged",
+            requester=requester,
+            sleeper=lambda _: None,
+        )
+        text, events = client.final_response(
+            "conversation-1",
+            retries=1,
+        )
+        self.assertEqual(text, '{"status":"done"}')
+        self.assertEqual(len(events), 1)
+        self.assertTrue(
+            any("sort_order=TIMESTAMP_DESC" in url for url in calls)
+        )
 
     def test_pause_sandbox_waits_for_paused_and_sanitizes_record(self) -> None:
         calls = []

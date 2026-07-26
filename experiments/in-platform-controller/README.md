@@ -181,3 +181,23 @@ server emitted the `1.36` event contract. SDK `1.33.0` rejected the
 preset but replaces only its setup script with `automation/setup-compat.sh`,
 which pins the SDK packages to `1.36.0`. This is an experiment-local
 compatibility overlay, not a database edit or an installation-wide patch.
+
+## Bounded in-platform load cell
+
+`automation/register-load-preset.sh` registers a separate dormant prompt
+automation for the combined controller-and-worker load test. Its prompt starts
+four V1 worker conversations, expects the automation parent and children to
+share one eligible sandbox, validates every result, and passes
+`--defer-sandbox-cleanup`. The stored automation must keep
+`keep_alive: false`; the outer automation service pauses the shared sandbox
+after the prompt conversation finishes.
+
+After registration, apply the tested SDK overlay with the load prompt:
+
+```bash
+./experiments/in-platform-controller/automation/patch-preset-sdk.sh \
+  AUTOMATION_ID \
+  experiments/in-platform-controller/automation/load-prompt.txt
+```
+
+Keep its January 1 schedule dormant and use manual dispatch for validation.

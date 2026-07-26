@@ -6,6 +6,7 @@ set -euo pipefail
 
 automation_id="${1:?Usage: patch-preset-sdk.sh AUTOMATION_ID}"
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+prompt_path="${2:-${script_dir}/prompt.txt}"
 work_dir="$(mktemp -d)"
 trap 'rm -rf "${work_dir}"' EXIT
 
@@ -16,7 +17,7 @@ curl -fsS \
 mkdir -p "${work_dir}/preset"
 tar -xzf "${work_dir}/preset.tar.gz" -C "${work_dir}/preset"
 cp "${script_dir}/setup-compat.sh" "${work_dir}/preset/setup.sh"
-cp "${script_dir}/prompt.txt" "${work_dir}/preset/prompt.txt"
+cp "${prompt_path}" "${work_dir}/preset/prompt.txt"
 chmod 755 "${work_dir}/preset/setup.sh"
 tar -czf "${work_dir}/patched.tar.gz" -C "${work_dir}/preset" .
 

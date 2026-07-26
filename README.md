@@ -166,7 +166,7 @@ three-task benchmark is not yet discriminating enough for a production claim.
 
 The hardened scale path now covers the shape of a full NeuroGolf campaign:
 400 task owners, 4,800 attempts per arm, and exactly 12 attempts per task.
-A separate 4,800-attempt file-ledger run completed in 19.08 seconds with
+A fresh 4,800-attempt file-ledger run completed in 8.44 seconds with
 24,013 parseable records in 94 MB. A live failure-injection test killed the
 controller after Replicated created the start task; restart reattached to the
 same conversation, completed one attempt, and paused the sandbox. These are
@@ -181,6 +181,12 @@ the [three-pattern result](evidence/2026-07-25-replicated-multi-agent-patterns/R
 the [12-task scale study](evidence/2026-07-25-replicated-scale-study/README.md),
 the [full 400-task capacity plan](docs/neurogolf-full-competition-capacity-plan.md),
 and the [operator runbook](docs/replicated-multi-agent-operations.md).
+The [controller deployment guide](docs/controller-deployment-patterns.md)
+shows how the same control loop fits Enterprise automations, Agent Canvas on
+Kubernetes, and bounded native subagents.
+The [controller load report](experiments/controller-load/results-2026-07-26.md)
+records the 4,800-attempt ledger test, the Enterprise failure and recovery
+sequence, the final 6/6 four-active load, and the two-tick Canvas resume test.
 The [Kaggle parity review](docs/kaggle-neurogolf-parity-review.md) separates
 what is now proven from the ONNX workload, adversarial validation, artifact
 quarantine, and submission gate still required. The

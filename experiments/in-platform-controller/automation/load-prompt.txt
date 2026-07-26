@@ -1,0 +1,35 @@
+Run exactly one bounded controller load cell from the cloned
+`rajshah4/openhands-agent-research-lab` repository.
+
+Use the cloned repository path supplied in the repository context. Do not edit
+code, inspect or print secrets, create a pull request, or perform any additional
+research. From the repository root, run exactly:
+
+```bash
+git fetch origin main
+git checkout -B main origin/main
+OPENHANDS_API_KEY="$OPENHANDS_API_KEY" \
+  PYTHONPATH=src \
+  python3 experiments/enterprise-sandbox-grouping/scripts/run-concurrent.py \
+    --campaign examples/hard-transfer-live.json \
+    --store .lab-in-platform-controller-load \
+    --no-repository \
+    --model litellm_proxy/us.anthropic.claude-haiku-4-5-20251001-v1:0 \
+    --concurrency 4 \
+    --dispatch-limit 4 \
+    --workload-size 4 \
+    --expected-sandboxes 1 \
+    --require-grouping-strategy FEWEST_CONVERSATIONS \
+    --request-interval 0.75 \
+    --poll-seconds 2 \
+    --execution-timeout 600 \
+    --defer-sandbox-cleanup \
+    --live
+```
+
+Wait for that command to finish. If it exits successfully, report the complete
+final JSON summary printed by the command and finish. The outer automation owns
+sandbox cleanup because its stored `keep_alive` value is false. If the command
+fails, report the error type and failing stage without printing environment
+variables, credential values, event contents, or exposed runtime URLs, then
+finish with a failure.

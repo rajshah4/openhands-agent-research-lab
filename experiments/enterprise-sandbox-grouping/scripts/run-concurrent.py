@@ -20,7 +20,6 @@ from typing import Any
 from research_lab.cli import _load_env_file
 from research_lab.domain import CampaignSpec
 from research_lab.openhands import (
-    OpenHandsAPIError,
     OpenHandsClient,
     configured_api_key,
     request_json,
@@ -31,17 +30,13 @@ from research_lab.store import FileResearchStore
 from research_lab.workers import OpenHandsWorker
 
 
-class RateLimitedRequester:
-    """Pace all controller requests and retry bounded HTTP 429 responses."""
+class PacedRequester:
+    """Pace controller requests; OpenHandsClient owns bounded retries."""
 
-    def __init__(self, interval_seconds: float, max_429_retries: int = 4):
+    def __init__(self, interval_seconds: float):
         self.interval_seconds = interval_seconds
-        self.max_429_retries = max_429_retries
         self._lock = threading.Lock()
         self._next_request_at = 0.0
-        self.rate_limit_retries = 0
-        self.transient_auth_retries = 0
-        self.transport_retries = 0
 
     def __call__(
         self,
@@ -51,43 +46,19 @@ class RateLimitedRequester:
         body: dict[str, Any] | None = None,
         timeout: int = 60,
     ) -> Any:
-        for retry in range(self.max_429_retries + 1):
-            with self._lock:
-                now = time.monotonic()
-                delay = max(self._next_request_at - now, 0.0)
-                if delay:
-                    time.sleep(delay)
-                self._next_request_at = time.monotonic() + self.interval_seconds
-            try:
-                return request_json(
-                    method,
-                    url,
-                    headers,
-                    body=body,
-                    timeout=timeout,
-                )
-            except TimeoutError:
-                if retry >= self.max_429_retries:
-                    raise
-                self.transport_retries += 1
-                time.sleep(min(2**retry, 8))
-            except OpenHandsAPIError as exc:
-                message = str(exc)
-                retryable_rate_limit = "HTTP 429" in message
-                retryable_transient_auth = (
-                    "HTTP 401" in message and "BearerTokenError" in message
-                )
-                if (
-                    not retryable_rate_limit
-                    and not retryable_transient_auth
-                ) or retry >= self.max_429_retries:
-                    raise
-                if retryable_rate_limit:
-                    self.rate_limit_retries += 1
-                else:
-                    self.transient_auth_retries += 1
-                time.sleep(min(2**retry, 8))
-        raise AssertionError("unreachable")
+        with self._lock:
+            now = time.monotonic()
+            delay = max(self._next_request_at - now, 0.0)
+            if delay:
+                time.sleep(delay)
+            self._next_request_at = time.monotonic() + self.interval_seconds
+        return request_json(
+            method,
+            url,
+            headers,
+            body=body,
+            timeout=timeout,
+        )
 
 
 def parse_args() -> argparse.Namespace:
@@ -138,6 +109,14 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--start-timeout", type=int, default=600)
     parser.add_argument("--execution-timeout", type=int, default=900)
     parser.add_argument("--poll-seconds", type=int, default=2)
+    parser.add_argument(
+        "--defer-sandbox-cleanup",
+        action="store_true",
+        help=(
+            "Leave the grouped sandbox for an outer automation with "
+            "keep_alive=false to clean up after this controller exits"
+        ),
+    )
     parser.add_argument("--live", action="store_true")
     return parser.parse_args()
 
@@ -276,7 +255,7 @@ def main() -> int:
     task_order = [task.id for task in scaled_tasks]
 
     args.store.mkdir(parents=True, exist_ok=True)
-    limiter = RateLimitedRequester(args.request_interval)
+    limiter = PacedRequester(args.request_interval)
     client = OpenHandsClient(
         args.base_url,
         configured_api_key(),
@@ -348,16 +327,17 @@ def main() -> int:
 
     controller_wall_seconds = time.monotonic() - started
     sandbox_ids = sandbox_ids_from_lifecycle(args.store)
-    for sandbox_id in sandbox_ids:
-        try:
-            current = client.get_sandbox(sandbox_id)
-            if str(current.get("status", "")).upper() == "PAUSED":
-                pause_results[sandbox_id] = "PAUSED"
-            else:
-                paused = client.pause_sandbox(sandbox_id)
-                pause_results[sandbox_id] = str(paused.get("status"))
-        except Exception as exc:
-            pause_errors[sandbox_id] = f"{type(exc).__name__}: {exc}"
+    if not args.defer_sandbox_cleanup:
+        for sandbox_id in sandbox_ids:
+            try:
+                current = client.get_sandbox(sandbox_id)
+                if str(current.get("status", "")).upper() == "PAUSED":
+                    pause_results[sandbox_id] = "PAUSED"
+                else:
+                    paused = client.pause_sandbox(sandbox_id)
+                    pause_results[sandbox_id] = str(paused.get("status"))
+            except Exception as exc:
+                pause_errors[sandbox_id] = f"{type(exc).__name__}: {exc}"
     if True:
         durations = [
             duration
@@ -406,9 +386,10 @@ def main() -> int:
             ),
             "sandbox_ids": sandbox_ids,
             "max_observed_concurrency": max_observed_concurrency(args.store),
-            "rate_limit_retries": limiter.rate_limit_retries,
-            "transient_auth_retries": limiter.transient_auth_retries,
-            "transport_retries": limiter.transport_retries,
+            "rate_limit_retries": client.retry_metrics()["rate_limit"],
+            "transient_auth_retries": client.retry_metrics()["transient_auth"],
+            "server_retries": client.retry_metrics()["server"],
+            "transport_retries": client.retry_metrics()["transport"],
             "controller_wall_seconds": round(controller_wall_seconds, 3),
             "attempt_batch_wall_seconds": (
                 round(attempt_batch_wall_seconds, 3)
@@ -460,6 +441,11 @@ def main() -> int:
                 }
             ),
             "wall_seconds": round(time.monotonic() - started, 3),
+            "cleanup_owner": (
+                "outer-automation"
+                if args.defer_sandbox_cleanup
+                else "controller"
+            ),
             "pause_results": pause_results,
             "pause_errors": pause_errors,
             "conversations": {
@@ -488,7 +474,10 @@ def main() -> int:
             summary["valid"] == workload_size
             and len(sandbox_ids) == args.expected_sandboxes
             and not pause_errors
-            and len(pause_results) == len(sandbox_ids)
+            and (
+                args.defer_sandbox_cleanup
+                or len(pause_results) == len(sandbox_ids)
+            )
         )
         else 1
     )

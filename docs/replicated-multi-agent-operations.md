@@ -340,4 +340,13 @@ PYTHONPATH=src .venv/bin/python \
 - Do not mix tenants or untrusted work in one runtime.
 - Store experiment state and sanitized evidence outside the OpenHands database.
 - Treat Git as the release and audit layer, not as a runtime lock manager.
+- Prefer durable terminal messages. On Enterprise versions that can cap an
+  event result before the final `MessageEvent`, read the descending event tail.
+  Only after terminal state is known may the controller reconstruct a response
+  from ordered streaming deltas; the result must still pass the strict contract
+  parser and independent validator.
+- Keep one bounded retry policy. Reads may retry transient rate-limit,
+  authentication, server, and transport failures. Do not retry an ambiguous
+  conversation-create timeout because the request may already have created a
+  worker.
 - Re-run this load test after changing images, models, limits, or versions.

@@ -7,6 +7,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from collections.abc import Callable
+from threading import Lock
 from typing import Any
 
 
@@ -46,6 +47,92 @@ class OpenHandsAPIError(RuntimeError):
 
 class OpenHandsCapacityError(OpenHandsAPIError):
     """Raised before launch when the configured runtime safety gate is closed."""
+
+
+class ResilientRequester:
+    """Bounded retries for transient API failures, with duplicate-safe writes.
+
+    GET requests may retry rate limits, transient authentication failures,
+    server errors, and transport failures. Mutating requests retry only 429 and
+    the observed transient BearerTokenError 401 because those responses confirm
+    that the server rejected the request before doing work.
+    """
+
+    def __init__(
+        self,
+        requester: Callable[..., Any],
+        *,
+        sleeper: Callable[[float], None] = time.sleep,
+        max_retries: int = 4,
+        base_delay_seconds: float = 1.0,
+    ):
+        if max_retries < 0:
+            raise ValueError("max_retries must be at least 0")
+        if base_delay_seconds < 0:
+            raise ValueError("base_delay_seconds must be non-negative")
+        self.requester = requester
+        self.sleeper = sleeper
+        self.max_retries = max_retries
+        self.base_delay_seconds = base_delay_seconds
+        self._lock = Lock()
+        self._counts = {
+            "rate_limit": 0,
+            "transient_auth": 0,
+            "server": 0,
+            "transport": 0,
+        }
+
+    def __call__(
+        self,
+        method: str,
+        url: str,
+        headers: dict[str, str],
+        body: dict[str, Any] | None = None,
+        timeout: int = 60,
+    ) -> Any:
+        normalized_method = method.upper()
+        for retry in range(self.max_retries + 1):
+            try:
+                return self.requester(
+                    method,
+                    url,
+                    headers,
+                    body=body,
+                    timeout=timeout,
+                )
+            except (TimeoutError, ConnectionError) as exc:
+                category = "transport"
+                retryable = normalized_method == "GET"
+                error = exc
+            except OpenHandsAPIError as exc:
+                message = str(exc)
+                if "HTTP 429" in message:
+                    category = "rate_limit"
+                    retryable = True
+                elif "HTTP 401" in message and "BearerTokenError" in message:
+                    category = "transient_auth"
+                    retryable = True
+                elif any(f"HTTP {status}" in message for status in range(500, 600)):
+                    category = "server"
+                    retryable = normalized_method == "GET"
+                elif " failed:" in message:
+                    category = "transport"
+                    retryable = normalized_method == "GET"
+                else:
+                    raise
+                error = exc
+            if not retryable or retry >= self.max_retries:
+                raise error
+            with self._lock:
+                self._counts[category] += 1
+            self.sleeper(
+                min(self.base_delay_seconds * (2**retry), 8.0)
+            )
+        raise AssertionError("unreachable")
+
+    def metrics(self) -> dict[str, int]:
+        with self._lock:
+            return dict(self._counts)
 
 
 def configured_base_url(explicit: str | None = None) -> str:
@@ -168,6 +255,22 @@ def latest_agent_text(events: list[dict[str, Any]]) -> str:
     return ""
 
 
+def streaming_agent_text(events: list[dict[str, Any]]) -> str:
+    """Reconstruct a terminal agent response when its MessageEvent is absent."""
+    chunks: list[str] = []
+    for event in events:
+        if str(event.get("source", "")).lower() not in {"agent", "assistant"}:
+            continue
+        if str(event.get("kind", "")) != "StreamingDeltaEvent":
+            continue
+        content = event.get("content")
+        if isinstance(content, str):
+            chunks.append(content)
+        elif isinstance(content, list):
+            chunks.append(_content_text(content))
+    return "".join(chunks).strip()
+
+
 def terminal_status_from_events(events: list[dict[str, Any]]) -> str | None:
     for event in reversed(events):
         event_kind = str(event.get("kind", ""))
@@ -212,6 +315,7 @@ class OpenHandsClient:
         requester: Callable[..., Any] = request_json,
         sleeper: Callable[[float], None] = time.sleep,
         monotonic: Callable[[], float] = time.monotonic,
+        transient_retries: int = 2,
     ):
         self.base_url = base_url.rstrip("/")
         self.headers = {
@@ -219,9 +323,17 @@ class OpenHandsClient:
             "Accept": "application/json",
             "Content-Type": "application/json",
         }
-        self._request = requester
+        self._resilient_requester = ResilientRequester(
+            requester,
+            sleeper=sleeper,
+            max_retries=transient_retries,
+        )
+        self._request = self._resilient_requester
         self._sleep = sleeper
         self._monotonic = monotonic
+
+    def retry_metrics(self) -> dict[str, int]:
+        return self._resilient_requester.metrics()
 
     def preflight(self) -> dict[str, Any]:
         record = self._request(
@@ -435,11 +547,22 @@ class OpenHandsClient:
             self._sleep(poll_seconds)
         raise TimeoutError(f"timed out pausing OpenHands sandbox {sandbox_id}")
 
-    def fetch_events(self, conversation_id: str, *, limit: int = 100) -> list[dict[str, Any]]:
+    def fetch_events(
+        self,
+        conversation_id: str,
+        *,
+        limit: int = 100,
+        sort_order: str = "TIMESTAMP",
+    ) -> list[dict[str, Any]]:
+        if sort_order not in {"TIMESTAMP", "TIMESTAMP_DESC"}:
+            raise ValueError(f"unknown event sort order: {sort_order}")
         events: list[dict[str, Any]] = []
         page_id: str | None = None
         while True:
-            query: dict[str, Any] = {"sort_order": "TIMESTAMP", "limit": limit}
+            query: dict[str, Any] = {
+                "sort_order": sort_order,
+                "limit": limit,
+            }
             if page_id:
                 query["page_id"] = page_id
             page = self._request(
@@ -457,7 +580,11 @@ class OpenHandsClient:
             events.extend(item for item in page.get("items", []) if isinstance(item, dict))
             page_id = page.get("next_page_id")
             if not page_id:
-                return events
+                return (
+                    list(reversed(events))
+                    if sort_order == "TIMESTAMP_DESC"
+                    else events
+                )
 
     def wait_for_terminal(
         self,
@@ -506,6 +633,29 @@ class OpenHandsClient:
             text = latest_agent_text(events)
             if text:
                 return text, events
+            # Enterprise can cap the chronological result before the terminal
+            # MessageEvent without returning next_page_id. Read the newest
+            # events and normalize them back to chronology.
+            tail_events = self.fetch_events(
+                conversation_id,
+                sort_order="TIMESTAMP_DESC",
+            )
+            tail_text = latest_agent_text(tail_events)
+            if tail_text:
+                return tail_text, tail_events
+            # A tested Enterprise edge case marked the conversation finished
+            # but indexed only StreamingDeltaEvents. At this point the caller
+            # has already observed terminal state, so reconstruct the bounded
+            # response rather than treating an absent MessageEvent as no work.
+            streamed_text = streaming_agent_text(tail_events)
+            if streamed_text:
+                return streamed_text, [
+                    *tail_events,
+                    {
+                        "kind": "ControllerRecoveredStreamingText",
+                        "source": "controller",
+                    },
+                ]
             if attempt < retries:
                 self._sleep(retry_seconds)
         return "", events
