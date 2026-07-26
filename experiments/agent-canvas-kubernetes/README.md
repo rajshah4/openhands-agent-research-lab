@@ -32,6 +32,9 @@ The pilot intentionally uses:
 - GKE Autopilot
 
 Confirm the live chart and cluster versions before reusing these values.
+The complete cluster creation, verification, experiment, cost, and deletion
+procedure is in the
+[`build-and-teardown runbook`](build-and-teardown-runbook.md).
 
 ## Deployment
 
@@ -118,4 +121,7 @@ for the result and its deployment-boundary caveats.
 
 The namespace is intentionally not deleted automatically. Removing it deletes
 the pilot workload and its PVC, so cleanup must be a deliberate operator action
-after artifacts are captured.
+after artifacts are captured. For the disposable GKE environment used here,
+delete the entire cluster after following the checks in the
+[`build-and-teardown runbook`](build-and-teardown-runbook.md); deleting only
+the namespace does not remove the GKE cluster itself.
