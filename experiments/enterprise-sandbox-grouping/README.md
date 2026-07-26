@@ -95,6 +95,8 @@ The runner:
 
 - seeds one eligible sandbox before launching the remaining followers;
 - globally paces API requests and retries bounded HTTP 429 responses;
+- defaults to one request every 0.75 seconds to stay below the observed
+  `100 requests/minute` Enterprise limit;
 - keeps all conversation histories and validators independent;
 - calculates actual ready-to-terminal concurrency from lifecycle events;
 - pauses every observed sandbox after all workers finish.

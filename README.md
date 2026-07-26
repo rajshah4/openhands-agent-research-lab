@@ -27,6 +27,7 @@ Campaign
   -> scheduler selects one task and relevant validated lessons
   -> worker backend runs one bounded attempt
        -> local deterministic worker (offline development)
+       -> Agent Canvas shared backend (trusted single-tenant execution)
        -> OpenHands V1 conversation (Enterprise/Cloud)
   -> deterministic validator scores the candidate
   -> storage records the immutable attempt
@@ -94,6 +95,39 @@ After each final response, the controller pauses the sandbox through the
 supported V1 API and verifies it reached `PAUSED`. Use `--keep-sandbox` only
 when a bounded debugging session intentionally needs the runtime to remain
 available.
+
+## Agent Canvas comparison backend
+
+Agent Canvas provides a shared, persistent execution backend without creating
+one Enterprise sandbox per attempt. It uses a different supported protocol from
+Enterprise, so the research lab provides a separate `CanvasClient` and
+`CanvasWorker` behind the same worker contract.
+
+Preflight an existing local Canvas backend without making a model call:
+
+```bash
+export CANVAS_API_KEY="..."
+PYTHONPATH=src python3 -m research_lab.cli preflight \
+  --campaign examples/graph-coloring-campaign.json \
+  --worker canvas \
+  --base-url http://127.0.0.1:8000
+```
+
+After preflight confirms the backend is healthy, ready, and has model access:
+
+```bash
+PYTHONPATH=src python3 -m research_lab.cli run \
+  --campaign examples/graph-coloring-campaign.json \
+  --store .lab-canvas \
+  --worker canvas \
+  --base-url http://127.0.0.1:8000 \
+  --canvas-workspace-root .lab-canvas-workspaces \
+  --live
+```
+
+Canvas attempts receive distinct workspace directories, but they share the
+backend process and host trust boundary. The parent remains the only writer to
+the experiment ledger, and deterministic validation is unchanged.
 
 ## Storage boundary
 

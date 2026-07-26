@@ -85,8 +85,17 @@ def request_json(
             return json.loads(raw) if raw else None
     except urllib.error.HTTPError as exc:
         raw = exc.read().decode("utf-8", errors="replace")
+        safe_detail = raw
+        try:
+            safe_detail = json.dumps(
+                sanitize_metadata(json.loads(raw)),
+                sort_keys=True,
+            )
+        except (json.JSONDecodeError, TypeError, ValueError):
+            safe_detail = "<non-json response omitted>"
         raise OpenHandsAPIError(
-            f"{method} {urllib.parse.urlsplit(url).path} -> HTTP {exc.code}: {raw[:1000]}"
+            f"{method} {urllib.parse.urlsplit(url).path} -> "
+            f"HTTP {exc.code}: {safe_detail[:1000]}"
         ) from exc
     except urllib.error.URLError as exc:
         raise OpenHandsAPIError(

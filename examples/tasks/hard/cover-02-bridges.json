@@ -1,0 +1,22 @@
+{
+  "id": "cover-02-bridges",
+  "family": "set-cover",
+  "description": "Cover twenty-four checkpoints using a small selection from interleaved bridge groups.",
+  "tags": ["set-cover", "interleaved", "hard-transfer"],
+  "target_score": 4,
+  "payload": {
+    "universe": ["c01", "c02", "c03", "c04", "c05", "c06", "c07", "c08", "c09", "c10", "c11", "c12", "c13", "c14", "c15", "c16", "c17", "c18", "c19", "c20", "c21", "c22", "c23", "c24"],
+    "sets": {
+      "north": ["c01", "c02", "c03", "c04", "c05", "c06"],
+      "east": ["c07", "c08", "c09", "c10", "c11", "c12"],
+      "south": ["c13", "c14", "c15", "c16", "c17", "c18"],
+      "west": ["c19", "c20", "c21", "c22", "c23", "c24"],
+      "arc-a": ["c01", "c07", "c13", "c19", "c20", "c21"],
+      "arc-b": ["c02", "c08", "c14", "c22", "c23", "c24"],
+      "arc-c": ["c03", "c04", "c09", "c10", "c15", "c16"],
+      "arc-d": ["c05", "c06", "c11", "c12", "c17", "c18"],
+      "splice-a": ["c01", "c04", "c08", "c11", "c14", "c17"],
+      "splice-b": ["c02", "c05", "c07", "c12", "c19", "c24"]
+    }
+  }
+}

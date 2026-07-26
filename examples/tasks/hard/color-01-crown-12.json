@@ -1,0 +1,16 @@
+{
+  "id": "color-01-crown-12",
+  "family": "graph-coloring",
+  "description": "Color a dense twelve-node graph whose tempting matched pairs are absent.",
+  "tags": ["graph-coloring", "dense", "hard-transfer"],
+  "nodes": ["p1", "q1", "p2", "q2", "p3", "q3", "p4", "q4", "p5", "q5", "p6", "q6"],
+  "edges": [
+    ["p1", "q2"], ["p1", "q3"], ["p1", "q4"], ["p1", "q5"], ["p1", "q6"],
+    ["p2", "q1"], ["p2", "q3"], ["p2", "q4"], ["p2", "q5"], ["p2", "q6"],
+    ["p3", "q1"], ["p3", "q2"], ["p3", "q4"], ["p3", "q5"], ["p3", "q6"],
+    ["p4", "q1"], ["p4", "q2"], ["p4", "q3"], ["p4", "q5"], ["p4", "q6"],
+    ["p5", "q1"], ["p5", "q2"], ["p5", "q3"], ["p5", "q4"], ["p5", "q6"],
+    ["p6", "q1"], ["p6", "q2"], ["p6", "q3"], ["p6", "q4"], ["p6", "q5"]
+  ],
+  "target_score": 2
+}

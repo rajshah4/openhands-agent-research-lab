@@ -1,0 +1,239 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-07-25",
+  "protocol": {
+    "campaign": "hard-transfer-live",
+    "scheduler": "managed-static-assignment",
+    "tasks_per_batch": 6,
+    "concurrency": 6,
+    "successful_replicates_per_arm": 3,
+    "execution_timeout_seconds": 600,
+    "model_family": "Claude Haiku 4.5 2025-10-01",
+    "validation": "independent deterministic family validator"
+  },
+  "agent_canvas": {
+    "deployment": {
+      "platform": "GKE Autopilot",
+      "cluster": "agent-canvas-pilot",
+      "namespace": "agent-canvas-research",
+      "image": "ghcr.io/openhands/agent-canvas:1.5.2",
+      "chart_version": "0.1.0",
+      "model": "anthropic/claude-haiku-4-5-20251001",
+      "provider_path": "direct Anthropic",
+      "cpu_request": "500m",
+      "memory_request": "1Gi",
+      "cpu_limit": "2",
+      "memory_limit": "4Gi",
+      "persistent_volume": "20Gi"
+    },
+    "runs": [
+      {
+        "id": "scheduled-managed-20260725T234935Z",
+        "valid": 6,
+        "task_coverage": 6,
+        "wall_seconds": 104,
+        "total_cost": 0.16115325,
+        "peak_cpu_millicores": 301,
+        "peak_memory_mib": 798,
+        "conversations": [
+          "15965f12-00c1-442d-984d-1e9a8507f369",
+          "527f7d65-f418-45fe-b2e3-f7be21ccbd29",
+          "8d39bd86-9eed-48ed-a812-e6d75dc41f30",
+          "895e2414-b1f9-46bd-89aa-68155caf1261",
+          "4821e10e-54cb-44ff-9c76-053b79726ebc",
+          "ba29f9b1-f7ba-4bae-8680-1efebb498586"
+        ]
+      },
+      {
+        "id": "scheduled-managed-20260725T235504Z",
+        "valid": 6,
+        "task_coverage": 6,
+        "wall_seconds": 147,
+        "total_cost": 0.1957414,
+        "peak_cpu_millicores": 341,
+        "peak_memory_mib": 815,
+        "conversations": [
+          "4dee71d6-64c3-4bf2-ac81-266449ac0f8b",
+          "2c8ab3b2-3044-4ada-aa96-b77c3c46d662",
+          "10a21629-cd3a-47b1-b770-a0dde63ef5af",
+          "57f8b5a9-3d85-4e86-bb00-26a89fe8662f",
+          "08a6eaf8-90b4-4624-b2e4-1aaac6e73851",
+          "3a709766-9a08-4faa-bfee-08f10712a2f9"
+        ]
+      },
+      {
+        "id": "scheduled-managed-20260726T000203Z",
+        "valid": 6,
+        "task_coverage": 6,
+        "wall_seconds": 171,
+        "total_cost": 0.24552635,
+        "peak_cpu_millicores": 285,
+        "peak_memory_mib": 839,
+        "conversations": [
+          "01a449aa-ff2b-4974-ab58-43f31187a7b3",
+          "beaf0180-bdbe-411f-80a4-4c893b751470",
+          "3c2f245b-b0fb-4c61-bdab-b3aff49a1854",
+          "6735f612-b88a-4516-a834-690a8fe0769c",
+          "6589655c-ce52-41f1-9f3d-edcd258aefb0",
+          "ea5ef64a-73a8-4af1-91dc-d301e6fe405d"
+        ]
+      }
+    ],
+    "aggregate": {
+      "valid": 18,
+      "attempts": 18,
+      "mean_batch_wall_seconds": 140.667,
+      "wall_range_seconds": [
+        104,
+        171
+      ],
+      "effective_throughput_tasks_per_hour": 153.55,
+      "mean_attempt_seconds": 101.088,
+      "median_attempt_seconds": 109.101,
+      "maximum_attempt_seconds": 171.752,
+      "total_cost": 0.602421,
+      "mean_cost_per_batch": 0.200807,
+      "cost_per_valid_result": 0.03346783,
+      "total_prompt_tokens": 303293,
+      "total_completion_tokens": 66986,
+      "peak_cpu_millicores": 341,
+      "peak_memory_mib": 839,
+      "pod_restarts": 0
+    }
+  },
+  "replicated": {
+    "deployment": {
+      "product_version": "0.24.0",
+      "enterprise_server_image": "images.r9.all-hands.dev/proxy/openhands/ghcr.io/openhands/enterprise-server:cloud-1.46.2",
+      "runtime_image": "images.r9.all-hands.dev/proxy/openhands/ghcr.io/openhands/agent-server:1.36.0-python",
+      "sandbox_grouping_strategy": "FEWEST_CONVERSATIONS",
+      "max_conversations_per_sandbox": 6,
+      "model": "litellm_proxy/us.anthropic.claude-haiku-4-5-20251001-v1:0",
+      "provider_path": "Bedrock through LiteLLM",
+      "runtime_cpu_limit": "1",
+      "runtime_memory_limit": "2Gi",
+      "request_interval_seconds": 0.75
+    },
+    "runs": [
+      {
+        "id": "replicated-managed-haiku-valid-r1-20260726T002700Z",
+        "valid": 6,
+        "task_coverage": 6,
+        "wall_seconds": 231.524,
+        "mean_attempt_seconds": 144.771,
+        "maximum_attempt_seconds": 219.439,
+        "total_cost": 0.24871165,
+        "sandbox_id": "3TJY9aqngmpzS84DsbFkAE",
+        "physical_runtime": "runtime-ociurzeshrseiyii",
+        "rate_limit_retries": 0,
+        "sandbox_final_status": "PAUSED",
+        "conversations": [
+          "19485873ad6b446d8742ae88275f577e",
+          "9eafc1a4dfa14bc18bb2e18306c8cdf0",
+          "c93758dd61024f7e8943cf8c9832dc32",
+          "b114078fde70423db2d7f932f8d08a29",
+          "e1ff6643f3d349bdad5eaca221f26537",
+          "282dd5ecf29c48c2a5585e2cc6bf5de2"
+        ]
+      },
+      {
+        "id": "replicated-managed-haiku-valid-r2-20260726T003110Z",
+        "valid": 6,
+        "task_coverage": 6,
+        "wall_seconds": 320.855,
+        "mean_attempt_seconds": 182.057,
+        "maximum_attempt_seconds": 308.743,
+        "total_cost": 0.1560603,
+        "sandbox_id": "68HrueFvqe5129L5LJBM56",
+        "physical_runtime": "runtime-ipyanpbltgvixurb",
+        "rate_limit_retries": 0,
+        "sandbox_final_status": "PAUSED",
+        "conversations": [
+          "7f13017f486e4df19f367a4361fcedaf",
+          "bb4acfc71e6f4abb938b4d3e61e1fd59",
+          "5c00366eee37457694af3e561df3341d",
+          "da35c0284c584e44835ec902864c1740",
+          "89909ec4bf7b40fca57bb166a4af616b",
+          "728d0a7c329c41c985fa783a266c79a4"
+        ]
+      },
+      {
+        "id": "replicated-managed-haiku-valid-r3-20260726T003651Z",
+        "valid": 6,
+        "task_coverage": 6,
+        "wall_seconds": 258.993,
+        "mean_attempt_seconds": 183.016,
+        "maximum_attempt_seconds": 246.854,
+        "total_cost": 0.20354042,
+        "sandbox_id": "4svzZI3whYM176pE7fYgI5",
+        "physical_runtime": "runtime-nskdsrcxyiulxtui",
+        "rate_limit_retries": 0,
+        "sandbox_final_status": "PAUSED",
+        "conversations": [
+          "12a967579ab24edc89f0025dfd45c977",
+          "8d00d33c7f9e44dc82e390fc12f93829",
+          "3ff334bfa85b461aab61434ff78b4428",
+          "95e919bed7b94b0f8442f4a28c7f7c3f",
+          "9ea38e9934c5426d8c218ff58fbceaa8",
+          "aee50a9d21c24916929d46f28e6fb550"
+        ]
+      }
+    ],
+    "aggregate": {
+      "valid": 18,
+      "attempts": 18,
+      "mean_batch_wall_seconds": 270.457,
+      "wall_range_seconds": [
+        231.524,
+        320.855
+      ],
+      "effective_throughput_tasks_per_hour": 79.86,
+      "mean_attempt_seconds": 169.948,
+      "median_attempt_seconds": 169.804,
+      "maximum_attempt_seconds": 308.743,
+      "total_cost": 0.60831237,
+      "mean_cost_per_batch": 0.20277079,
+      "cost_per_valid_result": 0.03379513,
+      "total_prompt_tokens": 155759,
+      "total_completion_tokens": 72248,
+      "peak_intermittently_observed_cpu_millicores": 161,
+      "peak_intermittently_observed_memory_mib": 463,
+      "runtime_restarts": 0,
+      "rate_limit_retries": 0,
+      "pools_paused": 3
+    },
+    "excluded_protocol_failure": {
+      "id": "replicated-managed-haiku-r1-20260726T002335Z",
+      "ready_conversations": 6,
+      "valid_attempts_recorded": 1,
+      "failed_attempts_recorded": 5,
+      "rate_limit_retries": 23,
+      "observed_error": "Rate limit exceeded: 100 per 1 minute",
+      "request_interval_seconds": 0.25,
+      "sandbox_final_status": "PAUSED",
+      "reason_excluded": "controller exceeded the app API minute limit before terminal evidence was recorded"
+    }
+  },
+  "comparison": {
+    "canvas_mean_wall_time_lower_percent": 47.99,
+    "canvas_effective_throughput_higher_percent": 92.27,
+    "canvas_mean_reported_model_cost_lower_percent": 0.97,
+    "quality_result": "tie: 18/18 valid and complete task coverage in both arms",
+    "interpretation": "Canvas is the faster shared execution backend; Replicated adds authenticated app-conversation governance, lifecycle management, and isolation options."
+  },
+  "limitations": [
+    "This compares deployed stacks, not identical containers.",
+    "The provider routes differ despite the matching dated model family.",
+    "Agent Canvas and Replicated used different agent-server and system configurations.",
+    "Runtime resource envelopes and sampling cadence differ.",
+    "Reported token accounting is not directly comparable across the two provider paths.",
+    "Infrastructure cost was not measured.",
+    "Three replicates characterize direction but not long-run production variance."
+  ],
+  "lifecycle": {
+    "agent_canvas_cluster": "agent-canvas-pilot",
+    "agent_canvas_cluster_status": "RUNNING",
+    "agent_canvas_cluster_must_not_be_deleted": true,
+    "replicated_active_sandboxes_after_test": 0
+  }
+}

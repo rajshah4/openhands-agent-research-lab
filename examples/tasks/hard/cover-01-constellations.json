@@ -1,0 +1,20 @@
+{
+  "id": "cover-01-constellations",
+  "family": "set-cover",
+  "description": "Cover eighteen signals using a small selection from overlapping constellations.",
+  "tags": ["set-cover", "overlap", "hard-transfer"],
+  "target_score": 3,
+  "payload": {
+    "universe": ["e01", "e02", "e03", "e04", "e05", "e06", "e07", "e08", "e09", "e10", "e11", "e12", "e13", "e14", "e15", "e16", "e17", "e18"],
+    "sets": {
+      "atlas": ["e01", "e02", "e03", "e04", "e05", "e06"],
+      "beacon": ["e07", "e08", "e09", "e10", "e11", "e12"],
+      "cipher": ["e13", "e14", "e15", "e16", "e17", "e18"],
+      "drift": ["e01", "e02", "e07", "e08", "e13", "e14"],
+      "ember": ["e03", "e04", "e09", "e10", "e15", "e16"],
+      "fable": ["e05", "e06", "e11", "e12", "e17", "e18"],
+      "glint": ["e01", "e06", "e08", "e11", "e14", "e17"],
+      "harbor": ["e02", "e05", "e07", "e12", "e13", "e18"]
+    }
+  }
+}

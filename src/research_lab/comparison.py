@@ -55,8 +55,33 @@ def summarize_arm(
         _normalized_quality(campaign, attempts[:sequence])
         for sequence in range(1, len(attempts) + 1)
     ]
+
+    def usage_metrics(attempt: dict[str, Any]) -> dict[str, Any]:
+        metadata = attempt.get("metadata") or {}
+        snapshot = metadata.get("conversation_snapshot") or {}
+        stats = snapshot.get("stats") or {}
+        usage = stats.get("usage_to_metrics") or {}
+        canvas_metrics = usage.get("default") or {}
+        if canvas_metrics:
+            return canvas_metrics
+        enterprise_metrics = snapshot.get("metrics") or {}
+        return (
+            enterprise_metrics
+            if isinstance(enterprise_metrics, dict)
+            else {}
+        )
+
+    def token_usage(attempt: dict[str, Any]) -> dict[str, Any]:
+        return usage_metrics(attempt).get("accumulated_token_usage") or {}
+
     return {
         "attempts": len(attempts),
+        "valid_attempts": sum(
+            1 for attempt in attempts if attempt.get("validation", {}).get("valid")
+        ),
+        "failed_attempts": sum(
+            1 for attempt in attempts if attempt.get("outcome") != "completed"
+        ),
         "problems_solved": len(solved),
         "task_count": len(task_ids),
         "coverage": len(attempted) / len(task_ids),
@@ -80,6 +105,22 @@ def summarize_arm(
             sum(1 for attempt in attempts if attempt.get("improved")) / len(attempts)
             if attempts
             else 0.0
+        ),
+        "retrieved_validated_lessons": sum(
+            len(attempt.get("retrieved_lesson_ids") or [])
+            for attempt in attempts
+        ),
+        "total_cost": sum(
+            float(usage_metrics(attempt).get("accumulated_cost") or 0)
+            for attempt in attempts
+        ),
+        "total_prompt_tokens": sum(
+            int(token_usage(attempt).get("prompt_tokens") or 0)
+            for attempt in attempts
+        ),
+        "total_completion_tokens": sum(
+            int(token_usage(attempt).get("completion_tokens") or 0)
+            for attempt in attempts
         ),
     }
 
@@ -110,6 +151,8 @@ def _report(comparison: dict[str, Any]) -> str:
         ("Quality AUC", "quality_auc", ".3f"),
         ("Duplicate experiments", "duplicate_experiments", ".0f"),
         ("Improvement per attempt", "improvement_per_attempt", ".3f"),
+        ("Retrieved validated lessons", "retrieved_validated_lessons", ".0f"),
+        ("Observed model cost", "total_cost", ".4f"),
     )
     for label, key, format_spec in metric_rows:
         naive = format(arms["naive"]["metrics"][key], format_spec)

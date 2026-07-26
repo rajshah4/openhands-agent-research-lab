@@ -1,0 +1,24 @@
+{
+  "id": "pack-01-pairs-12",
+  "family": "bin-packing",
+  "description": "Pack twelve scrambled complementary items into capacity-ten bins.",
+  "tags": ["bin-packing", "complementary", "hard-transfer"],
+  "target_score": 6,
+  "payload": {
+    "capacity": 10,
+    "items": {
+      "amber": 8,
+      "birch": 3,
+      "coral": 6,
+      "dune": 2,
+      "elm": 7,
+      "frost": 4,
+      "gale": 8,
+      "heath": 3,
+      "iris": 6,
+      "jade": 2,
+      "kelp": 7,
+      "lumen": 4
+    }
+  }
+}

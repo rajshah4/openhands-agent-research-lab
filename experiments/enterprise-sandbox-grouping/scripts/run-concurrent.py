@@ -7,8 +7,10 @@ import argparse
 import glob
 import json
 import os
+import statistics
 import threading
 import time
+import urllib.parse
 from concurrent.futures import Future, ThreadPoolExecutor
 from dataclasses import replace
 from datetime import datetime
@@ -84,8 +86,12 @@ def parse_args() -> argparse.Namespace:
         default="rajshah4/openhands-agent-research-lab",
     )
     parser.add_argument("--branch", default="main")
+    parser.add_argument(
+        "--model",
+        help="explicit OpenHands model identifier for matched live comparisons",
+    )
     parser.add_argument("--concurrency", type=int, default=6)
-    parser.add_argument("--request-interval", type=float, default=0.25)
+    parser.add_argument("--request-interval", type=float, default=0.75)
     parser.add_argument("--seed-ready-timeout", type=int, default=180)
     parser.add_argument("--start-timeout", type=int, default=600)
     parser.add_argument("--execution-timeout", type=int, default=900)
@@ -142,12 +148,41 @@ def sandbox_ids_from_lifecycle(root: Path) -> list[str]:
     )
 
 
+def usage_metrics(attempt: dict[str, Any]) -> dict[str, Any]:
+    metadata = attempt.get("metadata") or {}
+    snapshot = metadata.get("conversation_snapshot") or {}
+    metrics = snapshot.get("metrics") or {}
+    return metrics if isinstance(metrics, dict) else {}
+
+
+def attempt_duration_seconds(attempt: dict[str, Any]) -> float | None:
+    started_at = attempt.get("started_at")
+    finished_at = attempt.get("finished_at")
+    if not started_at or not finished_at:
+        return None
+    return (timestamp(str(finished_at)) - timestamp(str(started_at))).total_seconds()
+
+
+def physical_runtime(attempt: dict[str, Any]) -> str | None:
+    metadata = attempt.get("metadata") or {}
+    snapshot = metadata.get("conversation_snapshot") or {}
+    conversation_url = str(snapshot.get("conversation_url") or "")
+    hostname = urllib.parse.urlsplit(conversation_url).hostname or ""
+    suffix = ".runtime."
+    if suffix not in hostname:
+        return None
+    return f"runtime-{hostname.split(suffix, 1)[0]}"
+
+
 def main() -> int:
     args = parse_args()
     if not args.live:
         raise ValueError("this experiment creates real conversations; pass --live")
-    if args.request_interval < 0.2:
-        raise ValueError("--request-interval must be at least 0.2 seconds")
+    if args.request_interval < 0.65:
+        raise ValueError(
+            "--request-interval must be at least 0.65 seconds to stay below "
+            "the observed 100-request-per-minute API limit"
+        )
     if not 2 <= args.concurrency <= 6:
         raise ValueError("--concurrency must be between 2 and 6")
 
@@ -157,21 +192,17 @@ def main() -> int:
         base_campaign,
         repository=args.repository,
         branch=args.branch,
+        model=args.model or base_campaign.model,
         attempt_budget=1,
         policy="managed",
     )
     tasks = {task.id: task for task in base_campaign.tasks}
-    task_order = [
-        "color-cycle-7",
-        "color-bipartite-8",
-        "cover-campus",
-        "cover-grid",
-        "pack-alpha",
-        "pack-beta",
-    ][: args.concurrency]
-    missing = [task_id for task_id in task_order if task_id not in tasks]
-    if missing:
-        raise ValueError("campaign is missing tasks: " + ", ".join(missing))
+    task_order = [task.id for task in base_campaign.tasks[: args.concurrency]]
+    if len(task_order) != args.concurrency:
+        raise ValueError(
+            f"campaign has {len(base_campaign.tasks)} tasks but "
+            f"--concurrency is {args.concurrency}"
+        )
 
     args.store.mkdir(parents=True, exist_ok=True)
     limiter = RateLimitedRequester(args.request_interval)
@@ -228,14 +259,42 @@ def main() -> int:
         for task_id, future in futures.items():
             results[task_id] = future.result()
 
+    controller_wall_seconds = time.monotonic() - started
     sandbox_ids = sandbox_ids_from_lifecycle(args.store)
     try:
         for sandbox_id in sandbox_ids:
             paused = client.pause_sandbox(sandbox_id)
             pause_results[sandbox_id] = str(paused.get("status"))
     finally:
+        durations = [
+            duration
+            for item in results.values()
+            if (duration := attempt_duration_seconds(item)) is not None
+        ]
+        started_at = [
+            timestamp(str(item["started_at"]))
+            for item in results.values()
+            if item.get("started_at")
+        ]
+        finished_at = [
+            timestamp(str(item["finished_at"]))
+            for item in results.values()
+            if item.get("finished_at")
+        ]
+        attempt_batch_wall_seconds = (
+            (max(finished_at) - min(started_at)).total_seconds()
+            if started_at and finished_at
+            else None
+        )
+        metrics = [usage_metrics(item) for item in results.values()]
+        token_usage = [
+            item.get("accumulated_token_usage") or {}
+            for item in metrics
+        ]
         summary = {
             "schema_version": 1,
+            "campaign": base_campaign.id,
+            "model": base_campaign.model,
             "tasks": task_order,
             "attempts": len(results),
             "valid": sum(
@@ -248,6 +307,56 @@ def main() -> int:
             "sandbox_ids": sandbox_ids,
             "max_observed_concurrency": max_observed_concurrency(args.store),
             "rate_limit_retries": limiter.rate_limit_retries,
+            "controller_wall_seconds": round(controller_wall_seconds, 3),
+            "attempt_batch_wall_seconds": (
+                round(attempt_batch_wall_seconds, 3)
+                if attempt_batch_wall_seconds is not None
+                else None
+            ),
+            "throughput_tasks_per_hour": (
+                round(len(results) * 3600 / attempt_batch_wall_seconds, 2)
+                if attempt_batch_wall_seconds
+                else None
+            ),
+            "mean_attempt_seconds": (
+                round(statistics.mean(durations), 3) if durations else None
+            ),
+            "median_attempt_seconds": (
+                round(statistics.median(durations), 3) if durations else None
+            ),
+            "maximum_attempt_seconds": (
+                round(max(durations), 3) if durations else None
+            ),
+            "total_cost": round(
+                sum(float(item.get("accumulated_cost") or 0) for item in metrics),
+                8,
+            ),
+            "total_prompt_tokens": sum(
+                int(item.get("prompt_tokens") or 0) for item in token_usage
+            ),
+            "total_completion_tokens": sum(
+                int(item.get("completion_tokens") or 0) for item in token_usage
+            ),
+            "observed_models": sorted(
+                {
+                    str(
+                        (item.get("metadata") or {})
+                        .get("conversation_snapshot", {})
+                        .get("llm_model")
+                    )
+                    for item in results.values()
+                    if (item.get("metadata") or {})
+                    .get("conversation_snapshot", {})
+                    .get("llm_model")
+                }
+            ),
+            "physical_runtimes": sorted(
+                {
+                    runtime
+                    for item in results.values()
+                    if (runtime := physical_runtime(item))
+                }
+            ),
             "wall_seconds": round(time.monotonic() - started, 3),
             "pause_results": pause_results,
             "conversations": {

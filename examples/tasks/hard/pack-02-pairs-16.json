@@ -1,0 +1,28 @@
+{
+  "id": "pack-02-pairs-16",
+  "family": "bin-packing",
+  "description": "Pack sixteen scrambled complementary items into capacity-ten bins.",
+  "tags": ["bin-packing", "complementary", "hard-transfer"],
+  "target_score": 8,
+  "payload": {
+    "capacity": 10,
+    "items": {
+      "aqua": 9,
+      "brass": 2,
+      "cedar": 7,
+      "denim": 4,
+      "ember": 8,
+      "flint": 1,
+      "grove": 6,
+      "honey": 3,
+      "ivory": 9,
+      "juniper": 2,
+      "khaki": 7,
+      "linen": 4,
+      "moss": 8,
+      "navy": 1,
+      "ochre": 6,
+      "pearl": 3
+    }
+  }
+}

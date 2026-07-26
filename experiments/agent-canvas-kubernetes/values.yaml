@@ -1,0 +1,36 @@
+replicaCount: 1
+
+service:
+  type: ClusterIP
+  port: 8000
+
+ingress:
+  enabled: false
+
+rbac:
+  enabled: false
+  namespaces: []
+  clusterAdmin: false
+
+persistence:
+  enabled: true
+  size: 20Gi
+  storageClassName: standard-rwo
+  accessModes:
+    - ReadWriteOnce
+
+resources:
+  requests:
+    cpu: 500m
+    memory: 1Gi
+  limits:
+    cpu: "2"
+    memory: 4Gi
+
+probes:
+  startup:
+    enabled: true
+    path: /alive
+    periodSeconds: 5
+    timeoutSeconds: 5
+    failureThreshold: 60

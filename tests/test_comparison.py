@@ -2,7 +2,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from research_lab.comparison import MatchedComparisonRunner
+from research_lab.comparison import MatchedComparisonRunner, summarize_arm
 from research_lab.domain import CampaignSpec
 from research_lab.store import FileResearchStore
 from research_lab.workers import LocalHeuristicWorker
@@ -12,6 +12,57 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 
 class MatchedComparisonTests(unittest.TestCase):
+    def test_usage_metrics_support_canvas_and_enterprise_snapshots(self) -> None:
+        campaign = CampaignSpec.from_path(
+            PROJECT_ROOT / "examples" / "graph-coloring-campaign.json"
+        )
+        task_id = campaign.tasks[0].id
+        common = {
+            "task_id": task_id,
+            "outcome": "completed",
+            "validation": {"valid": True, "score": 3},
+        }
+        attempts = [
+            {
+                **common,
+                "metadata": {
+                    "conversation_snapshot": {
+                        "stats": {
+                            "usage_to_metrics": {
+                                "default": {
+                                    "accumulated_cost": 0.1,
+                                    "accumulated_token_usage": {
+                                        "prompt_tokens": 10,
+                                        "completion_tokens": 2,
+                                    },
+                                }
+                            }
+                        }
+                    }
+                },
+            },
+            {
+                **common,
+                "metadata": {
+                    "conversation_snapshot": {
+                        "metrics": {
+                            "accumulated_cost": 0.2,
+                            "accumulated_token_usage": {
+                                "prompt_tokens": 20,
+                                "completion_tokens": 3,
+                            },
+                        }
+                    }
+                },
+            },
+        ]
+
+        metrics = summarize_arm(campaign, attempts)
+
+        self.assertAlmostEqual(metrics["total_cost"], 0.3)
+        self.assertEqual(metrics["total_prompt_tokens"], 30)
+        self.assertEqual(metrics["total_completion_tokens"], 5)
+
     def test_isolated_arms_measure_validated_memory_effect(self) -> None:
         campaign = CampaignSpec.from_path(
             PROJECT_ROOT / "examples" / "graph-coloring-campaign.json"
