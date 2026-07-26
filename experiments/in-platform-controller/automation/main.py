@@ -20,7 +20,15 @@ TICK_SCRIPT = "experiments/in-platform-controller/run_tick.py"
 
 def get_secret(name):
     """Fetch a named secret stored in the agent server."""
-    url = os.environ.get("AGENT_SERVER_URL", "").rstrip("/")
+    # Automation service 1.1.5 on Rajistics injects the public agent-server
+    # address as RUNTIME_URL. Newer automation builds use AGENT_SERVER_URL.
+    url = (
+        os.environ.get("AGENT_SERVER_URL")
+        or os.environ.get("RUNTIME_URL")
+        or ""
+    ).rstrip("/")
+    if not url:
+        raise RuntimeError("automation did not inject an agent-server URL")
     key = os.environ.get("SESSION_API_KEY") or os.environ.get("OH_SESSION_API_KEYS_0", "")
     with urllib.request.urlopen(urllib.request.Request(
         f"{url}/api/settings/secrets/{name}", headers={"X-Session-API-Key": key}
