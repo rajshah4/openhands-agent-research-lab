@@ -1,0 +1,12 @@
+{
+  "created_at": "2026-07-26T18:00:32.001354+00:00",
+  "evidence": "The graph is bipartite with two independent sets (p nodes and q nodes). No edges exist within p nodes or within q nodes. All edges connect p nodes to q nodes.",
+  "id": "lesson-b300e088230f5291",
+  "source_attempt_id": "attempt-0001-18777c4b",
+  "source_run_id": "in-platform-controller-pilot-20260726T175646Z-8a8ad95c",
+  "source_task_id": "color-01-crown-12",
+  "statement": "Crown graphs are bipartite and can be 2-colored by assigning one color to each independent set.",
+  "tags": [
+    "graph-coloring"
+  ]
+}
