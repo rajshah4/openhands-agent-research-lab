@@ -137,7 +137,32 @@
     "taskActions": 1,
     "taskObservations": 1,
     "childType": "code-explorer",
-    "taskId": "task_00000001"
+    "taskId": "task_00000001",
+    "deeperComparison": {
+      "sequential": {
+        "wallSeconds": 501.362,
+        "modelCost": 0.597201,
+        "modelCalls": 31,
+        "deterministicValid": 4,
+        "strictContracts": 3
+      },
+      "parallel": {
+        "wallSeconds": 333.91,
+        "modelCost": 0.5064957,
+        "modelCalls": 29,
+        "deterministicValid": 4,
+        "strictContracts": 4,
+        "taskSpanSeconds": 301.276
+      },
+      "firstClass": {
+        "wallSeconds": 374.36,
+        "modelCost": 0.59279685,
+        "modelCalls": 26,
+        "deterministicValid": 3,
+        "strictContracts": 3,
+        "conversationRecords": 4
+      }
+    }
   },
   "scaleStudy": {
     "isolatedQueue": {

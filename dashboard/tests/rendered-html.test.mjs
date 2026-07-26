@@ -83,7 +83,11 @@ test("includes the Agent Canvas deployment evidence", async () => {
   assert.match(source, /Native TaskToolSet delegation passed in Agent Canvas/);
   assert.match(source, /Native TaskToolSet worked in Agent Canvas; the Replicated profile still omitted it/);
   assert.match(source, /A native code-explorer child performed the delegated work/);
-  assert.match(source, /Validate the same contract separately on OpenHands\s+Cloud/);
+  assert.match(source, /Same four research tasks, three execution structures/);
+  assert.match(source, /33\.4% faster than sequential delegation/);
+  assert.match(source, /Four first-class Canvas conversations/);
+  assert.match(source, /Recommended hybrid/);
+  assert.match(source, /validate the task\s+tool separately on OpenHands Cloud/i);
   assert.match(source, /Choosing an execution pattern/);
   assert.match(source, /NeuroGolf scaling planner/);
   assert.match(source, /One sandbox per active agent/);
@@ -102,4 +106,9 @@ test("includes the Agent Canvas deployment evidence", async () => {
   assert.match(snapshot, /"taskSeconds": 10\.214/);
   assert.match(snapshot, /"totalModelCost": 0\.1321128/);
   assert.match(snapshot, /"childModelCost": 0\.0195816/);
+  assert.match(snapshot, /"deeperComparison"/);
+  assert.match(snapshot, /"wallSeconds": 501\.362/);
+  assert.match(snapshot, /"wallSeconds": 333\.91/);
+  assert.match(snapshot, /"wallSeconds": 374\.36/);
+  assert.match(snapshot, /"modelCost": 0\.5064957/);
 });

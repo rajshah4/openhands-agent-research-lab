@@ -1,0 +1,80 @@
+{
+  "environment": {
+    "agent_canvas_version": "1.5.2",
+    "agent_server_version": "1.36.1",
+    "sdk_version": "1.36.1",
+    "tools_version": "1.36.1",
+    "model": "openhands/claude-sonnet-4-6"
+  },
+  "cases": [
+    {
+      "case_id": "scheduler",
+      "path": "src/research_lab/scheduler.py",
+      "symbols": ["RoundRobinPolicy", "ManagedPolicy", "policy_for"]
+    },
+    {
+      "case_id": "store",
+      "path": "src/research_lab/store.py",
+      "symbols": ["FileResearchStore", "controller_lock", "_atomic_write_text"]
+    },
+    {
+      "case_id": "runner",
+      "path": "src/research_lab/runner.py",
+      "symbols": ["CampaignRunner", "_reconcile_incomplete_attempts", "_record_successful_execution"]
+    },
+    {
+      "case_id": "canvas",
+      "path": "src/research_lab/canvas.py",
+      "symbols": ["CanvasClient", "capacity_snapshot", "wait_for_terminal"]
+    }
+  ],
+  "results": {
+    "native_sequential": {
+      "conversation_ids": ["54ff8ec3-b579-4ea8-9edf-8319b24b4e5f"],
+      "ui_records": 1,
+      "native_tasks": 4,
+      "tool_concurrency": 1,
+      "wall_seconds": 501.362,
+      "task_span_seconds": 456.513,
+      "model_cost": 0.597201,
+      "model_calls": 31,
+      "deterministic_valid": 4,
+      "strict_contracts_valid": 3
+    },
+    "native_parallel": {
+      "conversation_ids": ["5416da2f-d627-4282-8109-f8366de0094b"],
+      "ui_records": 1,
+      "native_tasks": 4,
+      "tool_concurrency": 4,
+      "wall_seconds": 333.91,
+      "task_span_seconds": 301.276,
+      "model_cost": 0.5064957,
+      "model_calls": 29,
+      "deterministic_valid": 4,
+      "strict_contracts_valid": 4
+    },
+    "first_class_conversations": {
+      "conversation_ids": [
+        "e7e3ecc3-aaff-4a0e-b68b-20a55c9e8abe",
+        "8e527d12-1c74-4465-a269-8a61de0fbc52",
+        "8a957666-1a49-4aaa-ba3b-7a023a7756e1",
+        "783bd6db-3d46-4ae7-8cbf-574fc8d3f4ce"
+      ],
+      "ui_records": 4,
+      "native_tasks": 0,
+      "tool_concurrency": 1,
+      "wall_seconds": 374.36,
+      "conversation_wall_seconds": [111.547, 192.623, 352.022, 373.845],
+      "model_cost": 0.59279685,
+      "model_calls": 26,
+      "deterministic_valid": 3,
+      "strict_contracts_valid": 3
+    }
+  },
+  "derived": {
+    "parallel_vs_sequential_wall_reduction_pct": 33.4,
+    "parallel_vs_sequential_cost_reduction_pct": 15.2,
+    "parallel_vs_external_wall_reduction_pct": 10.8,
+    "parallel_vs_external_cost_reduction_pct": 14.6
+  }
+}

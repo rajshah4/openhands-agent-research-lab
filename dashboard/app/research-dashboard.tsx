@@ -126,6 +126,31 @@ type Snapshot = {
     taskObservations: number;
     childType: string;
     taskId: string;
+    deeperComparison: {
+      sequential: {
+        wallSeconds: number;
+        modelCost: number;
+        modelCalls: number;
+        deterministicValid: number;
+        strictContracts: number;
+      };
+      parallel: {
+        wallSeconds: number;
+        modelCost: number;
+        modelCalls: number;
+        deterministicValid: number;
+        strictContracts: number;
+        taskSpanSeconds: number;
+      };
+      firstClass: {
+        wallSeconds: number;
+        modelCost: number;
+        modelCalls: number;
+        deterministicValid: number;
+        strictContracts: number;
+        conversationRecords: number;
+      };
+    };
   };
   scaleStudy: Record<
     "isolatedQueue" | "longLivedShared" | "boundedCells",
@@ -769,10 +794,10 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
       record: "One parent conversation",
       runtime: "One parent sandbox",
       isolation: "Shared parent context",
-      use: "Sequential specialist delegation inside one trusted workspace",
+      use: "Two to four independent specialists inside one trusted work cell",
       tradeoff: "Passed in Agent Canvas; the tested Enterprise profile still omitted the task tool",
-      concurrency: "Delegated work shares one parent sandbox and its budgets",
-      cost: `$${snapshot.agentCanvasTaskTool.totalModelCost.toFixed(3)} for the native Canvas test`,
+      concurrency: "Four read-only delegates ran concurrently; shared writes can race",
+      cost: `$${snapshot.agentCanvasTaskTool.deeperComparison.parallel.modelCost.toFixed(3)} for four matched Canvas tasks`,
       status: "Canvas validated · OHE gap",
     },
   ];
@@ -856,8 +881,8 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
           </article>
           <article>
             <span>SDK subagents</span>
-            <strong>{snapshot.agentCanvasTaskTool.wallSeconds.toFixed(1)} seconds</strong>
-            <p>Native Canvas parent and child completed with one TaskAction and one TaskObservation; OHE still omitted the enabled task tool.</p>
+            <strong>{snapshot.agentCanvasTaskTool.deeperComparison.parallel.wallSeconds.toFixed(1)} seconds</strong>
+            <p>Four parallel Canvas delegates completed 4/4 strict output contracts; OHE still omitted the enabled task tool.</p>
           </article>
         </div>
       </section>
@@ -1044,6 +1069,46 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
           <div><span>Child task time</span><strong>{snapshot.agentCanvasTaskTool.taskSeconds.toFixed(1)} sec</strong></div>
           <div><span>Total model cost</span><strong>${snapshot.agentCanvasTaskTool.totalModelCost.toFixed(4)}</strong></div>
         </div>
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">Matched four-task comparison</p>
+            <h2>Same four research tasks, three execution structures.</h2>
+          </div>
+          <p>
+            Each run inspected the same four source files and had to return the
+            same structured evidence. This separates delegation overhead from
+            task difficulty.
+          </p>
+        </div>
+        <div className="implementation-grid">
+          <article className="implementation-card">
+            <span className="implementation-status tested">Native · sequential</span>
+            <h3>{snapshot.agentCanvasTaskTool.deeperComparison.sequential.wallSeconds.toFixed(1)} seconds</h3>
+            <p>
+              Four children ran one at a time for $
+              {snapshot.agentCanvasTaskTool.deeperComparison.sequential.modelCost.toFixed(3)}.
+              All four analyses were correct; three followed the strict output contract.
+            </p>
+          </article>
+          <article className="implementation-card">
+            <span className="implementation-status tested">Native · four parallel</span>
+            <h3>{snapshot.agentCanvasTaskTool.deeperComparison.parallel.wallSeconds.toFixed(1)} seconds</h3>
+            <p>
+              Four concurrent children returned 4/4 strict contracts for $
+              {snapshot.agentCanvasTaskTool.deeperComparison.parallel.modelCost.toFixed(3)}.
+              This was 33.4% faster than sequential delegation.
+            </p>
+          </article>
+          <article className="implementation-card">
+            <span className="implementation-status tested">Four first-class records</span>
+            <h3>{snapshot.agentCanvasTaskTool.deeperComparison.firstClass.wallSeconds.toFixed(1)} seconds</h3>
+            <p>
+              Four first-class Canvas conversations cost $
+              {snapshot.agentCanvasTaskTool.deeperComparison.firstClass.modelCost.toFixed(3)}.
+              Three followed the strict contract; each retained an independent visible record.
+            </p>
+          </article>
+        </div>
         <div className="subagent-findings">
           <article>
             <span className="implementation-status tested">Canvas passed</span>
@@ -1069,23 +1134,24 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
           </article>
           <article>
             <span className="implementation-status pilot">Execution boundary</span>
-            <h3>The child shares the parent process and workspace</h3>
+            <h3>Parallel children still share the parent process and workspace</h3>
             <p>
-              At parallelism {snapshot.agentCanvasTaskTool.parallelToolCalls},
-              the parent waited for the child. The child used $
-              {snapshot.agentCanvasTaskTool.childModelCost.toFixed(4)} of the
-              total and had its own cost scope, but not a separate UI
-              conversation or sandbox.
+              The four task calls were issued together and completed out of
+              order, proving overlap. They shared one backend, workspace, and
+              model path, so the speedup was about 1.5× rather than 4×.
             </p>
           </article>
         </div>
         <p className="architecture-note">
-          <strong>Current conclusion:</strong> native SDK subagents are now
-          directly validated in Agent Canvas for sequential specialist work.
-          Keep parallel tool calls at 1 until independent two- and four-child
-          tests are run. Validate the same contract separately on OpenHands
-          Cloud, then file the OHE propagation issue with both environments
-          clearly distinguished.
+          <strong>Recommended hybrid:</strong> let an external scheduler and
+          experiment ledger own the campaign. Give independently retryable
+          work to first-class conversations or bounded Enterprise cells, then
+          use two to four native subagents inside each trusted cell for
+          independent read-only exploration, testing, or synthesis. Use
+          isolated sandboxes for untrusted code, conflicting writes, separate
+          credentials, or failures that must remain local. Validate the task
+          tool separately on OpenHands Cloud, then file the OHE propagation
+          issue with both environments clearly distinguished.
         </p>
       </section>
 
