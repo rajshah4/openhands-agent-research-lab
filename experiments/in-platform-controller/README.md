@@ -127,7 +127,8 @@ sandbox cleanup. The prompt only invokes
 `automation/preset_tick.py`:
 
 1. checks out the dedicated state branch, or creates it from `main`;
-2. verifies that OpenHands injected the worker API credential;
+2. verifies that OpenHands injected the worker API credential explicitly
+   referenced by the terminal command;
 3. runs `run_tick.py`; and
 4. returns the tick's exit status to the OpenHands automation lifecycle.
 

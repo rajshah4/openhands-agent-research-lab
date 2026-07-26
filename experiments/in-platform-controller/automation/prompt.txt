@@ -6,7 +6,8 @@ code, inspect or print secrets, create a pull request, or perform any additional
 research. From the repository root, run:
 
 ```bash
-python3 experiments/in-platform-controller/automation/preset_tick.py
+OPENHANDS_API_KEY="$OPENHANDS_API_KEY" \
+  python3 experiments/in-platform-controller/automation/preset_tick.py
 ```
 
 Wait for that command to finish. If it exits successfully, report the final
