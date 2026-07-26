@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run two to six validated OpenHands workers in one rate-limited sandbox pool."""
+"""Run a queued, validated OpenHands workload in a rate-limited sandbox pool."""
 
 from __future__ import annotations
 
@@ -115,6 +115,14 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--concurrency", type=int, default=6)
     parser.add_argument(
+        "--workload-size",
+        type=int,
+        help=(
+            "total queued tasks; cycles through the campaign with unique task "
+            "IDs when larger than --concurrency"
+        ),
+    )
+    parser.add_argument(
         "--dispatch-limit",
         type=int,
         help="maximum simultaneously executing agents; defaults to concurrency",
@@ -220,14 +228,19 @@ def main() -> int:
         )
     if not 2 <= args.concurrency <= 6:
         raise ValueError("--concurrency must be between 2 and 6")
-    dispatch_limit = args.dispatch_limit or args.concurrency
-    if not 1 <= dispatch_limit <= args.concurrency:
+    workload_size = args.workload_size or args.concurrency
+    if not args.concurrency <= workload_size <= 100:
         raise ValueError(
-            "--dispatch-limit must be between 1 and --concurrency"
+            "--workload-size must be between --concurrency and 100"
         )
-    if not 1 <= args.expected_sandboxes <= args.concurrency:
+    dispatch_limit = args.dispatch_limit or args.concurrency
+    if not 1 <= dispatch_limit <= workload_size:
         raise ValueError(
-            "--expected-sandboxes must be between 1 and --concurrency"
+            "--dispatch-limit must be between 1 and --workload-size"
+        )
+    if not 1 <= args.expected_sandboxes <= workload_size:
+        raise ValueError(
+            "--expected-sandboxes must be between 1 and --workload-size"
         )
 
     _load_env_file(args.env_file)
@@ -242,13 +255,25 @@ def main() -> int:
         attempt_budget=1,
         policy="managed",
     )
-    tasks = {task.id: task for task in base_campaign.tasks}
-    task_order = [task.id for task in base_campaign.tasks[: args.concurrency]]
-    if len(task_order) != args.concurrency:
+    source_tasks = base_campaign.tasks[: args.concurrency]
+    if len(source_tasks) != args.concurrency:
         raise ValueError(
             f"campaign has {len(base_campaign.tasks)} tasks but "
             f"--concurrency is {args.concurrency}"
         )
+    scaled_tasks = tuple(
+        replace(
+            source_tasks[index % len(source_tasks)],
+            id=(
+                f"{source_tasks[index % len(source_tasks)].id}"
+                f"-scale-{index + 1:03d}"
+            ),
+        )
+        for index in range(workload_size)
+    )
+    base_campaign = replace(base_campaign, tasks=scaled_tasks)
+    tasks = {task.id: task for task in scaled_tasks}
+    task_order = [task.id for task in scaled_tasks]
 
     args.store.mkdir(parents=True, exist_ok=True)
     limiter = RateLimitedRequester(args.request_interval)
@@ -366,6 +391,8 @@ def main() -> int:
             "repository": base_campaign.repository,
             "branch": base_campaign.branch,
             "sandbox_grouping_strategy": grouping_strategy,
+            "workload_size": workload_size,
+            "source_task_count": len(source_tasks),
             "dispatch_limit": dispatch_limit,
             "expected_sandboxes": args.expected_sandboxes,
             "tasks": task_order,
@@ -458,7 +485,7 @@ def main() -> int:
     return (
         0
         if (
-            summary["valid"] == args.concurrency
+            summary["valid"] == workload_size
             and len(sandbox_ids) == args.expected_sandboxes
             and not pause_errors
             and len(pause_results) == len(sandbox_ids)

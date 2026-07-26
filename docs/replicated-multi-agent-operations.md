@@ -185,6 +185,94 @@ did not restart. Keep the isolated default at four or lower, and let each
 isolated worker pause its own sandbox immediately after completion. The runner
 does this automatically under `NO_GROUPING`.
 
+## Run the bounded scale study
+
+`--workload-size` increases total queued work without raising the dispatch
+limit. It cycles through the six campaign tasks with unique task IDs. This is
+useful for measuring queue rollover and lifecycle behavior without pretending
+the small installation can run every task simultaneously.
+
+Run 12 isolated tasks, four active at a time:
+
+```bash
+PYTHONPATH=src .venv/bin/python \
+  experiments/enterprise-sandbox-grouping/scripts/run-concurrent.py \
+  --campaign examples/hard-transfer-live.json \
+  --store .lab-replicated-scale/isolated-four/w12-r1 \
+  --env-file "$RESEARCH_ENV_FILE" \
+  --no-repository \
+  --model litellm_proxy/us.anthropic.claude-haiku-4-5-20251001-v1:0 \
+  --request-interval 0.75 \
+  --poll-seconds 2 \
+  --concurrency 6 \
+  --workload-size 12 \
+  --dispatch-limit 4 \
+  --expected-sandboxes 12 \
+  --require-grouping-strategy NO_GROUPING \
+  --execution-timeout 600 \
+  --live
+```
+
+Run one long-lived 12-task shared pool:
+
+```bash
+PYTHONPATH=src .venv/bin/python \
+  experiments/enterprise-sandbox-grouping/scripts/run-concurrent.py \
+  --campaign examples/hard-transfer-live.json \
+  --store .lab-replicated-scale/grouped-four/w12-r1 \
+  --env-file "$RESEARCH_ENV_FILE" \
+  --no-repository \
+  --model litellm_proxy/us.anthropic.claude-haiku-4-5-20251001-v1:0 \
+  --request-interval 0.75 \
+  --poll-seconds 2 \
+  --concurrency 6 \
+  --workload-size 12 \
+  --dispatch-limit 4 \
+  --expected-sandboxes 2 \
+  --require-grouping-strategy FEWEST_CONVERSATIONS \
+  --execution-timeout 600 \
+  --live
+```
+
+The tested long-lived pool returned only `10/12` valid attempts. Two start
+tasks assigned to the second sandbox stayed non-ready for more than 600
+seconds. Do not increase to 24 tasks after this result.
+
+The safer shared pattern is a bounded work cell. Run the normal six-task,
+four-active shared command twice with different store paths. Require the first
+command to finish, pause its one sandbox, and pass preflight with zero active
+sandboxes before starting the second:
+
+```bash
+PYTHONPATH=src .venv/bin/python \
+  experiments/enterprise-sandbox-grouping/scripts/run-concurrent.py \
+  --campaign examples/hard-transfer-live.json \
+  --store .lab-replicated-scale/bounded-cells/w12-r1-cell1 \
+  --env-file "$RESEARCH_ENV_FILE" \
+  --no-repository \
+  --model litellm_proxy/us.anthropic.claude-haiku-4-5-20251001-v1:0 \
+  --request-interval 0.75 \
+  --poll-seconds 2 \
+  --concurrency 6 \
+  --workload-size 6 \
+  --dispatch-limit 4 \
+  --expected-sandboxes 1 \
+  --require-grouping-strategy FEWEST_CONVERSATIONS \
+  --execution-timeout 600 \
+  --live
+```
+
+Repeat that command with
+`--store .lab-replicated-scale/bounded-cells/w12-r1-cell2` only after the
+cleanup preflight passes. These two cells completed `12/12` with two total
+sandboxes.
+
+For a 100-job production queue, keep the workload in durable application
+storage and admit one bounded cell at a time on this installation. Do not use
+Git or the OpenHands internal database as the queue. Parallel shared cells
+need an explicit, tested sandbox-pool or sandbox-targeting contract; a global
+grouping selector is not a runtime lease.
+
 ## Watch cluster health during a batch
 
 Count live runtime pods and check restarts:
@@ -247,6 +335,8 @@ PYTHONPATH=src .venv/bin/python \
 - Use one controller as the lifecycle owner for each sandbox pool.
 - Enforce a per-sandbox dispatch limit and queue excess work.
 - Recycle shared sandboxes by job count, age, memory, or failure signal.
+- On Enterprise `0.24.0`, recycle at the configured six-conversation boundary
+  instead of relying on automatic rollover for a long-lived shared queue.
 - Do not mix tenants or untrusted work in one runtime.
 - Store experiment state and sanitized evidence outside the OpenHands database.
 - Treat Git as the release and audit layer, not as a runtime lock manager.

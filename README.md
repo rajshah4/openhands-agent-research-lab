@@ -165,5 +165,6 @@ See [the design](docs/design.md), [the framing record](FRAMING.md), and the
 comparison limits are in [the matched-comparison note](docs/matched-comparison.md).
 
 For production multi-agent deployment on OpenHands Enterprise/Replicated, see
-the [three-pattern result](evidence/2026-07-25-replicated-multi-agent-patterns/README.md)
+the [three-pattern result](evidence/2026-07-25-replicated-multi-agent-patterns/README.md),
+the [12-task scale study](evidence/2026-07-25-replicated-scale-study/README.md),
 and the [operator runbook](docs/replicated-multi-agent-operations.md).

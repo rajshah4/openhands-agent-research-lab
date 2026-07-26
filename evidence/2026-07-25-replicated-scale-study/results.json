@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "study": "replicated-bounded-scale",
+  "environment": {
+    "openhands_enterprise": "0.24.0",
+    "server": "1.46.2",
+    "agent_server": "1.36.0-python",
+    "per_sandbox_conversation_cap": 6,
+    "runtime_capacity_assumption": 10,
+    "launch_lock_at": 7
+  },
+  "workload": {
+    "tasks": 12,
+    "source_tasks": 6,
+    "dispatch_limit": 4,
+    "request_interval_seconds": 0.75,
+    "repository": null,
+    "model": "litellm_proxy/us.anthropic.claude-haiku-4-5-20251001-v1:0"
+  },
+  "patterns": {
+    "isolated_queue": {
+      "strategy": "NO_GROUPING",
+      "valid": 12,
+      "attempts": 12,
+      "sandboxes": 12,
+      "maximum_active_agents": 4,
+      "wall_seconds": 421.256,
+      "throughput_tasks_per_hour": 104.8,
+      "model_cost": 0.2493557,
+      "rate_limit_retries": 0,
+      "transient_auth_retries": 3,
+      "transport_retries": 1,
+      "pause_errors": 0
+    },
+    "long_lived_shared_pool": {
+      "strategy": "FEWEST_CONVERSATIONS",
+      "valid": 10,
+      "attempts": 12,
+      "sandboxes": 2,
+      "maximum_active_agents": 4,
+      "wall_seconds": 834.697,
+      "throughput_tasks_per_hour": 52.04,
+      "model_cost": 0.32593138,
+      "rate_limit_retries": 0,
+      "transient_auth_retries": 0,
+      "transport_retries": 0,
+      "stuck_start_tasks": 2,
+      "pause_errors": 0
+    },
+    "sequential_bounded_shared_cells": {
+      "strategy": "FEWEST_CONVERSATIONS",
+      "valid": 12,
+      "attempts": 12,
+      "sandboxes": 2,
+      "maximum_active_agents_per_cell": 4,
+      "cell_wall_seconds": [
+        342.463,
+        215.79
+      ],
+      "wall_seconds": 558.253,
+      "throughput_tasks_per_hour": 77.87,
+      "model_cost": 0.37644943,
+      "rate_limit_retries": 1,
+      "transient_auth_retries": 0,
+      "transport_retries": 0,
+      "pause_errors": 0
+    }
+  },
+  "linear_100_task_planning_estimates": {
+    "isolated_queue_minutes": 57.25,
+    "isolated_sandboxes_over_queue_lifetime": 100,
+    "bounded_shared_cells_minutes": 77.05,
+    "bounded_shared_sandboxes_over_queue_lifetime": 17,
+    "simultaneous_100_agents_tested": false,
+    "confidence": "directional single-replicate estimate"
+  },
+  "stop_decision": {
+    "planned_next_workload": 24,
+    "launched": false,
+    "reason": "two start tasks in the long-lived shared arm remained non-ready past the 600 second bound"
+  },
+  "final_state": {
+    "active_user_visible_sandboxes": 0,
+    "sandbox_grouping_strategy": "FEWEST_CONVERSATIONS",
+    "runtime_pod_restarts": 0
+  }
+}

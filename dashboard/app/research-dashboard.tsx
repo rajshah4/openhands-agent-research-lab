@@ -62,6 +62,17 @@ type Snapshot = {
       controllerRetries: number;
     }
   >;
+  scaleStudy: Record<
+    "isolatedQueue" | "longLivedShared" | "boundedCells",
+    {
+      valid: number;
+      attempts: number;
+      sandboxes: number;
+      wallSeconds: number;
+      throughput: number;
+      controllerRetries: number;
+    }
+  >;
   agents: AgentRecord[];
   lessons: Array<{
     id: string;
@@ -203,7 +214,7 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
             </div>
             <div>
               <dt>Runs at once</dt>
-              <dd>{snapshot.capacity.maxNewConcurrent} agent</dd>
+              <dd>{snapshot.capacity.maxNewConcurrent} agents</dd>
             </div>
             <div>
               <dt>Server memory free</dt>
@@ -455,14 +466,118 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
               </article>
             </div>
             <p className="architecture-note">
-              My default recommendation is the middle option:{" "}
-              <strong>FEWEST_CONVERSATIONS with four active agents per sandbox</strong>.
-              Keep separate runtimes for untrusted work. Raise the shared limit
-              only after a matched load test. Agent Canvas remains a lighter
-              single-team backend, and the SDK remains the custom-product path;
-              neither replaces the Enterprise identity and lifecycle controls
-              measured here. The experiment ledger stays outside the OpenHands
-              internal database.
+              For one six-task batch, my default is{" "}
+              <strong>FEWEST_CONVERSATIONS with four active agents</strong>.
+              The larger queue below adds an important boundary: recycle a
+              shared sandbox after six conversations instead of asking one
+              long-lived pool to roll over automatically. Keep separate
+              runtimes for untrusted work. The experiment ledger stays outside
+              the OpenHands internal database.
+            </p>
+          </section>
+
+          <section className="section implementation-section">
+            <div className="section-heading">
+              <div>
+                <p className="eyebrow">What happened when I doubled the queue</p>
+                <h2>Twelve jobs exposed the rollover boundary.</h2>
+              </div>
+              <p>
+                I kept the active limit at four and queued 12 jobs. This is a
+                small scaling test, not a claim that this server can run 100
+                agents at once.
+              </p>
+            </div>
+            <div className="implementation-grid">
+              <article className="implementation-card">
+                <span className="implementation-status tested">
+                  Reliable, more containers
+                </span>
+                <h3>Isolated queue</h3>
+                <p>
+                  {snapshot.scaleStudy.isolatedQueue.valid}/
+                  {snapshot.scaleStudy.isolatedQueue.attempts} jobs passed in{" "}
+                  {snapshot.scaleStudy.isolatedQueue.wallSeconds.toFixed(0)}
+                  {" "}seconds. Four sandboxes ran at most, and each was paused
+                  as soon as its job finished.
+                </p>
+                <dl>
+                  <div>
+                    <dt>Throughput</dt>
+                    <dd>{snapshot.scaleStudy.isolatedQueue.throughput.toFixed(1)} jobs/hour.</dd>
+                  </div>
+                  <div>
+                    <dt>Runtime use</dt>
+                    <dd>{snapshot.scaleStudy.isolatedQueue.sandboxes} sandboxes over the queue&apos;s lifetime.</dd>
+                  </div>
+                  <div>
+                    <dt>Recovery</dt>
+                    <dd>{snapshot.scaleStudy.isolatedQueue.controllerRetries} transient API calls retried.</dd>
+                  </div>
+                </dl>
+              </article>
+
+              <article className="implementation-card">
+                <span className="implementation-status next">
+                  Do not use for a long queue
+                </span>
+                <h3>Automatic shared rollover</h3>
+                <p>
+                  The first sandbox filled with six conversations. Two start
+                  tasks stalled after work rolled into the second sandbox, so
+                  only {snapshot.scaleStudy.longLivedShared.valid}/
+                  {snapshot.scaleStudy.longLivedShared.attempts} jobs passed.
+                </p>
+                <dl>
+                  <div>
+                    <dt>Throughput</dt>
+                    <dd>{snapshot.scaleStudy.longLivedShared.throughput.toFixed(1)} jobs/hour.</dd>
+                  </div>
+                  <div>
+                    <dt>Runtime use</dt>
+                    <dd>{snapshot.scaleStudy.longLivedShared.sandboxes} shared sandboxes.</dd>
+                  </div>
+                  <div>
+                    <dt>Failure</dt>
+                    <dd>Two starts stayed non-ready past the 10-minute bound.</dd>
+                  </div>
+                </dl>
+              </article>
+
+              <article className="implementation-card">
+                <span className="implementation-status pilot">
+                  Trusted-work recommendation
+                </span>
+                <h3>Bounded shared cells</h3>
+                <p>
+                  I ran two six-job cells. Each cell drained and paused its
+                  sandbox before the next began. All{" "}
+                  {snapshot.scaleStudy.boundedCells.valid}/
+                  {snapshot.scaleStudy.boundedCells.attempts} jobs passed.
+                </p>
+                <dl>
+                  <div>
+                    <dt>Throughput</dt>
+                    <dd>{snapshot.scaleStudy.boundedCells.throughput.toFixed(1)} jobs/hour.</dd>
+                  </div>
+                  <div>
+                    <dt>Runtime use</dt>
+                    <dd>{snapshot.scaleStudy.boundedCells.sandboxes} sandboxes over the queue&apos;s lifetime.</dd>
+                  </div>
+                  <div>
+                    <dt>Boundary</dt>
+                    <dd>One controller owns each cell from admission through pause.</dd>
+                  </div>
+                </dl>
+              </article>
+            </div>
+            <p className="architecture-note">
+              A 100-job system should keep 100 jobs in a durable queue, not
+              launch 100 containers. On this installation, the proven choices
+              are a four-active isolated queue or sequential bounded shared
+              cells. Parallel shared cells still need an explicit, tested way
+              to lease or target a sandbox; the global grouping menu does not
+              provide that contract.
             </p>
           </section>
         </>
@@ -614,7 +729,7 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
       <section className="section next-gate">
         <div>
           <p className="eyebrow">What I would test next</p>
-          <h2>The next run needs harder problems.</h2>
+          <h2>The next scale step needs a rollover fix.</h2>
         </div>
         <ol>
           <li>
@@ -623,7 +738,8 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
           </li>
           <li>
             <span>1</span>
-            Add problems where an earlier technique can change the final score.
+            Fix and retest shared-sandbox rollover before increasing the queue
+            from 12 to 24 jobs.
           </li>
           <li>
             <span>2</span>
