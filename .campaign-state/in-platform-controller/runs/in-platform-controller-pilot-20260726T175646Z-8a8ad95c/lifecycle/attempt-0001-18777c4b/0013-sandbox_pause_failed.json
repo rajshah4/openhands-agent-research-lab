@@ -1,0 +1,14 @@
+{
+  "attempt_id": "attempt-0001-18777c4b",
+  "id": "0013-sandbox_pause_failed",
+  "kind": "sandbox_pause_failed",
+  "payload": {
+    "conversation_id": "51e844ee080041bc999420d4837ddda9",
+    "message": "POST /api/v1/sandboxes/3Vkmr5jzsm2hDLjmpKz7ab/pause -> HTTP 404: {\"detail\": \"Not Found\"}",
+    "sandbox_id": "3Vkmr5jzsm2hDLjmpKz7ab",
+    "type": "OpenHandsAPIError"
+  },
+  "recorded_at": "2026-07-26T18:00:30.970991+00:00",
+  "run_id": "in-platform-controller-pilot-20260726T175646Z-8a8ad95c",
+  "schema_version": 1
+}
