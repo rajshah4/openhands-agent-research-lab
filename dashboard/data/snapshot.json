@@ -124,6 +124,21 @@
       "createdAdditionalConversation": true
     }
   },
+  "agentCanvasTaskTool": {
+    "passed": true,
+    "agentCanvasVersion": "1.5.2",
+    "agentServerVersion": "1.36.1",
+    "parallelToolCalls": 1,
+    "wallSeconds": 26.272,
+    "taskSeconds": 10.214,
+    "modelCalls": 5,
+    "totalModelCost": 0.1321128,
+    "childModelCost": 0.0195816,
+    "taskActions": 1,
+    "taskObservations": 1,
+    "childType": "code-explorer",
+    "taskId": "task_00000001"
+  },
   "scaleStudy": {
     "isolatedQueue": {
       "valid": 12,

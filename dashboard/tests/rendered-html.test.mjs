@@ -80,9 +80,10 @@ test("includes the Agent Canvas deployment evidence", async () => {
   assert.match(source, /Enterprise grouped/);
   assert.match(source, /Agent Canvas/);
   assert.match(source, /SDK subagents/);
-  assert.match(source, /exposed an integration gap before a native child could run/);
-  assert.match(source, /The Replicated setting saved, but the launched profile did not receive TaskToolSet/);
-  assert.match(source, /The system prompt did not advertise TaskToolSet/);
+  assert.match(source, /Native TaskToolSet delegation passed in Agent Canvas/);
+  assert.match(source, /Native TaskToolSet worked in Agent Canvas; the Replicated profile still omitted it/);
+  assert.match(source, /A native code-explorer child performed the delegated work/);
+  assert.match(source, /Validate the same contract separately on OpenHands\s+Cloud/);
   assert.match(source, /Choosing an execution pattern/);
   assert.match(source, /NeuroGolf scaling planner/);
   assert.match(source, /One sandbox per active agent/);
@@ -96,4 +97,9 @@ test("includes the Agent Canvas deployment evidence", async () => {
   assert.match(snapshot, /"executionSeconds": 204\.294/);
   assert.match(snapshot, /"modelCost": 0\.38482224/);
   assert.match(snapshot, /"taskToolAdvertised": false/);
+  assert.match(snapshot, /"agentCanvasTaskTool"/);
+  assert.match(snapshot, /"wallSeconds": 26\.272/);
+  assert.match(snapshot, /"taskSeconds": 10\.214/);
+  assert.match(snapshot, /"totalModelCost": 0\.1321128/);
+  assert.match(snapshot, /"childModelCost": 0\.0195816/);
 });

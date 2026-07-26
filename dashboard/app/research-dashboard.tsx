@@ -112,6 +112,21 @@ type Snapshot = {
       createdAdditionalConversation: boolean;
     };
   };
+  agentCanvasTaskTool: {
+    passed: boolean;
+    agentCanvasVersion: string;
+    agentServerVersion: string;
+    parallelToolCalls: number;
+    wallSeconds: number;
+    taskSeconds: number;
+    modelCalls: number;
+    totalModelCost: number;
+    childModelCost: number;
+    taskActions: number;
+    taskObservations: number;
+    childType: string;
+    taskId: string;
+  };
   scaleStudy: Record<
     "isolatedQueue" | "longLivedShared" | "boundedCells",
     {
@@ -754,11 +769,11 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
       record: "One parent conversation",
       runtime: "One parent sandbox",
       isolation: "Shared parent context",
-      use: "Sequential specialist delegation after TaskToolSet is verified",
-      tradeoff: "The tested Enterprise profile did not expose the enabled task tool",
+      use: "Sequential specialist delegation inside one trusted workspace",
+      tradeoff: "Passed in Agent Canvas; the tested Enterprise profile still omitted the task tool",
       concurrency: "Delegated work shares one parent sandbox and its budgets",
-      cost: `$${snapshot.subagentPilot.modelCost.toFixed(3)} in the blocked integration test`,
-      status: "Integration gap",
+      cost: `$${snapshot.agentCanvasTaskTool.totalModelCost.toFixed(3)} for the native Canvas test`,
+      status: "Canvas validated · OHE gap",
     },
   ];
 
@@ -782,7 +797,7 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
             ["01", "Enterprise isolated", "Each agent has its own OpenHands conversation and sandbox.", "isolated", "Measured"],
             ["02", "Enterprise grouped", "Agents keep separate conversations while trusted work shares a sandbox.", "grouped", "Measured"],
             ["03", "Agent Canvas", "Several agents share one lighter agent backend, workspace, and trust boundary.", "canvas", "Measured"],
-            ["04", "SDK subagents", "One parent delegates through TaskToolSet inside its conversation and sandbox.", "subagents", "Blocked in this deployment"],
+            ["04", "SDK subagents", "One parent delegates through TaskToolSet inside its conversation and sandbox.", "subagents", "Passed in Canvas · blocked in OHE"],
           ].map(([number, title, copy, visual, status]) => (
             <article className="pattern-card" key={number}>
               <div className={`pattern-miniature ${visual}`} aria-hidden="true">
@@ -804,8 +819,9 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
         <p className="architecture-note">
           <strong>What we measured:</strong> live tests covered Enterprise
           isolated conversations, Enterprise grouped conversations, and Agent
-          Canvas. The SDK subagent test reached the Replicated instance, but
-          exposed an integration gap before a native child could run.
+          Canvas. Native TaskToolSet delegation passed in Agent Canvas. The
+          matched Replicated test exposed a separate profile integration gap
+          before a native child could run.
         </p>
       </section>
 
@@ -818,8 +834,8 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
           <p>
             These are not one four-way benchmark. Enterprise isolated and
             grouped conversations used matched batches; Agent Canvas used a
-            separate matched deployment comparison; the subagent result is a
-            feature-integration test.
+            separate matched deployment comparison; the subagent results are
+            feature-integration tests in Canvas and OHE.
           </p>
         </div>
         <div className="result-overview-grid">
@@ -838,10 +854,10 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
             <strong>{snapshot.canvasPilot.matchedDeployment.meanBatchWallSeconds.toFixed(1)} seconds</strong>
             <p>Mean six-task batch time in one shared pod; {snapshot.canvasPilot.matchedDeployment.valid}/{snapshot.canvasPilot.matchedDeployment.attempts} independently valid.</p>
           </article>
-          <article className="result-gap">
+          <article>
             <span>SDK subagents</span>
-            <strong>Integration blocked</strong>
-            <p>One sandbox ran for {snapshot.subagentPilot.executionSeconds.toFixed(1)} seconds, but the enabled TaskToolSet was absent from the conversation tools.</p>
+            <strong>{snapshot.agentCanvasTaskTool.wallSeconds.toFixed(1)} seconds</strong>
+            <p>Native Canvas parent and child completed with one TaskAction and one TaskObservation; OHE still omitted the enabled task tool.</p>
           </article>
         </div>
       </section>
@@ -1014,62 +1030,62 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
         <div className="section-heading">
           <div>
             <p className="eyebrow">SDK subagent delegation</p>
-            <h2>The Replicated setting saved, but the launched profile did not receive TaskToolSet.</h2>
+            <h2>Native TaskToolSet worked in Agent Canvas; the Replicated profile still omitted it.</h2>
           </div>
           <p>
-            This test used the SDK model: one parent should call the task tool,
-            receive a child result, and resume that child by task ID. That is
-            different from Agent Canvas creating peer child conversations
-            through its API.
+            This SDK pattern keeps one parent conversation and runs a persisted
+            child beneath it. That is different from an external controller
+            creating another first-class Canvas or Enterprise conversation.
           </p>
         </div>
         <div className="compact-metrics">
-          <div><span>Enable subagents</span><strong>{snapshot.subagentPilot.settingEnabled ? "Saved" : "Off"}</strong></div>
-          <div><span>Parallel tool calls</span><strong>{snapshot.subagentPilot.parallelToolCalls}</strong></div>
-          <div><span>Visible sandboxes</span><strong>{snapshot.subagentPilot.sandboxCount}</strong></div>
-          <div><span>Parent execution</span><strong>{snapshot.subagentPilot.executionSeconds.toFixed(1)} sec</strong></div>
+          <div><span>Canvas native result</span><strong>{snapshot.agentCanvasTaskTool.passed ? "Passed" : "Failed"}</strong></div>
+          <div><span>Parent + child wall time</span><strong>{snapshot.agentCanvasTaskTool.wallSeconds.toFixed(1)} sec</strong></div>
+          <div><span>Child task time</span><strong>{snapshot.agentCanvasTaskTool.taskSeconds.toFixed(1)} sec</strong></div>
+          <div><span>Total model cost</span><strong>${snapshot.agentCanvasTaskTool.totalModelCost.toFixed(4)}</strong></div>
         </div>
         <div className="subagent-findings">
           <article>
-            <span className="implementation-status tested">What worked</span>
-            <h3>The setting and capacity controls behaved correctly</h3>
+            <span className="implementation-status tested">Canvas passed</span>
+            <h3>A native code-explorer child performed the delegated work</h3>
             <p>
-              The user record reported subagents enabled with sequential tool
-              execution. The parent completed in one sandbox, cost $
-              {snapshot.subagentPilot.modelCost.toFixed(4)}, and the sandbox
-              was paused after evidence collection.
+              The parent emitted {snapshot.agentCanvasTaskTool.taskActions}
+              {" "}TaskAction and received{" "}
+              {snapshot.agentCanvasTaskTool.taskObservations} TaskObservation
+              from {snapshot.agentCanvasTaskTool.childType}. The child returned
+              task ID {snapshot.agentCanvasTaskTool.taskId} and the exact
+              independently known file values.
             </p>
           </article>
           <article>
-            <span className="implementation-status next">What blocked</span>
-            <h3>No native task tool appeared in the launched conversation</h3>
+            <span className="implementation-status next">OHE side note</span>
+            <h3>The saved Enterprise setting still did not reach the launched profile</h3>
             <p>
-              The system prompt did not advertise TaskToolSet. The event stream
-              contained {snapshot.subagentPilot.taskActions} task actions and{" "}
-              {snapshot.subagentPilot.taskObservations} task observations, so
-              this cannot be counted as a successful subagent run.
+              The OHE user record reported subagents enabled, but its system
+              prompt did not advertise TaskToolSet and its event stream
+              contained {snapshot.subagentPilot.taskActions} task actions.
+              That remains a separate profile-wiring issue.
             </p>
           </article>
           <article>
-            <span className="implementation-status pilot">What the fallback did</span>
-            <h3>Ordinary delegated conversations still worked</h3>
+            <span className="implementation-status pilot">Execution boundary</span>
+            <h3>The child shares the parent process and workspace</h3>
             <p>
-              Before native subagents were enabled, the parent created an
-              additional app conversation in the same sandbox. That diagnostic
-              path took {snapshot.subagentPilot.fallbackRun.endToEndSeconds.toFixed(1)}
-              {" "}seconds end to end and cost $
-              {snapshot.subagentPilot.fallbackRun.modelCost.toFixed(4)}, but it
-              is not TaskToolSet.
+              At parallelism {snapshot.agentCanvasTaskTool.parallelToolCalls},
+              the parent waited for the child. The child used $
+              {snapshot.agentCanvasTaskTool.childModelCost.toFixed(4)} of the
+              total and had its own cost scope, but not a separate UI
+              conversation or sandbox.
             </p>
           </article>
         </div>
         <p className="architecture-note">
-          <strong>Current conclusion:</strong> SDK subagents are a valid fourth
-          architecture in the current OpenHands SDK, but they are not yet
-          production-proven on this Replicated profile. The next test should
-          happen only after the launched agent profile exposes the enabled task
-          tool; then repeat at parallelism 1 before testing 2–4 independent
-          delegates.
+          <strong>Current conclusion:</strong> native SDK subagents are now
+          directly validated in Agent Canvas for sequential specialist work.
+          Keep parallel tool calls at 1 until independent two- and four-child
+          tests are run. Validate the same contract separately on OpenHands
+          Cloud, then file the OHE propagation issue with both environments
+          clearly distinguished.
         </p>
       </section>
 
