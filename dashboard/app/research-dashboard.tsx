@@ -559,12 +559,12 @@ function OverviewGuide({ snapshot }: { snapshot: Snapshot }) {
             </p>
           </article>
           <article className="implementation-card">
-            <span className="implementation-status next">Current limit</span>
-            <h3>This was an orchestration test, not an ONNX score</h3>
+            <span className="implementation-status next">Production path</span>
+            <h3>The same control path can run NeuroGolf workers</h3>
             <p>
-              The remaining domain test is to connect licensed NeuroGolf
-              builders, ONNX execution, adversarial cases, and submission
-              assembly to this control system.
+              A production run would replace the controlled workers with
+              licensed ONNX builders and validators while keeping the
+              scheduler, attempt history, shared memory, and recovery path.
             </p>
           </article>
         </div>
@@ -573,29 +573,37 @@ function OverviewGuide({ snapshot }: { snapshot: Snapshot }) {
       <section className="section comparison">
         <div className="section-heading">
           <div>
-            <p className="eyebrow">How far the reproduction goes</p>
-            <h2>The multi-agent organization is implemented; the full competition solver is not.</h2>
+            <p className="eyebrow">Scope of this test</p>
+            <h2>This test focused on multi-agent orchestration.</h2>
           </div>
           <p>
-            Public NeuroGolf teams used task schedulers, persistent failure
-            records, candidate promotion, adversarial validation, and a serial
-            submission gate. This project reproduces the coordination layer and
-            makes the remaining domain work explicit.
+            The results give us enough evidence to proceed with OpenHands as
+            the execution layer for a full campaign. OpenHands would manage
+            agent conversations and sandboxes; the application would continue
+            to own scheduling, experiment history, validation, and promotion.
           </p>
         </div>
         <div className="comparison-grid">
           <article className="finding-card">
-            <span className="finding-label">Implemented</span>
-            <strong>Task assignment, attempt history, validation, shared lessons, recovery, and capacity limits.</strong>
+            <span className="finding-label">Domain worker</span>
+            <strong>Connect licensed NeuroGolf builders, ONNX execution, and competition-specific validators.</strong>
           </article>
           <article className="finding-card">
-            <span className="finding-label">Still to implement</span>
-            <strong>ONNX builders, ARC execution, generated test cases, artifact quarantine, and submission assembly.</strong>
+            <span className="finding-label">Production state</span>
+            <strong>Add database leases and artifact storage when more than one controller runs the campaign.</strong>
           </article>
           <article className="finding-card">
-            <span className="finding-label">Evidence location</span>
-            <strong>The live OpenHands checks and individual conversation records are in the Evidence view.</strong>
+            <span className="finding-label">Release process</span>
+            <strong>Quarantine candidates, run an independent 400-task audit, and assemble the submission through one release writer.</strong>
           </article>
+        </div>
+        <div className="architecture-note">
+          <strong>Our conclusion:</strong> OpenHands can orchestrate this
+          campaign as the worker execution layer. The remaining work is domain
+          and production integration, not a different orchestration
+          architecture. A 100-agent deployment should still pass
+          multi-controller and API load tests before it is treated as proven at
+          that concurrency.
         </div>
       </section>
     </>

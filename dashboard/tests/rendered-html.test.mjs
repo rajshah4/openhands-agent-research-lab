@@ -51,8 +51,11 @@ test("renders the NeuroGolf experiment for a new reader", async () => {
   assert.match(html, /Why teams used multiple agents/);
   assert.match(html, /The 400 tasks could be worked on in parallel/);
   assert.match(html, /12 attempts for each of 400 tasks/);
-  assert.match(html, /This was an orchestration test, not an ONNX score/);
-  assert.match(html, /The multi-agent organization is implemented; the full competition solver is not/);
+  assert.match(html, /The same control path can run NeuroGolf workers/);
+  assert.match(html, /This test focused on multi-agent orchestration/);
+  assert.match(html, /OpenHands can orchestrate this campaign as the worker execution layer/);
+  assert.match(html, /multi-controller and API load tests/);
   assert.doesNotMatch(html, /Supporting live-systems check|These are real OpenHands runs/);
+  assert.doesNotMatch(html, /full competition solver is not/);
   assert.doesNotMatch(html, /codex-preview|Your site is taking shape/);
 });
