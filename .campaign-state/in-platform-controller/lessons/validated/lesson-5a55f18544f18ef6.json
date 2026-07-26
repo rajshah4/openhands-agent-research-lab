@@ -1,0 +1,12 @@
+{
+  "created_at": "2026-07-26T18:10:15.691197+00:00",
+  "evidence": "All 12 items paired perfectly into 6 bins of exactly capacity 10 each. Weights: 8+2, 8+2, 7+3, 7+3, 6+4, 6+4.",
+  "id": "lesson-5a55f18544f18ef6",
+  "source_attempt_id": "attempt-0004-37089f95",
+  "source_run_id": "in-platform-controller-pilot-20260726T175646Z-8a8ad95c",
+  "source_task_id": "pack-01-pairs-12",
+  "statement": "For complementary bin packing tasks, pairing items by weight to sum exactly to capacity achieves optimal bin count.",
+  "tags": [
+    "bin-packing"
+  ]
+}
