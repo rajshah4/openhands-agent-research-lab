@@ -19,6 +19,11 @@ SPEC.loader.exec_module(MODULE)
 GitCheckpoint = MODULE.GitCheckpoint
 
 
+def test_defer_sandbox_cleanup_flag() -> None:
+    args = MODULE.build_parser().parse_args(["--defer-sandbox-cleanup"])
+    assert args.defer_sandbox_cleanup is True
+
+
 def git(cwd: Path, *arguments: str) -> None:
     subprocess.run(
         ["git", *arguments],

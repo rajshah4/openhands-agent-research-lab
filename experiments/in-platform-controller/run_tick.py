@@ -153,6 +153,14 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--poll-seconds", type=int, default=10)
     parser.add_argument("--runtime-capacity", type=int, default=10)
     parser.add_argument("--launch-lock-at", type=int, default=7)
+    parser.add_argument(
+        "--defer-sandbox-cleanup",
+        action="store_true",
+        help=(
+            "Do not pause the worker sandbox inside the tick. Use when the "
+            "outer automation owns cleanup of a controller/worker shared sandbox."
+        ),
+    )
     return parser
 
 
@@ -188,7 +196,7 @@ def main(argv: list[str] | None = None) -> int:
             start_timeout_seconds=args.start_timeout,
             execution_timeout_seconds=args.execution_timeout,
             poll_seconds=args.poll_seconds,
-            pause_after_attempt=True,
+            pause_after_attempt=not args.defer_sandbox_cleanup,
             runtime_limit=args.runtime_capacity,
             launch_lock_at=args.launch_lock_at,
         )

@@ -126,11 +126,19 @@ sandbox cleanup. The prompt only invokes
 
 `automation/preset_tick.py`:
 
-1. checks out the dedicated state branch, or creates it from `main`;
+1. checks out the dedicated state branch, or creates it from `main`, and
+   merges the current `origin/main` controller code before resuming;
 2. verifies that OpenHands injected the worker API credential explicitly
    referenced by the terminal command;
-3. runs `run_tick.py`; and
+3. runs `run_tick.py` with worker-level sandbox cleanup deferred; and
 4. returns the tick's exit status to the OpenHands automation lifecycle.
+
+The deferred cleanup is required when Enterprise places the worker
+conversation in the automation controller's sandbox. Pausing the "worker"
+sandbox from inside the tick would pause the controller before it could record
+validation. With `keep_alive: false`, the automation service is the single
+owner that cleans up the shared sandbox after the tick exits and its callback
+completes.
 
 The controller's scheduler still makes domain decisions, and OpenHands workers
 still use the configured model. The automation wrapper consumes a small amount

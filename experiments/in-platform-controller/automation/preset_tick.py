@@ -49,6 +49,7 @@ def _prepare_state_branch() -> None:
     if remote_state.returncode == 0:
         _git("fetch", "origin", f"{STATE_BRANCH}:refs/remotes/origin/{STATE_BRANCH}")
         _git("checkout", "-B", STATE_BRANCH, f"origin/{STATE_BRANCH}")
+        _git("merge", "--no-edit", "origin/main")
     else:
         _git("checkout", "-B", STATE_BRANCH)
 
@@ -71,7 +72,12 @@ def main() -> int:
         }
     )
     completed = subprocess.run(
-        [sys.executable, str(TICK_SCRIPT), "--live"],
+        [
+            sys.executable,
+            str(TICK_SCRIPT),
+            "--live",
+            "--defer-sandbox-cleanup",
+        ],
         cwd=PROJECT_ROOT,
         env=environment,
         check=False,
