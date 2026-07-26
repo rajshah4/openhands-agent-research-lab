@@ -36,6 +36,7 @@ def test_prepare_state_branch_resumes_remote_branch(monkeypatch):
     monkeypatch.setattr(module, "_git", fake_git)
     module._prepare_state_branch()
 
+    assert (("fetch", "--unshallow", "origin"), False) in calls
     assert (
         (
             "fetch",
@@ -54,6 +55,7 @@ def test_prepare_state_branch_resumes_remote_branch(monkeypatch):
         ),
         True,
     ) in calls
+    assert (("merge", "--no-edit", "origin/main"), True) in calls
 
 
 def test_prepare_state_branch_creates_branch_when_remote_is_absent(monkeypatch):
