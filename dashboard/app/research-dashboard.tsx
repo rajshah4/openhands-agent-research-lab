@@ -696,7 +696,7 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
       isolation: "Strongest",
       use: "Untrusted code, mixed tenants, or failures that must stay local",
       tradeoff: "Highest container count and startup churn",
-      concurrency: "N active agents require N simultaneous sandboxes",
+      concurrency: "Six jobs total: four run in four sandboxes; two wait for an agent slot",
       cost: `$${snapshot.replicatedPatterns.isolatedFour.totalCost.toFixed(3)} total for 18 measured attempts`,
       status: "Measured",
     },
@@ -707,7 +707,7 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
       isolation: "Shared within the cell",
       use: "One trusted team that needs audit history with fewer containers",
       tradeoff: "Shared compute and a larger failure boundary",
-      concurrency: "4 active conversations shared 1 sandbox; 2 waited",
+      concurrency: "Six jobs total: four run in one sandbox; two wait for an agent slot",
       cost: `$${snapshot.replicatedPatterns.groupedFour.totalCost.toFixed(3)} total for 18 measured attempts`,
       status: "Measured",
     },
@@ -909,10 +909,17 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
             difficulty.
           </p>
         </div>
+        <p className="architecture-note">
+          <strong>What “waiting” means:</strong> every batch contained six
+          agent jobs. A four-agent admission limit started four and kept two in
+          the controller queue until an agent slot opened. Those waiting jobs
+          did not have sandboxes yet. This backpressure kept the small
+          installation within its safe operating range.
+        </p>
         <div className="implementation-grid">
           <article className="implementation-card">
             <span className="implementation-status tested">Isolated</span>
-            <h3>6 runtimes per batch</h3>
+            <h3>4 running jobs; 2 waiting</h3>
             <p>
               {snapshot.replicatedPatterns.isolatedFour.valid}/
               {snapshot.replicatedPatterns.isolatedFour.attempts} valid,{" "}
@@ -920,14 +927,15 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
               {" "}seconds mean wall time.
             </p>
             <dl>
-              <div><dt>Concurrency</dt><dd>{snapshot.replicatedPatterns.isolatedFour.activeAgents} agents · {snapshot.replicatedPatterns.isolatedFour.simultaneousSandboxes} simultaneous sandboxes · {snapshot.replicatedPatterns.isolatedFour.queuedAgents} queued</dd></div>
+              <div><dt>Placement</dt><dd>{snapshot.replicatedPatterns.isolatedFour.activeAgents} active agents · {snapshot.replicatedPatterns.isolatedFour.simultaneousSandboxes} simultaneous sandboxes</dd></div>
+              <div><dt>Backpressure</dt><dd>{snapshot.replicatedPatterns.isolatedFour.queuedAgents} jobs waiting for an agent slot; each starts in its own sandbox when admitted</dd></div>
               <div><dt>Total model cost</dt><dd>${snapshot.replicatedPatterns.isolatedFour.totalCost.toFixed(3)} across 18 attempts</dd></div>
               <div><dt>Choose for</dt><dd>Strong isolation and untrusted work.</dd></div>
             </dl>
           </article>
           <article className="implementation-card">
             <span className="implementation-status pilot">Bounded cell</span>
-            <h3>1 runtime, 4 active agents</h3>
+            <h3>4 running jobs; 2 waiting</h3>
             <p>
               {snapshot.replicatedPatterns.groupedFour.valid}/
               {snapshot.replicatedPatterns.groupedFour.attempts} valid,{" "}
@@ -935,14 +943,15 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
               {" "}seconds mean wall time.
             </p>
             <dl>
-              <div><dt>Concurrency</dt><dd>{snapshot.replicatedPatterns.groupedFour.activeAgents} agents · {snapshot.replicatedPatterns.groupedFour.simultaneousSandboxes} simultaneous sandbox · {snapshot.replicatedPatterns.groupedFour.queuedAgents} queued</dd></div>
+              <div><dt>Placement</dt><dd>{snapshot.replicatedPatterns.groupedFour.activeAgents} active agents share {snapshot.replicatedPatterns.groupedFour.simultaneousSandboxes} sandbox</dd></div>
+              <div><dt>Backpressure</dt><dd>{snapshot.replicatedPatterns.groupedFour.queuedAgents} jobs waiting for an agent slot in the same bounded cell</dd></div>
               <div><dt>Total model cost</dt><dd>${snapshot.replicatedPatterns.groupedFour.totalCost.toFixed(3)} across 18 attempts</dd></div>
               <div><dt>Choose for</dt><dd>Trusted production work with separate conversation histories.</dd></div>
             </dl>
           </article>
           <article className="implementation-card">
             <span className="implementation-status next">Higher density</span>
-            <h3>1 runtime, 6 active agents</h3>
+            <h3>All 6 jobs running; none waiting</h3>
             <p>
               {snapshot.replicatedPatterns.groupedSix.valid}/
               {snapshot.replicatedPatterns.groupedSix.attempts} valid,{" "}
@@ -950,9 +959,10 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
               {" "}seconds mean wall time.
             </p>
             <dl>
-              <div><dt>Concurrency</dt><dd>{snapshot.replicatedPatterns.groupedSix.activeAgents} agents · {snapshot.replicatedPatterns.groupedSix.simultaneousSandboxes} simultaneous sandbox · {snapshot.replicatedPatterns.groupedSix.queuedAgents} queued</dd></div>
+              <div><dt>Placement</dt><dd>{snapshot.replicatedPatterns.groupedSix.activeAgents} active agents share {snapshot.replicatedPatterns.groupedSix.simultaneousSandboxes} sandbox</dd></div>
+              <div><dt>Backpressure</dt><dd>{snapshot.replicatedPatterns.groupedSix.queuedAgents} jobs waiting; the full batch starts together</dd></div>
               <div><dt>Total model cost</dt><dd>${snapshot.replicatedPatterns.groupedSix.totalCost.toFixed(3)} across 18 attempts</dd></div>
-              <div><dt>Finding</dt><dd>More contention without a wall-time win in this test.</dd></div>
+              <div><dt>Finding</dt><dd>Removing the queue increased contention and did not produce a wall-time win.</dd></div>
             </dl>
           </article>
         </div>
@@ -966,7 +976,8 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
           conversations in a cell, then explicit recycle. Model cost varied
           substantially between otherwise matched batches, so these totals are
           observed spend—not evidence that placement caused the difference.
-          Infrastructure cost was not measured.
+          The two-job queue is intentional admission control, not unused
+          sandbox capacity. Infrastructure cost was not measured.
         </p>
       </section>
     </>

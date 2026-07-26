@@ -72,6 +72,9 @@ test("includes the Agent Canvas deployment evidence", async () => {
 
   assert.match(source, /We measured setup time, shared-agent load, model cost, and estimated cluster cost/);
   assert.match(source, /resource-based estimate from the pilot configuration, not a/);
+  assert.match(source, /Those waiting jobs\s+did not have sandboxes yet/);
+  assert.match(source, /Removing the queue increased contention and did not produce a wall-time win/);
+  assert.doesNotMatch(source, /simultaneous sandbox(?:es)? · .* queued/);
   assert.match(snapshot, /"clusterProvisionMinutes": 8/);
   assert.match(snapshot, /"wallSeconds": 113/);
   assert.match(snapshot, /"effectiveThroughput": 153\.55/);
