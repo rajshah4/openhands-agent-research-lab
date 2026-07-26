@@ -108,6 +108,22 @@
       "afterApplicableFreeTierHigh": 0.68
     }
   },
+  "subagentPilot": {
+    "settingEnabled": true,
+    "parallelToolCalls": 1,
+    "sandboxCount": 1,
+    "executionSeconds": 204.294,
+    "endToEndSeconds": 352.34,
+    "modelCost": 0.38482224,
+    "taskToolAdvertised": false,
+    "taskActions": 0,
+    "taskObservations": 0,
+    "fallbackRun": {
+      "endToEndSeconds": 334.51,
+      "modelCost": 0.33649462,
+      "createdAdditionalConversation": true
+    }
+  },
   "scaleStudy": {
     "isolatedQueue": {
       "valid": 12,

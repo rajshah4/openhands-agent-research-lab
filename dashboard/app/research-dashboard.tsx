@@ -96,6 +96,22 @@ type Snapshot = {
       afterApplicableFreeTierHigh: number;
     };
   };
+  subagentPilot: {
+    settingEnabled: boolean;
+    parallelToolCalls: number;
+    sandboxCount: number;
+    executionSeconds: number;
+    endToEndSeconds: number;
+    modelCost: number;
+    taskToolAdvertised: boolean;
+    taskActions: number;
+    taskObservations: number;
+    fallbackRun: {
+      endToEndSeconds: number;
+      modelCost: number;
+      createdAdditionalConversation: boolean;
+    };
+  };
   scaleStudy: Record<
     "isolatedQueue" | "longLivedShared" | "boundedCells",
     {
@@ -738,11 +754,11 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
       record: "One parent conversation",
       runtime: "One parent sandbox",
       isolation: "Shared parent context",
-      use: "Low-overhead delegation when separate histories are unnecessary",
-      tradeoff: "Least independent audit and failure isolation",
+      use: "Sequential specialist delegation after TaskToolSet is verified",
+      tradeoff: "The tested Enterprise profile did not expose the enabled task tool",
       concurrency: "Delegated work shares one parent sandbox and its budgets",
-      cost: "Not measured in the matched Replicated cost study",
-      status: "Architecture option",
+      cost: `$${snapshot.subagentPilot.modelCost.toFixed(3)} in the blocked integration test`,
+      status: "Integration gap",
     },
   ];
 
@@ -761,38 +777,73 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
             environment.
           </p>
         </div>
-        <div className="workflow">
+        <div className="pattern-grid">
           {[
-            ["01", "Enterprise isolated", "Each agent has its own OpenHands conversation and sandbox."],
-            ["02", "Enterprise grouped", "Agents keep separate conversations while trusted work shares a sandbox."],
-            ["03", "Agent Canvas", "Several agents share one lighter agent backend, workspace, and trust boundary."],
-            ["04", "Subagents", "One parent conversation delegates work inside its own context and sandbox."],
-          ].map(([number, title, copy]) => (
-            <article className="workflow-step" key={number}>
-              <span>{number}</span>
+            ["01", "Enterprise isolated", "Each agent has its own OpenHands conversation and sandbox.", "isolated", "Measured"],
+            ["02", "Enterprise grouped", "Agents keep separate conversations while trusted work shares a sandbox.", "grouped", "Measured"],
+            ["03", "Agent Canvas", "Several agents share one lighter agent backend, workspace, and trust boundary.", "canvas", "Measured"],
+            ["04", "SDK subagents", "One parent delegates through TaskToolSet inside its conversation and sandbox.", "subagents", "Blocked in this deployment"],
+          ].map(([number, title, copy, visual, status]) => (
+            <article className="pattern-card" key={number}>
+              <div className={`pattern-miniature ${visual}`} aria-hidden="true">
+                <span className="mini-parent" />
+                <span className="mini-connector" />
+                <span className="mini-workers">
+                  <i />
+                  <i />
+                  <i />
+                </span>
+              </div>
+              <span className="pattern-number">{number}</span>
               <h3>{title}</h3>
               <p>{copy}</p>
+              <small>{status}</small>
             </article>
           ))}
         </div>
-        <figure className="deployment-illustration">
-          <img
-            src="/sandbox-placement.png"
-            alt="Isolated placement uses four sandboxes for four agent conversations, while grouped placement keeps four separate conversations inside one shared sandbox."
-          />
-          <figcaption>
-            The first two patterns use first-class Enterprise conversations.
-            Grouping changes only their runtime boundary: trusted agents share
-            compute and a filesystem instead of creating one sandbox for every
-            conversation.
-          </figcaption>
-        </figure>
         <p className="architecture-note">
           <strong>What we measured:</strong> live tests covered Enterprise
           isolated conversations, Enterprise grouped conversations, and Agent
-          Canvas. Subagents are included as an available structure, but were
-          not part of the matched performance study.
+          Canvas. The SDK subagent test reached the Replicated instance, but
+          exposed an integration gap before a native child could run.
         </p>
+      </section>
+
+      <section className="section">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">Results by execution pattern</p>
+            <h2>What each structure changed in the live tests.</h2>
+          </div>
+          <p>
+            These are not one four-way benchmark. Enterprise isolated and
+            grouped conversations used matched batches; Agent Canvas used a
+            separate matched deployment comparison; the subagent result is a
+            feature-integration test.
+          </p>
+        </div>
+        <div className="result-overview-grid">
+          <article>
+            <span>Enterprise isolated</span>
+            <strong>{snapshot.replicatedPatterns.isolatedFour.valid}/{snapshot.replicatedPatterns.isolatedFour.attempts} valid</strong>
+            <p>{snapshot.replicatedPatterns.isolatedFour.meanWallSeconds.toFixed(1)} seconds mean wall time; four simultaneous sandboxes and two waiting jobs.</p>
+          </article>
+          <article>
+            <span>Enterprise grouped</span>
+            <strong>1 shared sandbox</strong>
+            <p>{snapshot.replicatedPatterns.groupedFour.valid}/{snapshot.replicatedPatterns.groupedFour.attempts} valid with four active agents; six active agents did not finish faster.</p>
+          </article>
+          <article>
+            <span>Agent Canvas</span>
+            <strong>{snapshot.canvasPilot.matchedDeployment.meanBatchWallSeconds.toFixed(1)} seconds</strong>
+            <p>Mean six-task batch time in one shared pod; {snapshot.canvasPilot.matchedDeployment.valid}/{snapshot.canvasPilot.matchedDeployment.attempts} independently valid.</p>
+          </article>
+          <article className="result-gap">
+            <span>SDK subagents</span>
+            <strong>Integration blocked</strong>
+            <p>One sandbox ran for {snapshot.subagentPilot.executionSeconds.toFixed(1)} seconds, but the enabled TaskToolSet was absent from the conversation tools.</p>
+          </article>
+        </div>
       </section>
 
       <section className="section implementation-section">
@@ -808,63 +859,71 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
             replacement for it.
           </p>
         </div>
-        <div className="implementation-grid">
-          <article className="implementation-card">
-            <span className="implementation-status tested">Setup effort</span>
-            <h3>{snapshot.canvasPilot.clusterProvisionMinutes} minutes to provision the cluster</h3>
-            <p>
-              Cold workload startup took{" "}
-              {Math.floor(snapshot.canvasPilot.coldStartSeconds.first / 60)}:
-              {String(snapshot.canvasPilot.coldStartSeconds.first % 60).padStart(2, "0")}
-              {" "}on the first cluster and{" "}
-              {Math.floor(snapshot.canvasPilot.coldStartSeconds.recreated / 60)}:
-              {String(snapshot.canvasPilot.coldStartSeconds.recreated % 60).padStart(2, "0")}
-              {" "}after recreation.
-            </p>
-          </article>
-          <article className="implementation-card">
-            <span className="implementation-status tested">Six-agent load</span>
-            <h3>{snapshot.canvasPilot.sharedLoadSix.wallSeconds} seconds in one shared pod</h3>
-            <p>
-              {snapshot.canvasPilot.sharedLoadSix.valid}/
-              {snapshot.canvasPilot.sharedLoadSix.attempts} attempts validated;
-              peak use was {snapshot.canvasPilot.sharedLoadSix.peakCpuMillis}m
-              CPU and {snapshot.canvasPilot.sharedLoadSix.peakMemoryMib} MiB,
-              with {snapshot.canvasPilot.sharedLoadSix.restarts} restarts.
-            </p>
-            <dl>
-              <div><dt>Model cost</dt><dd>${snapshot.canvasPilot.sharedLoadSix.modelCost.toFixed(4)} for the phase</dd></div>
-            </dl>
-          </article>
-          <article className="implementation-card">
-            <span className="implementation-status tested">Matched comparison</span>
-            <h3>{snapshot.canvasPilot.matchedDeployment.meanBatchWallSeconds.toFixed(1)} seconds per Canvas batch</h3>
-            <p>
-              The matched Replicated batches averaged{" "}
-              {snapshot.canvasPilot.matchedDeployment.replicatedMeanBatchWallSeconds.toFixed(1)}
-              {" "}seconds. Both completed{" "}
-              {snapshot.canvasPilot.matchedDeployment.valid}/
-              {snapshot.canvasPilot.matchedDeployment.attempts} valid attempts,
-              and reported model cost was effectively tied.
-            </p>
-            <dl>
-              <div><dt>Canvas throughput</dt><dd>{snapshot.canvasPilot.matchedDeployment.effectiveThroughput.toFixed(2)} tasks/hour</dd></div>
-              <div><dt>Replicated throughput</dt><dd>{snapshot.canvasPilot.matchedDeployment.replicatedEffectiveThroughput.toFixed(2)} tasks/hour</dd></div>
-            </dl>
-          </article>
+        <div className="compact-metrics">
+          <div><span>Cluster provisioning</span><strong>{snapshot.canvasPilot.clusterProvisionMinutes} min</strong></div>
+          <div><span>Six-agent load phase</span><strong>{snapshot.canvasPilot.sharedLoadSix.wallSeconds} sec</strong></div>
+          <div><span>Peak shared pod</span><strong>{snapshot.canvasPilot.sharedLoadSix.peakCpuMillis}m · {snapshot.canvasPilot.sharedLoadSix.peakMemoryMib} MiB</strong></div>
+          <div><span>Estimated list price</span><strong>${snapshot.canvasPilot.estimatedDailyInfrastructure.publicListPrice.toFixed(2)}/day</strong></div>
         </div>
-        <p className="architecture-note">
-          <strong>Estimated infrastructure cost:</strong> about $
-          {snapshot.canvasPilot.estimatedDailyInfrastructure.publicListPrice.toFixed(2)}
-          /day at public list prices, including the cluster management fee, or
-          about $
-          {snapshot.canvasPilot.estimatedDailyInfrastructure.afterApplicableFreeTierLow.toFixed(2)}
-          –$
-          {snapshot.canvasPilot.estimatedDailyInfrastructure.afterApplicableFreeTierHigh.toFixed(2)}
-          /day if the applicable GKE free-tier cluster credit is available.
-          This is a resource-based estimate from the pilot configuration, not a
-          cloud invoice.
-        </p>
+        <details className="compact-details">
+          <summary>How Agent Canvas was deployed and measured</summary>
+          <div className="compact-details-grid">
+            <div>
+              <h3>Setup</h3>
+              <p>
+                GKE Autopilot in us-central1, one StatefulSet pod, one internal
+                ClusterIP service, and one 20 GiB persistent volume. The pod
+                requested 500m CPU and 1 GiB memory, with limits of 2 CPU and
+                4 GiB.
+              </p>
+            </div>
+            <div>
+              <h3>Startup</h3>
+              <p>
+                Cold workload startup took{" "}
+                {Math.floor(snapshot.canvasPilot.coldStartSeconds.first / 60)}:
+                {String(snapshot.canvasPilot.coldStartSeconds.first % 60).padStart(2, "0")}
+                {" "}on the first cluster and{" "}
+                {Math.floor(snapshot.canvasPilot.coldStartSeconds.recreated / 60)}:
+                {String(snapshot.canvasPilot.coldStartSeconds.recreated % 60).padStart(2, "0")}
+                {" "}after recreation.
+              </p>
+            </div>
+            <div>
+              <h3>Load result</h3>
+              <p>
+                {snapshot.canvasPilot.sharedLoadSix.valid}/
+                {snapshot.canvasPilot.sharedLoadSix.attempts} attempts
+                validated with {snapshot.canvasPilot.sharedLoadSix.restarts}
+                {" "}pod restarts. Model cost was $
+                {snapshot.canvasPilot.sharedLoadSix.modelCost.toFixed(4)} for
+                that phase.
+              </p>
+            </div>
+            <div>
+              <h3>Matched result</h3>
+              <p>
+                Canvas averaged{" "}
+                {snapshot.canvasPilot.matchedDeployment.meanBatchWallSeconds.toFixed(1)}
+                {" "}seconds and{" "}
+                {snapshot.canvasPilot.matchedDeployment.effectiveThroughput.toFixed(2)}
+                {" "}tasks/hour. Matched Replicated batches averaged{" "}
+                {snapshot.canvasPilot.matchedDeployment.replicatedMeanBatchWallSeconds.toFixed(1)}
+                {" "}seconds and{" "}
+                {snapshot.canvasPilot.matchedDeployment.replicatedEffectiveThroughput.toFixed(2)}
+                {" "}tasks/hour; reported model cost was effectively tied.
+              </p>
+            </div>
+          </div>
+          <p>
+            With the applicable GKE cluster credit, estimated infrastructure
+            was approximately $
+            {snapshot.canvasPilot.estimatedDailyInfrastructure.afterApplicableFreeTierLow.toFixed(2)}
+            –$
+            {snapshot.canvasPilot.estimatedDailyInfrastructure.afterApplicableFreeTierHigh.toFixed(2)}
+            /day. These are resource-based estimates, not a cloud invoice.
+          </p>
+        </details>
       </section>
 
       <section className="section implementation-section">
@@ -948,6 +1007,69 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
           observed spend—not evidence that placement caused the difference.
           The two-job queue is intentional admission control, not unused
           sandbox capacity. Infrastructure cost was not measured.
+        </p>
+      </section>
+
+      <section className="section subagent-section">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">SDK subagent delegation</p>
+            <h2>The Replicated setting saved, but the launched profile did not receive TaskToolSet.</h2>
+          </div>
+          <p>
+            This test used the SDK model: one parent should call the task tool,
+            receive a child result, and resume that child by task ID. That is
+            different from Agent Canvas creating peer child conversations
+            through its API.
+          </p>
+        </div>
+        <div className="compact-metrics">
+          <div><span>Enable subagents</span><strong>{snapshot.subagentPilot.settingEnabled ? "Saved" : "Off"}</strong></div>
+          <div><span>Parallel tool calls</span><strong>{snapshot.subagentPilot.parallelToolCalls}</strong></div>
+          <div><span>Visible sandboxes</span><strong>{snapshot.subagentPilot.sandboxCount}</strong></div>
+          <div><span>Parent execution</span><strong>{snapshot.subagentPilot.executionSeconds.toFixed(1)} sec</strong></div>
+        </div>
+        <div className="subagent-findings">
+          <article>
+            <span className="implementation-status tested">What worked</span>
+            <h3>The setting and capacity controls behaved correctly</h3>
+            <p>
+              The user record reported subagents enabled with sequential tool
+              execution. The parent completed in one sandbox, cost $
+              {snapshot.subagentPilot.modelCost.toFixed(4)}, and the sandbox
+              was paused after evidence collection.
+            </p>
+          </article>
+          <article>
+            <span className="implementation-status next">What blocked</span>
+            <h3>No native task tool appeared in the launched conversation</h3>
+            <p>
+              The system prompt did not advertise TaskToolSet. The event stream
+              contained {snapshot.subagentPilot.taskActions} task actions and{" "}
+              {snapshot.subagentPilot.taskObservations} task observations, so
+              this cannot be counted as a successful subagent run.
+            </p>
+          </article>
+          <article>
+            <span className="implementation-status pilot">What the fallback did</span>
+            <h3>Ordinary delegated conversations still worked</h3>
+            <p>
+              Before native subagents were enabled, the parent created an
+              additional app conversation in the same sandbox. That diagnostic
+              path took {snapshot.subagentPilot.fallbackRun.endToEndSeconds.toFixed(1)}
+              {" "}seconds end to end and cost $
+              {snapshot.subagentPilot.fallbackRun.modelCost.toFixed(4)}, but it
+              is not TaskToolSet.
+            </p>
+          </article>
+        </div>
+        <p className="architecture-note">
+          <strong>Current conclusion:</strong> SDK subagents are a valid fourth
+          architecture in the current OpenHands SDK, but they are not yet
+          production-proven on this Replicated profile. The next test should
+          happen only after the launched agent profile exposes the enabled task
+          tool; then repeat at parallelism 1 before testing 2–4 independent
+          delegates.
         </p>
       </section>
 

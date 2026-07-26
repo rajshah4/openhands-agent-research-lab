@@ -419,6 +419,302 @@ dd {
   line-height: 1.55;
 }
 
+.pattern-grid {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  overflow: hidden;
+}
+
+.pattern-card {
+  background: rgba(251, 250, 246, 0.72);
+  min-height: 330px;
+  padding: 20px;
+}
+
+.pattern-card + .pattern-card {
+  border-left: 1px solid var(--line);
+}
+
+.pattern-miniature {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  height: 92px;
+  margin-bottom: 18px;
+  overflow: hidden;
+  position: relative;
+}
+
+.mini-parent {
+  background: var(--blue);
+  border-radius: 50%;
+  height: 18px;
+  left: calc(50% - 9px);
+  position: absolute;
+  top: 14px;
+  width: 18px;
+}
+
+.mini-connector {
+  background: var(--line);
+  height: 24px;
+  left: calc(50% - 1px);
+  position: absolute;
+  top: 32px;
+  width: 2px;
+}
+
+.mini-workers {
+  bottom: 13px;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  left: 12px;
+  position: absolute;
+  right: 12px;
+}
+
+.mini-workers i {
+  background: var(--green);
+  border: 3px solid white;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px var(--line);
+  height: 18px;
+  width: 18px;
+}
+
+.pattern-miniature.isolated .mini-parent,
+.pattern-miniature.isolated .mini-connector,
+.pattern-miniature.grouped .mini-parent,
+.pattern-miniature.grouped .mini-connector,
+.pattern-miniature.canvas .mini-connector {
+  display: none;
+}
+
+.pattern-miniature.isolated .mini-workers,
+.pattern-miniature.grouped .mini-workers,
+.pattern-miniature.canvas .mini-workers {
+  align-items: center;
+  bottom: 0;
+  top: 0;
+}
+
+.pattern-miniature.isolated .mini-workers i {
+  background: white;
+  border: 2px solid var(--blue);
+  border-radius: 5px;
+  height: 46px;
+  width: 27px;
+}
+
+.pattern-miniature.grouped::after {
+  border: 2px solid var(--blue);
+  border-radius: 7px;
+  bottom: 15px;
+  content: "";
+  left: 24px;
+  position: absolute;
+  right: 24px;
+  top: 15px;
+}
+
+.pattern-miniature.grouped .mini-workers {
+  z-index: 1;
+}
+
+.pattern-miniature.canvas {
+  background: var(--ink);
+}
+
+.pattern-miniature.canvas::before {
+  background: #314047;
+  border-radius: 999px;
+  content: "";
+  height: 7px;
+  left: 20px;
+  position: absolute;
+  right: 20px;
+  top: 17px;
+}
+
+.pattern-miniature.canvas .mini-parent {
+  background: #87c7a7;
+  display: block;
+  left: 19px;
+  top: 12px;
+  z-index: 1;
+}
+
+.pattern-miniature.canvas .mini-workers i {
+  background: var(--blue);
+  border-color: #17262d;
+  box-shadow: 0 0 0 1px #526169;
+}
+
+.pattern-miniature.subagents .mini-workers i {
+  background: var(--amber);
+}
+
+.pattern-number,
+.pattern-card small,
+.result-overview-grid span,
+.compact-metrics span {
+  color: var(--green);
+  font: 600 9px var(--mono);
+  text-transform: uppercase;
+}
+
+.pattern-card h3 {
+  font-size: 21px;
+  margin: 18px 0 10px;
+}
+
+.pattern-card p {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.55;
+  min-height: 74px;
+}
+
+.pattern-card small {
+  color: var(--muted);
+}
+
+.result-overview-grid {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  overflow: hidden;
+}
+
+.result-overview-grid article {
+  min-height: 220px;
+  padding: 24px;
+}
+
+.result-overview-grid article + article {
+  border-left: 1px solid var(--line);
+}
+
+.result-overview-grid article.result-gap {
+  background: var(--amber-soft);
+}
+
+.result-overview-grid strong {
+  display: block;
+  font-size: 25px;
+  letter-spacing: -0.035em;
+  margin: 42px 0 14px;
+}
+
+.result-overview-grid p {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.compact-metrics {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  overflow: hidden;
+}
+
+.compact-metrics > div {
+  padding: 20px;
+}
+
+.compact-metrics > div + div {
+  border-left: 1px solid var(--line);
+}
+
+.compact-metrics strong {
+  display: block;
+  font-size: 25px;
+  letter-spacing: -0.035em;
+  margin-top: 18px;
+}
+
+.compact-details {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  margin-top: 16px;
+}
+
+.compact-details summary {
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 18px 20px;
+}
+
+.compact-details[open] summary {
+  border-bottom: 1px solid var(--line);
+}
+
+.compact-details-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.compact-details-grid > div {
+  padding: 20px;
+}
+
+.compact-details-grid > div + div {
+  border-left: 1px solid var(--line);
+}
+
+.compact-details h3 {
+  font-size: 16px;
+  margin: 0 0 12px;
+}
+
+.compact-details p {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.65;
+}
+
+.compact-details > p {
+  border-top: 1px solid var(--line);
+  margin: 0;
+  padding: 16px 20px;
+}
+
+.subagent-section {
+  background: #ebe9e2;
+}
+
+.subagent-findings {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(3, 1fr);
+  margin-top: 16px;
+}
+
+.subagent-findings article {
+  background: rgba(251, 250, 246, 0.72);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 22px;
+}
+
+.subagent-findings h3 {
+  font-size: 22px;
+  margin: 24px 0 12px;
+}
+
+.subagent-findings p {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.65;
+}
+
 .architecture-note {
   color: var(--muted);
   font-size: 15px;
@@ -1171,8 +1467,30 @@ footer > div:last-child {
     grid-template-columns: 1fr 1fr;
   }
 
+  .pattern-grid,
+  .result-overview-grid,
+  .compact-metrics,
+  .compact-details-grid,
+  .subagent-findings {
+    grid-template-columns: 1fr 1fr;
+  }
+
   .workflow-step + .workflow-step {
     border-left: 0;
+  }
+
+  .pattern-card:nth-child(odd),
+  .result-overview-grid article:nth-child(odd),
+  .compact-metrics > div:nth-child(odd),
+  .compact-details-grid > div:nth-child(odd) {
+    border-left: 0;
+  }
+
+  .pattern-card:nth-child(n + 3),
+  .result-overview-grid article:nth-child(n + 3),
+  .compact-metrics > div:nth-child(n + 3),
+  .compact-details-grid > div:nth-child(n + 3) {
+    border-top: 1px solid var(--line);
   }
 
   .workflow-step {
@@ -1263,6 +1581,11 @@ footer > div:last-child {
   }
 
   .workflow,
+  .pattern-grid,
+  .result-overview-grid,
+  .compact-metrics,
+  .compact-details-grid,
+  .subagent-findings,
   .comparison-grid,
   .memory-grid,
   .implementation-grid,
@@ -1271,6 +1594,14 @@ footer > div:last-child {
   .planner-comparison,
   .planner-requirements {
     grid-template-columns: 1fr;
+  }
+
+  .pattern-card + .pattern-card,
+  .result-overview-grid article + article,
+  .compact-metrics > div + div,
+  .compact-details-grid > div + div {
+    border-left: 0;
+    border-top: 1px solid var(--line);
   }
 
   .planner-total {

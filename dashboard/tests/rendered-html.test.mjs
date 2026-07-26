@@ -71,7 +71,7 @@ test("includes the Agent Canvas deployment evidence", async () => {
   );
 
   assert.match(source, /We measured setup time, shared-agent load, model cost, and estimated cluster cost/);
-  assert.match(source, /resource-based estimate from the pilot configuration, not a/);
+  assert.match(source, /These are resource-based estimates, not a cloud invoice/);
   assert.match(source, /Those waiting jobs\s+did not have sandboxes yet/);
   assert.match(source, /Removing the queue increased contention and did not produce a wall-time win/);
   assert.doesNotMatch(source, /simultaneous sandbox(?:es)? · .* queued/);
@@ -79,8 +79,10 @@ test("includes the Agent Canvas deployment evidence", async () => {
   assert.match(source, /Enterprise isolated/);
   assert.match(source, /Enterprise grouped/);
   assert.match(source, /Agent Canvas/);
-  assert.match(source, /Subagents/);
-  assert.match(source, /Subagents are included as an available structure, but were\s+not part of the matched performance study/);
+  assert.match(source, /SDK subagents/);
+  assert.match(source, /exposed an integration gap before a native child could run/);
+  assert.match(source, /The Replicated setting saved, but the launched profile did not receive TaskToolSet/);
+  assert.match(source, /The system prompt did not advertise TaskToolSet/);
   assert.match(source, /Choosing an execution pattern/);
   assert.match(source, /NeuroGolf scaling planner/);
   assert.match(source, /One sandbox per active agent/);
@@ -91,4 +93,7 @@ test("includes the Agent Canvas deployment evidence", async () => {
   assert.match(snapshot, /"clusterProvisionMinutes": 8/);
   assert.match(snapshot, /"wallSeconds": 113/);
   assert.match(snapshot, /"effectiveThroughput": 153\.55/);
+  assert.match(snapshot, /"executionSeconds": 204\.294/);
+  assert.match(snapshot, /"modelCost": 0\.38482224/);
+  assert.match(snapshot, /"taskToolAdvertised": false/);
 });
