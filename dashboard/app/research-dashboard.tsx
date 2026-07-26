@@ -109,7 +109,7 @@ type Snapshot = {
   }>;
 };
 
-const views = ["Scale", "Deployment", "Robustness", "Planner"] as const;
+const views = ["Overview", "Deployment", "Robustness", "Evidence", "Planner"] as const;
 type View = (typeof views)[number];
 
 function pct(value: number) {
@@ -453,6 +453,201 @@ function CompetitionPlanner({ snapshot }: { snapshot: Snapshot }) {
   );
 }
 
+function OverviewGuide({ snapshot }: { snapshot: Snapshot }) {
+  return (
+    <>
+      <section className="section narrative" id="overview">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">What the Kaggle competition required</p>
+            <h1>NeuroGolf had 400 separate ARC tasks, each requiring a correct and efficient ONNX program.</h1>
+          </div>
+          <p>
+            Each task described an input-to-output transformation. A submission
+            needed an ONNX graph that reproduced that transformation correctly.
+            Once a graph worked, the competition rewarded reducing its memory
+            use and parameter count.
+          </p>
+        </div>
+        <div className="implementation-grid">
+          <article className="implementation-card">
+            <span className="implementation-status tested">The workload</span>
+            <h3>400 independent implementation problems</h3>
+            <p>
+              Every ARC task could require a different algorithm, builder, test
+              process, and optimization strategy.
+            </p>
+          </article>
+          <article className="implementation-card">
+            <span className="implementation-status tested">The scoring problem</span>
+            <h3>Correctness first, then program efficiency</h3>
+            <p>
+              A smaller graph was useful only after it passed the task&apos;s
+              examples and independent validation.
+            </p>
+          </article>
+          <article className="implementation-card">
+            <span className="implementation-status pilot">The research problem</span>
+            <h3>Many candidate implementations per task</h3>
+            <p>
+              Teams needed to preserve failed approaches, compare candidates,
+              and keep the best validated result for each task.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section className="section narrative">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">Why teams used multiple agents</p>
+            <h2>The 400 tasks could be worked on in parallel, but the work still needed central coordination.</h2>
+          </div>
+          <p>
+            Kaggle did not require agents. The workload made them useful:
+            different workers could try different tasks and approaches at the
+            same time. Without a shared task registry and validation process,
+            however, agents could repeat the same work while other tasks were
+            never attempted.
+          </p>
+        </div>
+        <div className="workflow">
+          {[
+            ["01", "Register", "Keep one record for each of the 400 competition tasks."],
+            ["02", "Assign", "Give every attempt a task, owner, budget, and stable ID."],
+            ["03", "Experiment", "Run candidate implementations in bounded agent workspaces."],
+            ["04", "Validate", "Check results outside the agent before accepting them."],
+            ["05", "Record", "Save failures, improvements, artifacts, and reusable lessons."],
+          ].map(([number, title, copy]) => (
+            <article className="workflow-step" key={number}>
+              <span>{number}</span>
+              <h3>{title}</h3>
+              <p>{copy}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="section implementation-section">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">What this project reproduced</p>
+            <h2>We exercised the coordination system with 12 attempts for each of 400 tasks.</h2>
+          </div>
+          <p>
+            The scale run used controlled deterministic workers so that missing
+            work, duplicate ownership, incorrect retrieval, and measurement
+            errors could be detected reliably.
+          </p>
+        </div>
+        <div className="implementation-grid">
+          <article className="implementation-card">
+            <span className="implementation-status tested">Task assignment</span>
+            <h3>All 400 tasks received work</h3>
+            <p>
+              The scheduler recorded exactly{" "}
+              {snapshot.portfolioScale.exactAttemptsPerTask} attempts for every
+              task instead of concentrating work on only a subset.
+            </p>
+          </article>
+          <article className="implementation-card">
+            <span className="implementation-status tested">Experiment history</span>
+            <h3>{formatNumber(snapshot.portfolioScale.totalAttempts)} attempts were retained</h3>
+            <p>
+              Each attempt kept its task, sequence, result, validation state,
+              and the lessons it was allowed to use.
+            </p>
+          </article>
+          <article className="implementation-card">
+            <span className="implementation-status next">Current limit</span>
+            <h3>This was an orchestration test, not an ONNX score</h3>
+            <p>
+              The remaining domain test is to connect licensed NeuroGolf
+              builders, ONNX execution, adversarial cases, and submission
+              assembly to this control system.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section className="section comparison">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">How far the reproduction goes</p>
+            <h2>The multi-agent organization is implemented; the full competition solver is not.</h2>
+          </div>
+          <p>
+            Public NeuroGolf teams used task schedulers, persistent failure
+            records, candidate promotion, adversarial validation, and a serial
+            submission gate. This project reproduces the coordination layer and
+            makes the remaining domain work explicit.
+          </p>
+        </div>
+        <div className="comparison-grid">
+          <article className="finding-card">
+            <span className="finding-label">Implemented</span>
+            <strong>Task assignment, attempt history, validation, shared lessons, recovery, and capacity limits.</strong>
+          </article>
+          <article className="finding-card">
+            <span className="finding-label">Still to implement</span>
+            <strong>ONNX builders, ARC execution, generated test cases, artifact quarantine, and submission assembly.</strong>
+          </article>
+          <article className="finding-card">
+            <span className="finding-label">Evidence location</span>
+            <strong>The live OpenHands checks and individual conversation records are in the Evidence view.</strong>
+          </article>
+        </div>
+      </section>
+    </>
+  );
+}
+
+function EvidenceGuide({ snapshot }: { snapshot: Snapshot }) {
+  return (
+    <>
+      <section className="section narrative">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">Live OpenHands evidence</p>
+            <h1>Small test problems were used to verify the real execution path.</h1>
+          </div>
+          <p>
+            These were not intended to represent NeuroGolf difficulty. They
+            were deliberately easy to check independently, which made them
+            useful for testing conversation creation, model execution, result
+            parsing, validation, memory retrieval, sandbox placement, and
+            cleanup on the Replicated installation.
+          </p>
+        </div>
+        <div className="implementation-grid">
+          <article className="implementation-card">
+            <span className="implementation-status tested">Live execution</span>
+            <h3>{snapshot.proof.validAttempts}/{snapshot.proof.liveAttempts} accepted OpenHands runs</h3>
+            <p>Every accepted answer was checked by code rather than accepted from the agent&apos;s own assessment.</p>
+          </article>
+          <article className="implementation-card">
+            <span className="implementation-status tested">Matched protocol</span>
+            <h3>Six small problems, two organizations, three repetitions</h3>
+            <p>The model, problems, timeouts, and attempt budgets were held constant.</p>
+          </article>
+          <article className="implementation-card">
+            <span className="implementation-status next">Interpretation</span>
+            <h3>An infrastructure result, not a reasoning result</h3>
+            <p>Both organizations solved the problems, so this run does not establish a quality advantage from shared memory.</p>
+          </article>
+        </div>
+        <p className="architecture-note">
+          After the tests, the Replicated instance had{" "}
+          {snapshot.capacity.active} active sandboxes,{" "}
+          {snapshot.capacity.unhealthyPods} unhealthy services, and{" "}
+          {snapshot.capacity.memoryAvailable} of available memory. Finished
+          sandboxes were paused and their identifiers remain in the evidence.
+        </p>
+      </section>
+    </>
+  );
+}
+
 function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
   const patterns = [
     {
@@ -506,8 +701,8 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
       <section className="section narrative">
         <div className="section-heading">
           <div>
-            <p className="eyebrow">Deployment is a separate design decision</p>
-            <h1>Choose the trust boundary before choosing the container count.</h1>
+            <p className="eyebrow">OpenHands multi-agent deployment options</p>
+            <h1>How the available execution patterns differ.</h1>
           </div>
           <p>
             Scheduling decides who does the work. Deployment decides what those
@@ -548,8 +743,8 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
       <section className="section">
         <div className="section-heading">
           <div>
-            <p className="eyebrow">OpenHands deployment choices</p>
-            <h2>Four patterns, with different isolation and audit boundaries.</h2>
+            <p className="eyebrow">Structure and trade-offs</p>
+            <h2>The same scheduler can use four OpenHands execution patterns.</h2>
           </div>
           <p>
             These can use the same external task registry, scheduler,
@@ -594,8 +789,8 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
       <section className="section implementation-section">
         <div className="section-heading">
           <div>
-            <p className="eyebrow">What Replicated measured</p>
-            <h2>Grouping six conversations reduced six runtimes to one.</h2>
+            <p className="eyebrow">Replicated measurements</p>
+            <h2>Measured results for isolated and grouped OpenHands conversations.</h2>
           </div>
           <p>
             The same model and six-task batch ran three times in each setup.
@@ -684,7 +879,7 @@ function RobustnessGuide({ snapshot }: { snapshot: Snapshot }) {
         <div className="section-heading">
           <div>
             <p className="eyebrow">Production robustness</p>
-            <h1>The hard part is not starting agents. It is knowing what happened when something stops.</h1>
+            <h1>How the controller handles failures and incomplete work.</h1>
           </div>
           <p>
             The controller treats OpenHands as the execution plane and keeps
@@ -714,8 +909,8 @@ function RobustnessGuide({ snapshot }: { snapshot: Snapshot }) {
       <section className="section implementation-section">
         <div className="section-heading">
           <div>
-            <p className="eyebrow">Seven controls around every agent</p>
-            <h2>Reliability comes from the organization, not a longer prompt.</h2>
+            <p className="eyebrow">Controls around every agent</p>
+            <h2>Controls applied before, during, and after each agent run.</h2>
           </div>
           <p>
             These controls apply whether workers use isolated Enterprise
@@ -736,8 +931,8 @@ function RobustnessGuide({ snapshot }: { snapshot: Snapshot }) {
       <section className="section comparison">
         <div className="section-heading">
           <div>
-            <p className="eyebrow">Failure injection and scale evidence</p>
-            <h2>We killed the controller after OpenHands started the work.</h2>
+            <p className="eyebrow">Controller restart test</p>
+            <h2>Recovery after the controller stopped during an active OpenHands run.</h2>
           </div>
           <p>
             Restart found the unfinished attempt, attached to the same live
@@ -768,7 +963,7 @@ function RobustnessGuide({ snapshot }: { snapshot: Snapshot }) {
 }
 
 export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
-  const [view, setView] = useState<View>("Scale");
+  const [view, setView] = useState<View>("Overview");
   const [arm, setArm] = useState("all");
 
   const visibleAgents = useMemo(
@@ -779,7 +974,6 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
     [snapshot.agents, arm],
   );
 
-  const utilization = snapshot.capacity.active / snapshot.capacity.limit;
   return (
     <main>
       <header className="topbar">
@@ -787,7 +981,7 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
           <span className="brand-mark">N</span>
           <span>
             <strong>NeuroGolf with OpenHands</strong>
-            <small>A public multi-agent experiment</small>
+            <small>Reproducing a Kaggle multi-agent workflow</small>
           </span>
         </a>
         <nav className="view-switcher" aria-label="Dashboard view">
@@ -810,17 +1004,19 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
 
       <section className="hero" id="top">
         <div className="hero-copy">
-          <p className="eyebrow">A public multi-agent systems test</p>
-          <h1>We reproduced the organization behind a 400-task agent campaign.</h1>
+          <p className="eyebrow">A Kaggle competition workload reproduced with OpenHands</p>
+          <h1>NeuroGolf required solving and optimizing 400 separate ARC tasks.</h1>
           <p className="lede">
-            NeuroGolf teams used many coding agents to search for better
-            solutions. I rebuilt the coordination layer with OpenHands: who
-            owns each task, what gets remembered, how results are checked, how
-            work survives a restart, and how many containers it really needs.
+            NeuroGolf 2026 was a Kaggle competition in which each task needed a
+            correct ONNX program. The rules did not require agents, but the 400
+            independent problems made parallel agent work useful. This project
+            reproduces the system needed to assign that work, check results,
+            retain experiment history, share validated lessons, and manage the
+            OpenHands runtimes.
           </p>
           <div className="hero-actions">
-            <a href="#live-agents" className="primary-action">
-              See what happened
+            <a href="#overview" className="primary-action">
+              How the work was structured
             </a>
             <a
               href="https://github.com/rajshah4/openhands-agent-research-lab"
@@ -837,70 +1033,59 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
           </div>
         </div>
 
-        <aside className="capacity-card" aria-label="OpenHands server capacity">
+        <aside className="capacity-card" aria-label="NeuroGolf competition summary">
           <div className="card-heading">
-            <span>OpenHands after the test</span>
-            <span
-              className={`status-badge ${
-                snapshot.capacity.launchAllowed ? "healthy" : "blocked"
-              }`}
-            >
-              {snapshot.capacity.launchAllowed ? "Ready for another run" : "Runs paused"}
-            </span>
+            <span>NeuroGolf workload</span>
+            <span className="status-badge healthy">Kaggle 2026</span>
           </div>
           <div className="capacity-number">
-            <strong>{snapshot.capacity.active}</strong>
-            <span>/ {snapshot.capacity.limit} agent workspaces running</span>
-          </div>
-          <div className="meter" aria-label={`${pct(utilization)} capacity used`}>
-            <span style={{ width: pct(utilization) }} />
+            <strong>400</strong>
+            <span>separate ARC tasks</span>
           </div>
           <dl className="capacity-details">
             <div>
-              <dt>Stop new runs</dt>
-              <dd>At {snapshot.capacity.launchAtOrAbove} running</dd>
+              <dt>Required output</dt>
+              <dd>One ONNX program per task</dd>
             </div>
             <div>
-              <dt>Runs at once</dt>
-              <dd>{snapshot.capacity.maxNewConcurrent} agents</dd>
+              <dt>Correctness</dt>
+              <dd>Match the ARC transformation</dd>
             </div>
             <div>
-              <dt>Server memory free</dt>
-              <dd>{snapshot.capacity.memoryAvailable}</dd>
+              <dt>Optimization</dt>
+              <dd>Reduce memory and parameters</dd>
             </div>
             <div>
-              <dt>Unhealthy services</dt>
-              <dd>{snapshot.capacity.unhealthyPods}</dd>
+              <dt>Work structure</dt>
+              <dd>Independent tasks, shared research process</dd>
             </div>
           </dl>
           <p className="capacity-note">
-            The recommended setup lets four trusted agents share one runtime
-            while keeping six separate conversation records. The controller
-            pauses the runtime only after the batch finishes.
+            Different tasks could be attempted in parallel. The coordination
+            problem was making sure every task received work, candidates were
+            checked consistently, and useful results were retained.
           </p>
         </aside>
       </section>
 
       <section className="proof-strip" aria-label="Proof summary">
         <div>
-          <span>Large orchestration run</span>
-          <strong>{formatNumber(snapshot.portfolioScale.totalAttempts)}</strong>
-          <small>{snapshot.portfolioScale.tasks} task owners, fully covered</small>
+          <span>Competition tasks</span>
+          <strong>{snapshot.portfolioScale.tasks}</strong>
+          <small>separate ARC problems</small>
           <div className="mini-meter">
             <span style={{ width: pct(1) }} />
           </div>
         </div>
         <div>
-          <span>Automated code checks</span>
-          <strong>{snapshot.proof.tests}</strong>
-          <small>all passed</small>
+          <span>Attempts recorded</span>
+          <strong>{formatNumber(snapshot.portfolioScale.totalAttempts)}</strong>
+          <small>across two matched organizations</small>
         </div>
         <div>
-          <span>Valid live agent runs</span>
-          <strong>
-            {snapshot.proof.validAttempts}/{snapshot.proof.liveAttempts}
-          </strong>
-          <small>checked by code</small>
+          <span>Tasks receiving work</span>
+          <strong>400/400</strong>
+          <small>in the orchestration test</small>
         </div>
         <div>
           <span>Attempts per task</span>
@@ -909,7 +1094,9 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
         </div>
       </section>
 
-      {view === "Scale" && (
+      {view === "Overview" && <OverviewGuide snapshot={snapshot} />}
+
+      {false && (
         <>
           <section className="section narrative">
             <div className="section-heading">
@@ -1461,14 +1648,16 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
 
       {view === "Robustness" && <RobustnessGuide snapshot={snapshot} />}
 
+      {view === "Evidence" && <EvidenceGuide snapshot={snapshot} />}
+
       {view === "Planner" && <CompetitionPlanner snapshot={snapshot} />}
 
-      {(view === "Scale" || view === "Robustness") && (
+      {view === "Evidence" && (
         <section className="section" id="live-agents">
           <div className="section-heading agents-heading">
             <div>
-              <p className="eyebrow">The actual conversations</p>
-              <h2>These are real OpenHands runs. You can open them.</h2>
+              <p className="eyebrow">OpenHands conversation records</p>
+              <h2>Individual live runs used to verify the execution path.</h2>
               <p>
                 Each row links to the agent conversation. The score came from
                 the independent checker, not from the agent grading itself.
@@ -1608,8 +1797,8 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
 
       <section className="section next-gate">
         <div>
-          <p className="eyebrow">What comes next</p>
-          <h2>Put the real NeuroGolf workload on the proven control path.</h2>
+          <p className="eyebrow">Remaining work</p>
+          <h2>Steps required for a full NeuroGolf reproduction.</h2>
         </div>
         <ol>
           <li>

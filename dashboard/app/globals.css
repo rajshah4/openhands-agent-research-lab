@@ -1219,10 +1219,11 @@ footer > div:last-child {
     grid-column: 1 / -1;
     grid-row: 2;
     justify-self: stretch;
+    overflow-x: auto;
   }
 
   .view-switcher button {
-    flex: 1;
+    flex: 0 0 auto;
   }
 
   .environment-pill {

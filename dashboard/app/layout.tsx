@@ -24,9 +24,9 @@ export async function generateMetadata(): Promise<Metadata> {
     requestHeaders.get("x-forwarded-proto") ??
     (host.startsWith("localhost") ? "http" : "https");
   const socialImage = `${protocol}://${host}/og.png`;
-  const title = "NeuroGolf with OpenHands | Multi-agent patterns on Replicated";
+  const title = "NeuroGolf with OpenHands | Reproducing a Kaggle multi-agent workflow";
   const description =
-    "A 400-task OpenHands orchestration test: Replicated sandbox tradeoffs, restart recovery, validated memory, capacity planning, and the remaining Kaggle gap.";
+    "How we used OpenHands to coordinate the 400-task NeuroGolf workload, compare deployment structures, preserve experiment history, and recover incomplete agent work.";
 
   return {
     title,

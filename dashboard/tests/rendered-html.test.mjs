@@ -36,32 +36,23 @@ test("renders the NeuroGolf experiment for a new reader", async () => {
   const html = await response.text();
   assert.match(
     html,
-    /<title>NeuroGolf with OpenHands \| Multi-agent patterns on Replicated<\/title>/i,
+    /<title>NeuroGolf with OpenHands \| Reproducing a Kaggle multi-agent workflow<\/title>/i,
   );
-  assert.match(html, /reproduced the organization behind a 400-task agent campaign/i);
-  assert.match(html, /NeuroGolf teams used many coding agents/);
-  assert.match(html, />Scale</);
+  assert.match(html, /NeuroGolf required solving and optimizing 400 separate ARC tasks/i);
+  assert.match(html, /NeuroGolf 2026 was a Kaggle competition/);
+  assert.match(html, /The rules did not require agents/);
+  assert.match(html, />Overview</);
   assert.match(html, />Deployment</);
   assert.match(html, />Robustness</);
+  assert.match(html, />Evidence</);
   assert.match(html, />Planner</);
-  assert.match(html, /One campaign coordinated 400 task owners and 9,600 attempts/);
-  assert.match(html, /Supporting live-systems check/);
-  assert.match(html, /verified the loop with real OpenHands agents/);
-  assert.match(html, /not a quality or generalization result/);
-  assert.match(html, /The main scale result is a matched campaign/);
-  assert.match(html, /Separate runtime for each agent/);
-  assert.match(html, /One runtime, four active agents/);
-  assert.match(html, /One runtime, six active agents/);
-  assert.match(html, /Recommended starting point/);
-  assert.match(html, /FEWEST_CONVERSATIONS/);
-  assert.match(html, /Total model cost/);
-  assert.match(html, /across all 18 accepted attempts/);
-  assert.match(html, /4 agents in 4 sandboxes; 2 jobs queued/);
-  assert.match(html, /6 agents in 1 sandbox; no jobs queued/);
-  assert.match(html, /These are real OpenHands runs/);
-  assert.match(html, /Every one of 400 task owners received exactly 12 attempts/);
-  assert.match(html, /I killed the controller after OpenHands started the work/);
-  assert.match(html, /Four ways to use OpenHands/);
-  assert.match(html, /We reproduced the research organization, not a leaderboard score/);
+  assert.match(html, /What the Kaggle competition required/);
+  assert.match(html, /400 independent implementation problems/);
+  assert.match(html, /Why teams used multiple agents/);
+  assert.match(html, /The 400 tasks could be worked on in parallel/);
+  assert.match(html, /12 attempts for each of 400 tasks/);
+  assert.match(html, /This was an orchestration test, not an ONNX score/);
+  assert.match(html, /The multi-agent organization is implemented; the full competition solver is not/);
+  assert.doesNotMatch(html, /Supporting live-systems check|These are real OpenHands runs/);
   assert.doesNotMatch(html, /codex-preview|Your site is taking shape/);
 });
