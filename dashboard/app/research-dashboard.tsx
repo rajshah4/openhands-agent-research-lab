@@ -89,7 +89,7 @@ type Snapshot = {
   }>;
 };
 
-const views = ["Overview", "Runs", "Lessons"] as const;
+const views = ["Overview", "Planner", "Runs", "Lessons"] as const;
 type View = (typeof views)[number];
 
 function pct(value: number) {
@@ -115,6 +115,322 @@ function transportLabel(value: string) {
     "fenced-json-fallback": "JSON in a code block",
     "trailing-json-fallback": "JSON after an explanation",
   }[value] ?? value.replaceAll("-", " ");
+}
+
+function formatNumber(value: number) {
+  return new Intl.NumberFormat("en-US", {
+    maximumFractionDigits: 1,
+  }).format(value);
+}
+
+function formatMoney(value: number) {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  }).format(value);
+}
+
+function CompetitionPlanner({ snapshot }: { snapshot: Snapshot }) {
+  const [attemptsPerTask, setAttemptsPerTask] = useState(12);
+  const [parallelCells, setParallelCells] = useState(4);
+  const [workloadMultiplier, setWorkloadMultiplier] = useState(3);
+  const [costPerAttempt, setCostPerAttempt] = useState(0.025);
+  const [artifactMb, setArtifactMb] = useState(5);
+
+  const tasks = 400;
+  const agentsPerCell = 4;
+  const conversationsPerSandbox = 6;
+  const activeAgents = parallelCells * agentsPerCell;
+  const totalJobs = tasks * attemptsPerTask;
+  const coverageJobs = tasks;
+  const explorationJobs = totalJobs - coverageJobs;
+  const boundedCells = Math.ceil(totalJobs / conversationsPerSandbox);
+  const isolatedThroughput =
+    (snapshot.scaleStudy.isolatedQueue.throughput * activeAgents) /
+    agentsPerCell /
+    workloadMultiplier;
+  const boundedThroughput =
+    (snapshot.scaleStudy.boundedCells.throughput * parallelCells) /
+    workloadMultiplier;
+  const isolatedHours = totalJobs / isolatedThroughput;
+  const boundedHours = totalJobs / boundedThroughput;
+  const modelSpend = totalJobs * costPerAttempt;
+  const artifactStorageGb = (totalJobs * artifactMb) / 1024;
+  const ledgerEvents = totalJobs * 10;
+  const pollingRequestsPerMinute = activeAgents * 15;
+  const apiPressure = pollingRequestsPerMinute / 80;
+  const workerCpu = parallelCells * 4;
+  const workerMemoryGb = parallelCells * 8;
+  const capacityHeadroom = 1.3;
+
+  const applyPreset = (name: "coverage" | "campaign" | "intensive") => {
+    if (name === "coverage") {
+      setAttemptsPerTask(1);
+      setParallelCells(2);
+      setWorkloadMultiplier(2);
+    } else if (name === "campaign") {
+      setAttemptsPerTask(12);
+      setParallelCells(4);
+      setWorkloadMultiplier(3);
+    } else {
+      setAttemptsPerTask(25);
+      setParallelCells(8);
+      setWorkloadMultiplier(4);
+    }
+  };
+
+  return (
+    <section className="section planner-section">
+      <div className="section-heading">
+        <div>
+          <p className="eyebrow">Full NeuroGolf capacity planner</p>
+          <h1>What would it take to cover all 400 tasks?</h1>
+        </div>
+        <p>
+          The competition required one correct, optimized ONNX graph for each
+          ARC task. My postmortem found that 249 tasks never received an
+          independent attempt. This model makes coverage, repeated experiments,
+          validation, and infrastructure visible before work begins.
+        </p>
+      </div>
+
+      <div className="planner-presets" aria-label="Planning presets">
+        <button type="button" onClick={() => applyPreset("coverage")}>
+          Coverage pass
+          <small>1 attempt per task</small>
+        </button>
+        <button type="button" onClick={() => applyPreset("campaign")}>
+          Serious campaign
+          <small>12 attempts per task</small>
+        </button>
+        <button type="button" onClick={() => applyPreset("intensive")}>
+          Intensive search
+          <small>25 attempts per task</small>
+        </button>
+      </div>
+
+      <div className="planner-controls">
+        <label>
+          <span>
+            Attempts per task <strong>{attemptsPerTask}</strong>
+          </span>
+          <input
+            type="range"
+            min="1"
+            max="50"
+            value={attemptsPerTask}
+            onChange={(event) => setAttemptsPerTask(Number(event.target.value))}
+          />
+        </label>
+        <label>
+          <span>
+            Parallel work cells <strong>{parallelCells}</strong>
+          </span>
+          <input
+            type="range"
+            min="1"
+            max="25"
+            value={parallelCells}
+            onChange={(event) => setParallelCells(Number(event.target.value))}
+          />
+        </label>
+        <label>
+          <span>
+            ONNX workload factor <strong>{workloadMultiplier}×</strong>
+          </span>
+          <input
+            type="range"
+            min="1"
+            max="8"
+            value={workloadMultiplier}
+            onChange={(event) => setWorkloadMultiplier(Number(event.target.value))}
+          />
+        </label>
+        <label>
+          <span>
+            Model cost per attempt <strong>${costPerAttempt.toFixed(3)}</strong>
+          </span>
+          <input
+            type="range"
+            min="0.005"
+            max="0.25"
+            step="0.005"
+            value={costPerAttempt}
+            onChange={(event) => setCostPerAttempt(Number(event.target.value))}
+          />
+        </label>
+        <label>
+          <span>
+            Evidence per attempt <strong>{artifactMb} MB</strong>
+          </span>
+          <input
+            type="range"
+            min="1"
+            max="25"
+            value={artifactMb}
+            onChange={(event) => setArtifactMb(Number(event.target.value))}
+          />
+        </label>
+      </div>
+
+      <div className="planner-total">
+        <span>Planned work</span>
+        <strong>{formatNumber(totalJobs)} agent attempts</strong>
+        <small>
+          {tasks} tasks × {attemptsPerTask} attempts · {activeAgents} agents
+          active at once
+        </small>
+      </div>
+
+      <div className="coverage-bar" aria-label={`${coverageJobs} coverage attempts and ${explorationJobs} optimization attempts`}>
+        <span
+          className="coverage-first"
+          style={{ width: `${(coverageJobs / totalJobs) * 100}%` }}
+        />
+        {explorationJobs > 0 && (
+          <span className="coverage-search" />
+        )}
+      </div>
+      <div className="coverage-labels">
+        <span>
+          <i className="coverage-first" />
+          <b>{formatNumber(coverageJobs)}</b> first-coverage attempts
+        </span>
+        <span>
+          <i className="coverage-search" />
+          <b>{formatNumber(explorationJobs)}</b> follow-up experiments
+        </span>
+      </div>
+
+      <div className="planner-comparison">
+        <article>
+          <span className="implementation-status tested">Placement proven</span>
+          <h2>Isolated queue</h2>
+          <strong>{(isolatedHours / 24).toFixed(1)} days</strong>
+          <p>
+            {formatNumber(isolatedThroughput)} attempts/hour at the selected
+            workload factor.
+          </p>
+          <dl>
+            <div>
+              <dt>Simultaneous sandboxes</dt>
+              <dd>{activeAgents}</dd>
+            </div>
+            <div>
+              <dt>Sandboxes over campaign</dt>
+              <dd>{formatNumber(totalJobs)}</dd>
+            </div>
+            <div>
+              <dt>Isolation</dt>
+              <dd>One task per runtime</dd>
+            </div>
+          </dl>
+        </article>
+        <article className="recommended-plan">
+          <span className="implementation-status pilot">Density option</span>
+          <h2>Bounded shared cells</h2>
+          <strong>{(boundedHours / 24).toFixed(1)} days</strong>
+          <p>
+            {formatNumber(boundedThroughput)} attempts/hour at the selected
+            workload factor.
+          </p>
+          <dl>
+            <div>
+              <dt>Simultaneous sandboxes</dt>
+              <dd>{parallelCells}</dd>
+            </div>
+            <div>
+              <dt>Cells over campaign</dt>
+              <dd>{formatNumber(boundedCells)}</dd>
+            </div>
+            <div>
+              <dt>Isolation</dt>
+              <dd>Four trusted agents per runtime</dd>
+            </div>
+          </dl>
+        </article>
+      </div>
+
+      <div className="planner-requirements">
+        <article>
+          <span>Worker cluster</span>
+          <strong>
+            {Math.ceil(workerCpu * capacityHeadroom)} vCPU ·{" "}
+            {Math.ceil(workerMemoryGb * capacityHeadroom)} GB RAM
+          </strong>
+          <p>
+            {parallelCells} four-agent runtimes plus 30% operating headroom.
+            This assumes 4 vCPU and 8 GB per ONNX work cell.
+          </p>
+        </article>
+        <article className={apiPressure > 1 ? "requirement-warning" : ""}>
+          <span>OpenHands control path</span>
+          <strong>{formatNumber(pollingRequestsPerMinute)} requests/minute</strong>
+          <p>
+            About {apiPressure.toFixed(1)}× the measured safe 80-request/minute
+            controller pace. Above that boundary, use event-driven status,
+            fewer polls, or a tested higher API limit.
+          </p>
+        </article>
+        <article>
+          <span>Experiment ledger</span>
+          <strong>{formatNumber(ledgerEvents)} lifecycle records</strong>
+          <p>
+            Use application-owned PostgreSQL for claims, leases, idempotency,
+            task coverage, candidate state, and submission gates.
+          </p>
+        </article>
+        <article>
+          <span>Artifact storage</span>
+          <strong>{formatNumber(artifactStorageGb)} GB</strong>
+          <p>
+            Candidate ONNX files, builders, validation logs, counterexamples,
+            and immutable evidence belong in object storage with hashes.
+          </p>
+        </article>
+        <article>
+          <span>Estimated model spend</span>
+          <strong>{formatMoney(modelSpend)}</strong>
+          <p>
+            Model calls only, using the selected per-attempt assumption.
+            Infrastructure, human review, and Kaggle submissions are separate.
+          </p>
+        </article>
+        <article>
+          <span>Serial release gate</span>
+          <strong>400/400 audit</strong>
+          <p>
+            Candidate work can run in parallel. ZIP assembly, differential
+            audit, full scoring, and submission promotion remain single-writer.
+          </p>
+        </article>
+      </div>
+
+      <div className="planner-warning">
+        <strong>What is measured and what is extrapolated</strong>
+        <p>
+          Four-active placement and 12-job queue behavior were measured on the
+          Rajistics Replicated instance. Parallel shared cells, ONNX-heavy
+          runtime demand, and the full-campaign duration are planning
+          projections. Automatic sandbox rollover is excluded because it
+          stalled in the 12-job test.
+        </p>
+      </div>
+
+      <div className="planner-sources">
+        <a href="https://www.kaggle.com/competitions/neurogolf-2026/writeups/155th-place-what-i-learned-about-managing-ai-codi">
+          Competition postmortem ↗
+        </a>
+        <a href="https://2026.ijcai.org/competitions/">
+          Official competition description ↗
+        </a>
+        <a href="https://github.com/rajshah4/openhands-agent-research-lab/tree/main/evidence/2026-07-25-replicated-scale-study">
+          Measured scaling evidence ↗
+        </a>
+      </div>
+    </section>
+  );
 }
 
 export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
@@ -582,6 +898,8 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
           </section>
         </>
       )}
+
+      {view === "Planner" && <CompetitionPlanner snapshot={snapshot} />}
 
       {(view === "Overview" || view === "Runs") && (
         <section className="section" id="live-agents">

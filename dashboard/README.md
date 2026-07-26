@@ -7,6 +7,7 @@ The dashboard turns the research ledger into an operator-facing story:
 - conversation-level provenance and sandbox lifecycle
 - promoted lessons with their evidence chain
 - resolved incidents and the next proof gates
+- an adjustable full-competition planner for all 400 NeuroGolf tasks
 
 The initial release renders a checked-in snapshot from `data/snapshot.json`. This
 keeps the public dashboard read-only and deployable without granting it access to

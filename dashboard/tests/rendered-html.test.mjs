@@ -34,6 +34,7 @@ test("renders the NeuroGolf experiment for a new reader", async () => {
   );
   assert.match(html, /Can coding agents learn from each other/);
   assert.match(html, /A Kaggle team used many agents/);
+  assert.match(html, />Planner</);
   assert.match(html, /I ran the same six problems two ways, three times/);
   assert.match(html, /The six live problems were too easy/);
   assert.match(html, /This reproduces the multi-agent research setup/);

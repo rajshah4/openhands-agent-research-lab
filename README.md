@@ -167,4 +167,5 @@ comparison limits are in [the matched-comparison note](docs/matched-comparison.m
 For production multi-agent deployment on OpenHands Enterprise/Replicated, see
 the [three-pattern result](evidence/2026-07-25-replicated-multi-agent-patterns/README.md),
 the [12-task scale study](evidence/2026-07-25-replicated-scale-study/README.md),
+the [full 400-task capacity plan](docs/neurogolf-full-competition-capacity-plan.md),
 and the [operator runbook](docs/replicated-multi-agent-operations.md).

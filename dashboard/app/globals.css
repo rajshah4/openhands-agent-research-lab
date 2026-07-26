@@ -576,6 +576,287 @@ dd {
   line-height: 1.55;
 }
 
+.planner-section {
+  max-width: 1500px;
+  padding-top: clamp(64px, 8vw, 112px);
+}
+
+.planner-section h1 {
+  font-size: clamp(40px, 5vw, 72px);
+}
+
+.planner-presets {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(3, 1fr);
+  margin-bottom: 18px;
+}
+
+.planner-presets button {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--ink);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 16px;
+  text-align: left;
+}
+
+.planner-presets button:hover {
+  border-color: var(--green);
+}
+
+.planner-presets small {
+  color: var(--muted);
+  display: block;
+  font: 500 10px var(--mono);
+  margin-top: 5px;
+}
+
+.planner-controls {
+  background: var(--ink);
+  border-radius: 14px;
+  color: white;
+  display: grid;
+  gap: 1px;
+  grid-template-columns: repeat(5, 1fr);
+  overflow: hidden;
+}
+
+.planner-controls label {
+  background: #17262d;
+  display: block;
+  min-width: 0;
+  padding: 18px;
+}
+
+.planner-controls label > span {
+  color: #aebabc;
+  display: flex;
+  font-size: 10px;
+  justify-content: space-between;
+  line-height: 1.4;
+}
+
+.planner-controls label strong {
+  color: white;
+  font: 600 10px var(--mono);
+  margin-left: 10px;
+  white-space: nowrap;
+}
+
+.planner-controls input[type="range"] {
+  accent-color: #87c7a7;
+  margin-top: 18px;
+  width: 100%;
+}
+
+.planner-total {
+  align-items: baseline;
+  display: grid;
+  gap: 8px 20px;
+  grid-template-columns: auto 1fr auto;
+  margin: 44px 0 18px;
+}
+
+.planner-total > span {
+  color: var(--green);
+  font: 600 10px var(--mono);
+  text-transform: uppercase;
+}
+
+.planner-total strong {
+  font-size: clamp(28px, 4vw, 52px);
+  letter-spacing: -0.045em;
+}
+
+.planner-total small {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.coverage-bar {
+  background: var(--line);
+  border-radius: 999px;
+  display: flex;
+  height: 16px;
+  overflow: hidden;
+}
+
+.coverage-bar span {
+  display: block;
+  height: 100%;
+}
+
+.coverage-first {
+  background: var(--green);
+}
+
+.coverage-search {
+  background: var(--blue);
+  flex: 1;
+}
+
+.coverage-labels {
+  color: var(--muted);
+  display: flex;
+  font-size: 11px;
+  gap: 24px;
+  margin-top: 10px;
+}
+
+.coverage-labels span {
+  align-items: center;
+  display: flex;
+  gap: 7px;
+}
+
+.coverage-labels i {
+  border-radius: 50%;
+  display: inline-block;
+  flex: 0 0 auto;
+  height: 8px;
+  width: 8px;
+}
+
+.coverage-labels b {
+  color: var(--ink);
+  font: 600 10px var(--mono);
+}
+
+.planner-comparison {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: 1fr 1fr;
+  margin-top: 46px;
+}
+
+.planner-comparison article {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 26px;
+}
+
+.planner-comparison article.recommended-plan {
+  background: var(--panel);
+  border-color: #9aafd2;
+}
+
+.planner-comparison h2 {
+  font-size: 28px;
+  margin: 28px 0 10px;
+}
+
+.planner-comparison article > strong {
+  display: block;
+  font-size: clamp(40px, 5vw, 66px);
+  letter-spacing: -0.055em;
+}
+
+.planner-comparison article > p {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.planner-comparison dl {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(3, 1fr);
+  margin: 30px 0 0;
+}
+
+.planner-comparison dl div {
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+
+.planner-comparison dt,
+.planner-requirements article > span {
+  color: var(--muted);
+  display: block;
+  font: 600 9px var(--mono);
+  text-transform: uppercase;
+}
+
+.planner-comparison dd {
+  font-size: 12px;
+  line-height: 1.45;
+  margin: 6px 0 0;
+}
+
+.planner-requirements {
+  border-top: 1px solid var(--line);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin-top: 58px;
+}
+
+.planner-requirements article {
+  border-bottom: 1px solid var(--line);
+  min-height: 190px;
+  padding: 24px;
+}
+
+.planner-requirements article:nth-child(3n + 2),
+.planner-requirements article:nth-child(3n + 3) {
+  border-left: 1px solid var(--line);
+}
+
+.planner-requirements article > strong {
+  display: block;
+  font-size: 24px;
+  letter-spacing: -0.025em;
+  margin: 28px 0 10px;
+}
+
+.planner-requirements article > p {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+  margin-bottom: 0;
+}
+
+.planner-requirements .requirement-warning {
+  background: var(--amber-soft);
+}
+
+.planner-warning {
+  background: var(--ink);
+  border-radius: 12px;
+  color: white;
+  display: grid;
+  gap: 30px;
+  grid-template-columns: 0.45fr 1fr;
+  margin-top: 48px;
+  padding: 26px;
+}
+
+.planner-warning strong {
+  font-size: 18px;
+}
+
+.planner-warning p {
+  color: #aebabc;
+  font-size: 12px;
+  line-height: 1.65;
+  margin: 0;
+}
+
+.planner-sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 22px;
+  margin-top: 24px;
+}
+
+.planner-sources a {
+  border-bottom: 1px solid var(--ink);
+  font-size: 12px;
+  padding-bottom: 4px;
+}
+
 .agents-heading {
   align-items: center;
 }
@@ -877,8 +1158,22 @@ footer > div:last-child {
 
   .comparison-grid,
   .memory-grid,
-  .implementation-grid {
+  .implementation-grid,
+  .planner-requirements {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .planner-controls {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .planner-requirements article:nth-child(3n + 2),
+  .planner-requirements article:nth-child(3n + 3) {
+    border-left: 0;
+  }
+
+  .planner-requirements article:nth-child(even) {
+    border-left: 1px solid var(--line);
   }
 
   .implementation-card:last-child {
@@ -946,8 +1241,36 @@ footer > div:last-child {
   .workflow,
   .comparison-grid,
   .memory-grid,
-  .implementation-grid {
+  .implementation-grid,
+  .planner-presets,
+  .planner-controls,
+  .planner-comparison,
+  .planner-requirements {
     grid-template-columns: 1fr;
+  }
+
+  .planner-total {
+    align-items: start;
+    grid-template-columns: 1fr;
+  }
+
+  .planner-comparison dl {
+    grid-template-columns: 1fr;
+  }
+
+  .planner-requirements article,
+  .planner-requirements article:nth-child(even) {
+    border-left: 0;
+  }
+
+  .planner-warning {
+    grid-template-columns: 1fr;
+  }
+
+  .coverage-labels {
+    align-items: start;
+    flex-direction: column;
+    gap: 7px;
   }
 
   .implementation-card:last-child {
