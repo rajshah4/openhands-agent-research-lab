@@ -116,6 +116,11 @@ def main() -> int:
     openhands_api_key = get_secret("OPENHANDS_API_KEY")
     if not github_token or not openhands_api_key:
         raise RuntimeError("required stored credentials are unavailable")
+    # Replicated automation 1.1.5 injected a callback credential that returned
+    # 401 in the first live run. The stored OpenHands API key is already used
+    # for the child-conversation API and is accepted by /api/v1/users/me, which
+    # is the callback endpoint's documented authentication check.
+    os.environ["AUTOMATION_CALLBACK_API_KEY"] = openhands_api_key
 
     git_environment = _git_environment(github_token)
     with tempfile.TemporaryDirectory(prefix="research-controller-") as directory:
@@ -149,7 +154,10 @@ if __name__ == "__main__":
     try:
         exit_code = main()
     except Exception as exc:
-        print(f"controller tick failed: {type(exc).__name__}", file=sys.stderr)
+        print(
+            f"controller tick failed: {type(exc).__name__}: {exc}",
+            file=sys.stderr,
+        )
         fire_callback("FAILED", str(exc))
         raise SystemExit(1)
     fire_callback("COMPLETED")
