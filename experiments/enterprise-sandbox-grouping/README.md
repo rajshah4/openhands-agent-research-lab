@@ -108,3 +108,17 @@ and the
 [four-worker comparison](../../evidence/2026-07-25-concurrency-four-vs-six/README.md)
 for the measured latency, throughput, resource use, and API-rate-limit
 tradeoffs.
+
+## Production pattern comparison
+
+The final matched matrix compares bounded isolated execution, bounded grouped
+execution, and full-cap grouped execution across three accepted replicates
+each. All patterns produced `18/18` valid tasks. The bounded grouped pattern
+used one runtime instead of six, had 4.5% lower mean wall time than bounded
+isolation, and needed no controller retries. Six-active grouping was 3.0%
+slower on average than four-active grouping.
+
+See the
+[Replicated pattern evidence](../../evidence/2026-07-25-replicated-multi-agent-patterns/README.md)
+and the
+[operator runbook](../../docs/replicated-multi-agent-operations.md).

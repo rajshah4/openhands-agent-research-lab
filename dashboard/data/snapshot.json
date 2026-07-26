@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-25T22:45:27Z",
+  "generatedAt": "2026-07-26T02:12:00Z",
   "environment": {
     "name": "Rajistics Replicated",
     "version": "0.24.0",
@@ -15,7 +15,7 @@
     "launchAllowed": true
   },
   "proof": {
-    "tests": 27,
+    "tests": 45,
     "liveAttempts": 36,
     "validAttempts": 36,
     "invalidLessons": 0,
@@ -37,6 +37,35 @@
       "qualityAuc": 0.583,
       "duplicates": 0,
       "retrievedLessons": 9
+    }
+  },
+  "replicatedPatterns": {
+    "isolatedFour": {
+      "valid": 18,
+      "attempts": 18,
+      "runtimesPerBatch": 6,
+      "activeAgents": 4,
+      "meanWallSeconds": 284.941,
+      "meanCost": 0.19292597,
+      "controllerRetries": 12
+    },
+    "groupedFour": {
+      "valid": 18,
+      "attempts": 18,
+      "runtimesPerBatch": 1,
+      "activeAgents": 4,
+      "meanWallSeconds": 272.011,
+      "meanCost": 0.24019233,
+      "controllerRetries": 0
+    },
+    "groupedSix": {
+      "valid": 18,
+      "attempts": 18,
+      "runtimesPerBatch": 1,
+      "activeAgents": 6,
+      "meanWallSeconds": 280.063,
+      "meanCost": 0.15521366,
+      "controllerRetries": 0
     }
   },
   "agents": [

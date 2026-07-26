@@ -50,6 +50,18 @@ type Snapshot = {
     }
   >;
   comparisonTaskCount: number;
+  replicatedPatterns: Record<
+    "isolatedFour" | "groupedFour" | "groupedSix",
+    {
+      valid: number;
+      attempts: number;
+      runtimesPerBatch: number;
+      activeAgents: number;
+      meanWallSeconds: number;
+      meanCost: number;
+      controllerRetries: number;
+    }
+  >;
   agents: AgentRecord[];
   lessons: Array<{
     id: string;
@@ -203,8 +215,9 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
             </div>
           </dl>
           <p className="capacity-note">
-            Each agent gets its own workspace. When the agent finishes, I pause
-            that workspace but keep the conversation and result.
+            The recommended setup lets four trusted agents share one runtime
+            while keeping six separate conversation records. The controller
+            pauses the runtime only after the batch finishes.
           </p>
         </aside>
       </section>
@@ -341,108 +354,115 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
           <section className="section implementation-section">
             <div className="section-heading">
               <div>
-                <p className="eyebrow">Three ways to run it in OpenHands</p>
-                <h2>The research loop stays the same. The operating model changes.</h2>
+                <p className="eyebrow">Three Replicated setups I measured</p>
+                <h2>Six conversations do not have to mean six containers.</h2>
               </div>
               <p>
-                This experiment used the first option. A second pilot tested
-                the shared Canvas setup on Kubernetes. The SDK version is the
-                next implementation I would build. These choices mostly move
-                the boundaries around isolation, startup cost, and how much
-                infrastructure your team owns.
+                I ran the same six problems and model three times for each
+                setup. Every accepted batch solved all six problems. The main
+                difference was where I put the isolation boundary and how much
+                pressure I put on the small Enterprise server.
               </p>
             </div>
             <div className="implementation-grid">
               <article className="implementation-card">
                 <span className="implementation-status tested">
-                  Tested here: 36 conversations
+                  Strongest isolation
                 </span>
-                <h3>One Enterprise sandbox per agent</h3>
+                <h3>Separate runtime for each agent</h3>
                 <p>
-                  An external controller starts each worker through the
-                  OpenHands Conversation API. Every agent gets a separate
-                  conversation, context window, and runtime. OpenHands keeps
-                  the conversation history and gives people a place to inspect
-                  the work.
+                  I kept four agents active and queued two. Each agent owned its
+                  runtime and paused it when finished. Across three accepted
+                  batches, {snapshot.replicatedPatterns.isolatedFour.valid}/
+                  {snapshot.replicatedPatterns.isolatedFour.attempts} answers
+                  passed in an average of{" "}
+                  {snapshot.replicatedPatterns.isolatedFour.meanWallSeconds.toFixed(1)}
+                  {" "}seconds.
                 </p>
                 <dl>
                   <div>
                     <dt>Use it when</dt>
-                    <dd>You need user access controls, audit trails, or stronger isolation.</dd>
+                    <dd>Code is untrusted, tenants differ, or failures must stay local.</dd>
                   </div>
                   <div>
                     <dt>Tradeoff</dt>
-                    <dd>Each active agent needs a runtime. Startup time and container capacity set the pace.</dd>
+                    <dd>Six runtimes per batch. The controller needed {snapshot.replicatedPatterns.isolatedFour.controllerRetries} API retries.</dd>
                   </div>
                   <div>
-                    <dt>Your team owns</dt>
-                    <dd>The scheduler, validator, research memory, and experiment records.</dd>
+                    <dt>Measured cost</dt>
+                    <dd>${snapshot.replicatedPatterns.isolatedFour.meanCost.toFixed(3)} per six-task batch.</dd>
                   </div>
                 </dl>
               </article>
 
               <article className="implementation-card">
                 <span className="implementation-status pilot">
-                  Pilot tested: 2 at once
+                  Recommended starting point
                 </span>
-                <h3>Many agents on one Agent Canvas</h3>
+                <h3>One runtime, four active agents</h3>
                 <p>
-                  One Agent Canvas pod can run several conversations against a
-                  shared volume. In the GKE pilot, two simultaneous agents
-                  finished in 12.0 and 22.5 seconds. Both answers passed the
-                  independent checker, and the pod used about 691 MiB of memory
-                  afterward.
+                  Six first-class Enterprise conversations shared one runtime.
+                  Four ran while two waited. Across three batches,{" "}
+                  {snapshot.replicatedPatterns.groupedFour.valid}/
+                  {snapshot.replicatedPatterns.groupedFour.attempts} answers
+                  passed in an average of{" "}
+                  {snapshot.replicatedPatterns.groupedFour.meanWallSeconds.toFixed(1)}
+                  {" "}seconds.
                 </p>
                 <dl>
                   <div>
                     <dt>Use it when</dt>
-                    <dd>One trusted team wants fast startup and more work from a small cluster.</dd>
+                    <dd>One trusted team wants production controls without one container per agent.</dd>
                   </div>
                   <div>
                     <dt>Tradeoff</dt>
-                    <dd>Agents share a pod, process boundary, and filesystem. This is not tenant isolation.</dd>
+                    <dd>Agents share compute and a larger failure boundary. Do not mix tenants.</dd>
                   </div>
                   <div>
-                    <dt>Your team owns</dt>
-                    <dd>The Kubernetes service, workspace boundaries, access policy, and recovery plan.</dd>
+                    <dt>Measured result</dt>
+                    <dd>One runtime, zero controller retries, ${snapshot.replicatedPatterns.groupedFour.meanCost.toFixed(3)} per batch.</dd>
                   </div>
                 </dl>
               </article>
 
               <article className="implementation-card">
                 <span className="implementation-status next">
-                  Next implementation
+                  Higher-pressure mode
                 </span>
-                <h3>Embed the OpenHands SDK</h3>
+                <h3>One runtime, six active agents</h3>
                 <p>
-                  Your Python service creates the agents and conversations
-                  directly. You can add custom tools, async execution,
-                  delegation, and your own API or user interface without
-                  routing every decision through the OpenHands application.
+                  I filled the configured six-conversation sandbox cap. All{" "}
+                  {snapshot.replicatedPatterns.groupedSix.valid}/
+                  {snapshot.replicatedPatterns.groupedSix.attempts} answers
+                  passed, but mean wall time was{" "}
+                  {snapshot.replicatedPatterns.groupedSix.meanWallSeconds.toFixed(1)}
+                  {" "}seconds—slower than the four-active setup.
                 </p>
                 <dl>
                   <div>
                     <dt>Use it when</dt>
-                    <dd>The agent system is part of your product and needs custom behavior.</dd>
+                    <dd>Trusted, short jobs have already passed load tests on your installation.</dd>
                   </div>
                   <div>
                     <dt>Tradeoff</dt>
-                    <dd>This gives the most control and leaves the most production work with your team.</dd>
+                    <dd>Larger contention and blast radius without a measured speed win here.</dd>
                   </div>
                   <div>
-                    <dt>Your team owns</dt>
-                    <dd>The isolation layer and the design for authentication, persistence, restarts, scaling, and observability.</dd>
+                    <dt>Measured cost</dt>
+                    <dd>${snapshot.replicatedPatterns.groupedSix.meanCost.toFixed(3)} per six-task batch.</dd>
                   </div>
                 </dl>
               </article>
             </div>
             <p className="architecture-note">
-              Storage is a separate choice. This repo writes a file ledger
-              because one controller owns the queue. Git is useful for
-              publishing the artifacts, but I would not use it to claim
-              concurrent work. Once multiple controllers can pick tasks at the
-              same time, I would add an application-owned PostgreSQL database.
-              I would leave the OpenHands internal database alone.
+              My default recommendation is the middle option:{" "}
+              <strong>FEWEST_CONVERSATIONS with four active agents per sandbox</strong>.
+              Keep separate runtimes for untrusted work. Raise the shared limit
+              only after a matched load test. Agent Canvas remains a lighter
+              single-team backend, and the SDK remains the custom-product path;
+              neither replaces the Enterprise identity and lifecycle controls
+              measured here. The experiment ledger stays outside the OpenHands
+              internal database.
             </p>
           </section>
         </>

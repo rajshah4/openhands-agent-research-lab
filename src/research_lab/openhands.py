@@ -20,6 +20,13 @@ TERMINAL_STATUSES = {
 }
 FAILED_START_STATUSES = {"ERROR", "FAILED", "STOPPED"}
 ACTIVE_SANDBOX_STATUSES = {"RUNNING", "STARTING", "PENDING", "CREATING"}
+SANDBOX_GROUPING_STRATEGIES = {
+    "NO_GROUPING",
+    "GROUP_BY_NEWEST",
+    "LEAST_RECENTLY_USED",
+    "FEWEST_CONVERSATIONS",
+    "ADD_TO_ANY",
+}
 SENSITIVE_KEYS = {
     "api_key",
     "authorization",
@@ -225,6 +232,26 @@ class OpenHandsClient:
         )
         return sanitize_metadata(record or {})
 
+    def set_sandbox_grouping_strategy(self, strategy: str) -> str:
+        if strategy not in SANDBOX_GROUPING_STRATEGIES:
+            raise ValueError(f"unknown sandbox grouping strategy: {strategy}")
+        self._request(
+            "POST",
+            _endpoint(self.base_url, "/api/v1/settings"),
+            self.headers,
+            body={"sandbox_grouping_strategy": strategy},
+            timeout=30,
+        )
+        observed = str(
+            self.preflight().get("sandbox_grouping_strategy") or ""
+        )
+        if observed != strategy:
+            raise OpenHandsAPIError(
+                f"sandbox grouping strategy is {observed!r}, "
+                f"expected {strategy!r}"
+            )
+        return observed
+
     def search_sandboxes(self, *, limit: int = 100) -> list[dict[str, Any]]:
         """Return all sandboxes visible to the authenticated OpenHands user."""
         sandboxes: list[dict[str, Any]] = []
@@ -327,17 +354,7 @@ class OpenHandsClient:
     ) -> dict[str, Any]:
         deadline = self._monotonic() + timeout_seconds
         while self._monotonic() < deadline:
-            tasks = self._request(
-                "GET",
-                _endpoint(
-                    self.base_url,
-                    "/api/v1/app-conversations/start-tasks",
-                    {"ids": task_id},
-                ),
-                self.headers,
-                timeout=60,
-            )
-            task = tasks[0] if isinstance(tasks, list) and tasks else {}
+            task = self.get_start_task(task_id)
             status = str(task.get("status", "")).upper()
             if task.get("app_conversation_id"):
                 return task
@@ -345,6 +362,20 @@ class OpenHandsClient:
                 raise OpenHandsAPIError(f"start task {task_id} ended with {status}")
             self._sleep(poll_seconds)
         raise TimeoutError(f"timed out waiting for OpenHands start task {task_id}")
+
+    def get_start_task(self, task_id: str) -> dict[str, Any]:
+        tasks = self._request(
+            "GET",
+            _endpoint(
+                self.base_url,
+                "/api/v1/app-conversations/start-tasks",
+                {"ids": task_id},
+            ),
+            self.headers,
+            timeout=60,
+        )
+        task = tasks[0] if isinstance(tasks, list) and tasks else {}
+        return sanitize_metadata(task)
 
     def get_conversation(self, conversation_id: str) -> dict[str, Any]:
         records = self._request(

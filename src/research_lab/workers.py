@@ -348,11 +348,27 @@ class OpenHandsWorker:
         )
         start_task_id = str(start["id"])
         on_lifecycle("start_task_created", {"start_task_id": start_task_id})
-        ready = self.client.poll_start_task(
-            start_task_id,
-            timeout_seconds=self.start_timeout_seconds,
-            poll_seconds=self.poll_seconds,
-        )
+        try:
+            ready = self.client.poll_start_task(
+                start_task_id,
+                timeout_seconds=self.start_timeout_seconds,
+                poll_seconds=self.poll_seconds,
+            )
+        except Exception:
+            try:
+                failed_start = self.client.get_start_task(start_task_id)
+            except Exception:
+                failed_start = {}
+            on_lifecycle(
+                "conversation_start_failed",
+                {
+                    "start_task_id": start_task_id,
+                    "status": failed_start.get("status"),
+                    "detail": failed_start.get("detail"),
+                    "sandbox_id": failed_start.get("sandbox_id"),
+                },
+            )
+            raise
         conversation_id = str(ready["app_conversation_id"])
         sandbox_id = ready.get("sandbox_id")
         on_lifecycle(

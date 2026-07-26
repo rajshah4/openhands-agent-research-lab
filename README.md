@@ -163,3 +163,7 @@ three-task benchmark is not yet discriminating enough for a production claim.
 See [the design](docs/design.md), [the framing record](FRAMING.md), and the
 [live validation log](docs/live-validation.md). The metric definitions and
 comparison limits are in [the matched-comparison note](docs/matched-comparison.md).
+
+For production multi-agent deployment on OpenHands Enterprise/Replicated, see
+the [three-pattern result](evidence/2026-07-25-replicated-multi-agent-patterns/README.md)
+and the [operator runbook](docs/replicated-multi-agent-operations.md).

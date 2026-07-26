@@ -40,6 +40,8 @@ class RateLimitedRequester:
         self._lock = threading.Lock()
         self._next_request_at = 0.0
         self.rate_limit_retries = 0
+        self.transient_auth_retries = 0
+        self.transport_retries = 0
 
     def __call__(
         self,
@@ -64,10 +66,26 @@ class RateLimitedRequester:
                     body=body,
                     timeout=timeout,
                 )
-            except OpenHandsAPIError as exc:
-                if "HTTP 429" not in str(exc) or retry >= self.max_429_retries:
+            except TimeoutError:
+                if retry >= self.max_429_retries:
                     raise
-                self.rate_limit_retries += 1
+                self.transport_retries += 1
+                time.sleep(min(2**retry, 8))
+            except OpenHandsAPIError as exc:
+                message = str(exc)
+                retryable_rate_limit = "HTTP 429" in message
+                retryable_transient_auth = (
+                    "HTTP 401" in message and "BearerTokenError" in message
+                )
+                if (
+                    not retryable_rate_limit
+                    and not retryable_transient_auth
+                ) or retry >= self.max_429_retries:
+                    raise
+                if retryable_rate_limit:
+                    self.rate_limit_retries += 1
+                else:
+                    self.transient_auth_retries += 1
                 time.sleep(min(2**retry, 8))
         raise AssertionError("unreachable")
 
@@ -85,12 +103,28 @@ def parse_args() -> argparse.Namespace:
         "--repository",
         default="rajshah4/openhands-agent-research-lab",
     )
+    parser.add_argument(
+        "--no-repository",
+        action="store_true",
+        help="run prompt-contained tasks without mounting a Git repository",
+    )
     parser.add_argument("--branch", default="main")
     parser.add_argument(
         "--model",
         help="explicit OpenHands model identifier for matched live comparisons",
     )
     parser.add_argument("--concurrency", type=int, default=6)
+    parser.add_argument(
+        "--dispatch-limit",
+        type=int,
+        help="maximum simultaneously executing agents; defaults to concurrency",
+    )
+    parser.add_argument("--expected-sandboxes", type=int, default=1)
+    parser.add_argument(
+        "--require-grouping-strategy",
+        choices=("NO_GROUPING", "FEWEST_CONVERSATIONS"),
+        help="refuse the run unless the authenticated user has this strategy",
+    )
     parser.add_argument("--request-interval", type=float, default=0.75)
     parser.add_argument("--seed-ready-timeout", type=int, default=180)
     parser.add_argument("--start-timeout", type=int, default=600)
@@ -142,7 +176,8 @@ def sandbox_ids_from_lifecycle(root: Path) -> list[str]:
     return sorted(
         {
             str(item["payload"]["sandbox_id"])
-            for item in load_lifecycle(root, "conversation_ready")
+            for kind in ("conversation_ready", "conversation_start_failed")
+            for item in load_lifecycle(root, kind)
             if item.get("payload", {}).get("sandbox_id")
         }
     )
@@ -185,13 +220,24 @@ def main() -> int:
         )
     if not 2 <= args.concurrency <= 6:
         raise ValueError("--concurrency must be between 2 and 6")
+    dispatch_limit = args.dispatch_limit or args.concurrency
+    if not 1 <= dispatch_limit <= args.concurrency:
+        raise ValueError(
+            "--dispatch-limit must be between 1 and --concurrency"
+        )
+    if not 1 <= args.expected_sandboxes <= args.concurrency:
+        raise ValueError(
+            "--expected-sandboxes must be between 1 and --concurrency"
+        )
 
     _load_env_file(args.env_file)
     base_campaign = CampaignSpec.from_path(args.campaign.resolve())
+    selected_repository = None if args.no_repository else args.repository
+    selected_branch = None if args.no_repository else args.branch
     base_campaign = replace(
         base_campaign,
-        repository=args.repository,
-        branch=args.branch,
+        repository=selected_repository,
+        branch=selected_branch,
         model=args.model or base_campaign.model,
         attempt_budget=1,
         policy="managed",
@@ -212,6 +258,18 @@ def main() -> int:
         requester=limiter,
     )
 
+    user_settings = client.preflight()
+    grouping_strategy = str(
+        user_settings.get("sandbox_grouping_strategy") or ""
+    )
+    if (
+        args.require_grouping_strategy
+        and grouping_strategy != args.require_grouping_strategy
+    ):
+        raise RuntimeError(
+            f"sandbox grouping strategy is {grouping_strategy!r}, expected "
+            f"{args.require_grouping_strategy!r}"
+        )
     capacity = client.capacity_snapshot(runtime_limit=10, launch_lock_at=7)
     if not capacity["launch_allowed"]:
         raise RuntimeError("OpenHands capacity gate is closed")
@@ -224,7 +282,7 @@ def main() -> int:
             start_timeout_seconds=args.start_timeout,
             execution_timeout_seconds=args.execution_timeout,
             poll_seconds=args.poll_seconds,
-            pause_after_attempt=False,
+            pause_after_attempt=grouping_strategy == "NO_GROUPING",
             runtime_limit=10,
             launch_lock_at=7,
         )
@@ -240,32 +298,42 @@ def main() -> int:
     futures: dict[str, Future[dict[str, Any]]] = {}
     results: dict[str, dict[str, Any]] = {}
     pause_results: dict[str, str] = {}
-    with ThreadPoolExecutor(max_workers=args.concurrency) as executor:
+    pause_errors: dict[str, str] = {}
+    with ThreadPoolExecutor(max_workers=dispatch_limit) as executor:
         seed_id = task_order[0]
         futures[seed_id] = executor.submit(run_task, seed_id)
         deadline = time.monotonic() + args.seed_ready_timeout
+        seed_ready = False
         while time.monotonic() < deadline:
             if lifecycle_files(args.store, "conversation_ready"):
+                seed_ready = True
                 break
             if futures[seed_id].done():
                 results[seed_id] = futures[seed_id].result()
-                raise RuntimeError("seed ended before its conversation became ready")
+                break
             time.sleep(0.5)
         else:
             raise TimeoutError("timed out waiting for seed conversation readiness")
 
-        for task_id in task_order[1:]:
-            futures[task_id] = executor.submit(run_task, task_id)
-        for task_id, future in futures.items():
-            results[task_id] = future.result()
+        if seed_ready:
+            for task_id in task_order[1:]:
+                futures[task_id] = executor.submit(run_task, task_id)
+            for task_id, future in futures.items():
+                results[task_id] = future.result()
 
     controller_wall_seconds = time.monotonic() - started
     sandbox_ids = sandbox_ids_from_lifecycle(args.store)
-    try:
-        for sandbox_id in sandbox_ids:
-            paused = client.pause_sandbox(sandbox_id)
-            pause_results[sandbox_id] = str(paused.get("status"))
-    finally:
+    for sandbox_id in sandbox_ids:
+        try:
+            current = client.get_sandbox(sandbox_id)
+            if str(current.get("status", "")).upper() == "PAUSED":
+                pause_results[sandbox_id] = "PAUSED"
+            else:
+                paused = client.pause_sandbox(sandbox_id)
+                pause_results[sandbox_id] = str(paused.get("status"))
+        except Exception as exc:
+            pause_errors[sandbox_id] = f"{type(exc).__name__}: {exc}"
+    if True:
         durations = [
             duration
             for item in results.values()
@@ -295,6 +363,11 @@ def main() -> int:
             "schema_version": 1,
             "campaign": base_campaign.id,
             "model": base_campaign.model,
+            "repository": base_campaign.repository,
+            "branch": base_campaign.branch,
+            "sandbox_grouping_strategy": grouping_strategy,
+            "dispatch_limit": dispatch_limit,
+            "expected_sandboxes": args.expected_sandboxes,
             "tasks": task_order,
             "attempts": len(results),
             "valid": sum(
@@ -307,6 +380,8 @@ def main() -> int:
             "sandbox_ids": sandbox_ids,
             "max_observed_concurrency": max_observed_concurrency(args.store),
             "rate_limit_retries": limiter.rate_limit_retries,
+            "transient_auth_retries": limiter.transient_auth_retries,
+            "transport_retries": limiter.transport_retries,
             "controller_wall_seconds": round(controller_wall_seconds, 3),
             "attempt_batch_wall_seconds": (
                 round(attempt_batch_wall_seconds, 3)
@@ -359,6 +434,7 @@ def main() -> int:
             ),
             "wall_seconds": round(time.monotonic() - started, 3),
             "pause_results": pause_results,
+            "pause_errors": pause_errors,
             "conversations": {
                 task_id: {
                     "conversation_id": item.get("conversation", {}).get(
@@ -381,7 +457,12 @@ def main() -> int:
 
     return (
         0
-        if summary["valid"] == args.concurrency and len(sandbox_ids) == 1
+        if (
+            summary["valid"] == args.concurrency
+            and len(sandbox_ids) == args.expected_sandboxes
+            and not pause_errors
+            and len(pause_results) == len(sandbox_ids)
+        )
         else 1
     )
 

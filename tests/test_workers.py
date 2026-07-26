@@ -130,6 +130,53 @@ class OpenHandsWorkerTests(unittest.TestCase):
         self.assertEqual(client.starts, 0)
         self.assertEqual([kind for kind, _ in lifecycle], ["capacity_checked"])
 
+    def test_records_failed_start_sandbox_for_cleanup(self) -> None:
+        client = FakeOpenHandsClient()
+        client.poll_start_task = lambda *args, **kwargs: (_ for _ in ()).throw(
+            RuntimeError("start failed")
+        )
+        client.get_start_task = lambda task_id: {
+            "id": task_id,
+            "status": "ERROR",
+            "detail": "provider unavailable",
+            "sandbox_id": "sandbox-failed",
+        }
+        lifecycle = []
+        worker = OpenHandsWorker(client, poll_seconds=1)
+        campaign = CampaignSpec(
+            id="campaign-1",
+            name="Campaign",
+            policy="managed",
+            attempt_budget=1,
+            repository=None,
+            branch=None,
+            model=None,
+            tasks=(),
+        )
+        task = TaskSpec(
+            id="task-1",
+            family="graph-coloring",
+            description="test",
+            tags=("graph-coloring",),
+            nodes=("0",),
+            edges=(),
+            target_score=1,
+        )
+
+        with self.assertRaisesRegex(RuntimeError, "start failed"):
+            worker.execute(
+                campaign=campaign,
+                task=task,
+                run_id="run-1",
+                attempt_id="attempt-1",
+                lessons=[],
+                on_lifecycle=lambda kind, payload: lifecycle.append((kind, payload)),
+            )
+
+        failed = [payload for kind, payload in lifecycle if kind == "conversation_start_failed"]
+        self.assertEqual(failed[0]["sandbox_id"], "sandbox-failed")
+        self.assertEqual(failed[0]["detail"], "provider unavailable")
+
     def test_bin_packing_contract_example_uses_exact_task_item_ids(self) -> None:
         campaign = CampaignSpec(
             id="campaign-1",

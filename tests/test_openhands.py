@@ -107,6 +107,40 @@ class OpenHandsHelpersTests(unittest.TestCase):
         self.assertEqual(record, {"id": "sandbox-1", "status": "PAUSED"})
         self.assertEqual([method for method, _ in calls], ["POST", "GET"])
 
+    def test_sets_and_verifies_sandbox_grouping_strategy(self) -> None:
+        calls = []
+
+        def requester(method, url, headers, body=None, timeout=60):
+            calls.append((method, url, body))
+            if method == "POST" and url.endswith("/api/v1/settings"):
+                return True
+            if method == "GET" and url.endswith("/api/v1/users/me"):
+                return {"sandbox_grouping_strategy": "NO_GROUPING"}
+            raise AssertionError((method, url))
+
+        client = OpenHandsClient(
+            "https://example.test",
+            "not-logged",
+            requester=requester,
+        )
+        self.assertEqual(
+            client.set_sandbox_grouping_strategy("NO_GROUPING"),
+            "NO_GROUPING",
+        )
+        self.assertEqual(
+            calls[0],
+            (
+                "POST",
+                "https://example.test/api/v1/settings",
+                {"sandbox_grouping_strategy": "NO_GROUPING"},
+            ),
+        )
+
+    def test_rejects_unknown_sandbox_grouping_strategy(self) -> None:
+        client = OpenHandsClient("https://example.test", "not-logged")
+        with self.assertRaisesRegex(ValueError, "unknown sandbox grouping"):
+            client.set_sandbox_grouping_strategy("RANDOM")
+
     def test_capacity_snapshot_paginates_and_counts_only_active_states(self) -> None:
         def requester(method, url, headers, body=None, timeout=60):
             self.assertEqual(method, "GET")

@@ -1,0 +1,182 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-07-25",
+  "protocol": {
+    "deployment": "OpenHands Enterprise 0.24.0 on Replicated",
+    "campaign": "hard-transfer-live",
+    "tasks_per_batch": 6,
+    "accepted_replicates_per_pattern": 3,
+    "repository_mount": null,
+    "repository_note": "Tasks were prompt-contained. Every accepted arm disabled the repository mount after the installation's Git-provider integration failed preflight.",
+    "model": "litellm_proxy/us.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "request_interval_seconds": 0.75,
+    "execution_timeout_seconds": 600,
+    "validation": "independent deterministic family validators"
+  },
+  "patterns": {
+    "isolated_four": {
+      "strategy": "NO_GROUPING",
+      "tasks": 6,
+      "dispatch_limit": 4,
+      "sandboxes_per_batch": 6,
+      "accepted_runs": [
+        {
+          "id": "isolated-four-haiku-r1-20260726T011400Z",
+          "valid": 6,
+          "wall_seconds": 256.293,
+          "total_cost": 0.21761657,
+          "throughput_tasks_per_hour": 84.28,
+          "transient_auth_retries": 1,
+          "transport_retries": 0
+        },
+        {
+          "id": "isolated-four-haiku-r2-20260726T011900Z",
+          "valid": 6,
+          "wall_seconds": 372.638,
+          "total_cost": 0.18801585,
+          "throughput_tasks_per_hour": 57.97,
+          "transient_auth_retries": 5,
+          "transport_retries": 3
+        },
+        {
+          "id": "isolated-four-haiku-r4-20260726T013600Z",
+          "valid": 6,
+          "wall_seconds": 225.892,
+          "total_cost": 0.1731455,
+          "throughput_tasks_per_hour": 95.62,
+          "transient_auth_retries": 3,
+          "transport_retries": 0
+        }
+      ],
+      "aggregate": {
+        "valid": 18,
+        "attempts": 18,
+        "mean_wall_seconds": 284.941,
+        "mean_total_cost": 0.19292597,
+        "mean_throughput_tasks_per_hour": 79.29,
+        "mean_attempt_seconds": 172.548,
+        "controller_retries": 12,
+        "pools_paused": 18
+      }
+    },
+    "grouped_four": {
+      "strategy": "FEWEST_CONVERSATIONS",
+      "tasks": 6,
+      "dispatch_limit": 4,
+      "sandboxes_per_batch": 1,
+      "accepted_runs": [
+        {
+          "id": "grouped-four-haiku-r1-20260726T014000Z",
+          "valid": 6,
+          "wall_seconds": 255.883,
+          "total_cost": 0.2288286,
+          "throughput_tasks_per_hour": 84.41
+        },
+        {
+          "id": "grouped-four-haiku-r2-20260726T014500Z",
+          "valid": 6,
+          "wall_seconds": 321.571,
+          "total_cost": 0.35330405,
+          "throughput_tasks_per_hour": 67.17
+        },
+        {
+          "id": "grouped-four-haiku-r3-20260726T015100Z",
+          "valid": 6,
+          "wall_seconds": 238.58,
+          "total_cost": 0.13844435,
+          "throughput_tasks_per_hour": 90.54
+        }
+      ],
+      "aggregate": {
+        "valid": 18,
+        "attempts": 18,
+        "mean_wall_seconds": 272.011,
+        "mean_total_cost": 0.24019233,
+        "mean_throughput_tasks_per_hour": 80.707,
+        "mean_attempt_seconds": 157.322,
+        "controller_retries": 0,
+        "pools_paused": 3
+      }
+    },
+    "grouped_six": {
+      "strategy": "FEWEST_CONVERSATIONS",
+      "tasks": 6,
+      "dispatch_limit": 6,
+      "sandboxes_per_batch": 1,
+      "accepted_runs": [
+        {
+          "id": "grouped-six-haiku-r1-20260726T015500Z",
+          "valid": 6,
+          "wall_seconds": 223.165,
+          "total_cost": 0.10806537,
+          "throughput_tasks_per_hour": 96.79
+        },
+        {
+          "id": "grouped-six-haiku-r2-20260726T015900Z",
+          "valid": 6,
+          "wall_seconds": 309.725,
+          "total_cost": 0.1837506,
+          "throughput_tasks_per_hour": 69.74
+        },
+        {
+          "id": "grouped-six-haiku-r3-20260726T020500Z",
+          "valid": 6,
+          "wall_seconds": 307.299,
+          "total_cost": 0.17382502,
+          "throughput_tasks_per_hour": 70.29
+        }
+      ],
+      "aggregate": {
+        "valid": 18,
+        "attempts": 18,
+        "mean_wall_seconds": 280.063,
+        "mean_total_cost": 0.15521366,
+        "mean_throughput_tasks_per_hour": 78.94,
+        "mean_attempt_seconds": 171.052,
+        "controller_retries": 0,
+        "pools_paused": 3
+      }
+    }
+  },
+  "comparison": {
+    "grouped_four_runtime_count_lower_percent_vs_isolated": 83.33,
+    "grouped_four_mean_wall_lower_percent_vs_isolated": 4.54,
+    "grouped_six_mean_wall_higher_percent_vs_grouped_four": 2.96,
+    "quality_result": "tie: every accepted pattern produced 18/18 independently valid tasks",
+    "cost_interpretation": "Reported model cost varied substantially by replicate and did not track runtime placement; infrastructure cost was not measured.",
+    "recommendation": "Use FEWEST_CONVERSATIONS with a controller dispatch limit of four for trusted agent teams. Use NO_GROUPING for untrusted or cross-tenant work. Treat six-active grouping as a load-tested opt-in."
+  },
+  "excluded_runs": [
+    {
+      "id": "isolated-haiku-r1-20260726T005657Z",
+      "reason": "transient authentication failures interrupted terminal reads before the retry hardening",
+      "cleanup": "six sandboxes paused through the supported V1 endpoint"
+    },
+    {
+      "id": "isolated-haiku-r1-20260726T010333Z",
+      "reason": "Git-provider authentication issue while resolving the repository",
+      "cleanup": "failed-start sandbox discovered and paused"
+    },
+    {
+      "id": "isolated-haiku-r1-20260726T010547Z",
+      "reason": "Git-provider authentication issue reproduced",
+      "cleanup": "failed-start sandbox recorded and automatically paused"
+    },
+    {
+      "id": "isolated-haiku-r1-20260726T010800Z",
+      "reason": "six-active isolated stress overloaded the application control path; 0/6 valid",
+      "cleanup": "all six sandboxes paused; one missing ID was reconciled through sandbox discovery"
+    },
+    {
+      "id": "isolated-four-haiku-r3-20260726T012500Z",
+      "reason": "one agent finished without a parseable final JSON contract; 5/6 valid",
+      "cleanup": "all six sandboxes paused"
+    }
+  ],
+  "final_state": {
+    "sandbox_grouping_strategy": "FEWEST_CONVERSATIONS",
+    "active_user_visible_sandboxes": 0,
+    "max_conversations_per_sandbox": 6,
+    "warm_runtimes_observed": 1
+  }
+}
