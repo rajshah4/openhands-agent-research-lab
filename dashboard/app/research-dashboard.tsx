@@ -106,7 +106,7 @@ type Snapshot = {
   }>;
 };
 
-const views = ["Overview", "Planner", "Runs", "Lessons"] as const;
+const views = ["Scale", "Deployment", "Robustness", "Planner"] as const;
 type View = (typeof views)[number];
 
 function pct(value: number) {
@@ -450,8 +450,283 @@ function CompetitionPlanner({ snapshot }: { snapshot: Snapshot }) {
   );
 }
 
+function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
+  const patterns = [
+    {
+      name: "Enterprise isolated",
+      record: "One conversation per agent",
+      runtime: "One sandbox per conversation",
+      isolation: "Strongest",
+      use: "Untrusted code, mixed tenants, or failures that must stay local",
+      tradeoff: "Highest container count and startup churn",
+      status: "Measured",
+    },
+    {
+      name: "Enterprise bounded cell",
+      record: "Separate conversations",
+      runtime: "Several trusted agents share one sandbox",
+      isolation: "Shared within the cell",
+      use: "One trusted team that needs audit history with fewer containers",
+      tradeoff: "Shared compute and a larger failure boundary",
+      status: "Measured",
+    },
+    {
+      name: "Agent Canvas",
+      record: "Canvas agent records",
+      runtime: "Shared backend and workspace",
+      isolation: "Shared trust boundary",
+      use: "Tightly coupled trusted work and lightweight demonstrations",
+      tradeoff: "Less runtime isolation than Enterprise conversations",
+      status: "Compared",
+    },
+    {
+      name: "Subagents",
+      record: "One parent conversation",
+      runtime: "One parent sandbox",
+      isolation: "Shared parent context",
+      use: "Low-overhead delegation when separate histories are unnecessary",
+      tradeoff: "Least independent audit and failure isolation",
+      status: "Architecture option",
+    },
+  ];
+
+  return (
+    <>
+      <section className="section narrative">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">Deployment is a separate design decision</p>
+            <h1>Choose the trust boundary before choosing the container count.</h1>
+          </div>
+          <p>
+            Scheduling decides who does the work. Deployment decides what those
+            workers share. OpenHands supports several useful boundaries; the
+            right one depends on trust, audit needs, failure isolation, and
+            infrastructure budget.
+          </p>
+        </div>
+        <div className="workflow">
+          {[
+            ["01", "Trust", "Can these agents safely share a filesystem and compute?"],
+            ["02", "Record", "Does every agent need its own conversation history?"],
+            ["03", "Failure", "How much work may fail together?"],
+            ["04", "Capacity", "How many sandboxes can the cluster sustain?"],
+            ["05", "Lifecycle", "Who drains, pauses, and recycles each runtime?"],
+          ].map(([number, title, copy]) => (
+            <article className="workflow-step" key={number}>
+              <span>{number}</span>
+              <h3>{title}</h3>
+              <p>{copy}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">OpenHands deployment choices</p>
+            <h2>Four patterns, with different isolation and audit boundaries.</h2>
+          </div>
+          <p>
+            These can use the same external task registry, scheduler,
+            validators, and experiment ledger. Placement does not have to
+            change the research protocol.
+          </p>
+        </div>
+        <div className="agent-table-wrap">
+          <table className="agent-table">
+            <thead>
+              <tr>
+                <th>Pattern</th>
+                <th>Agent record</th>
+                <th>Runtime boundary</th>
+                <th>Isolation</th>
+                <th>Best fit</th>
+                <th>Main tradeoff</th>
+                <th>Evidence</th>
+              </tr>
+            </thead>
+            <tbody>
+              {patterns.map((pattern) => (
+                <tr key={pattern.name}>
+                  <td><strong>{pattern.name}</strong></td>
+                  <td>{pattern.record}</td>
+                  <td>{pattern.runtime}</td>
+                  <td>{pattern.isolation}</td>
+                  <td>{pattern.use}</td>
+                  <td>{pattern.tradeoff}</td>
+                  <td><span className="arm-chip managed">{pattern.status}</span></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="section implementation-section">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">What Replicated measured</p>
+            <h2>Grouping six conversations reduced six runtimes to one.</h2>
+          </div>
+          <p>
+            The same model and six-task batch ran three times in each setup.
+            This measured placement overhead and container pressure, not task
+            difficulty.
+          </p>
+        </div>
+        <div className="implementation-grid">
+          <article className="implementation-card">
+            <span className="implementation-status tested">Isolated</span>
+            <h3>6 runtimes per batch</h3>
+            <p>
+              {snapshot.replicatedPatterns.isolatedFour.valid}/
+              {snapshot.replicatedPatterns.isolatedFour.attempts} valid,{" "}
+              {snapshot.replicatedPatterns.isolatedFour.meanWallSeconds.toFixed(1)}
+              {" "}seconds mean wall time.
+            </p>
+            <dl><div><dt>Choose for</dt><dd>Strong isolation and untrusted work.</dd></div></dl>
+          </article>
+          <article className="implementation-card">
+            <span className="implementation-status pilot">Bounded cell</span>
+            <h3>1 runtime, 4 active agents</h3>
+            <p>
+              {snapshot.replicatedPatterns.groupedFour.valid}/
+              {snapshot.replicatedPatterns.groupedFour.attempts} valid,{" "}
+              {snapshot.replicatedPatterns.groupedFour.meanWallSeconds.toFixed(1)}
+              {" "}seconds mean wall time.
+            </p>
+            <dl><div><dt>Choose for</dt><dd>Trusted production work with separate conversation histories.</dd></div></dl>
+          </article>
+          <article className="implementation-card">
+            <span className="implementation-status next">Higher density</span>
+            <h3>1 runtime, 6 active agents</h3>
+            <p>
+              {snapshot.replicatedPatterns.groupedSix.valid}/
+              {snapshot.replicatedPatterns.groupedSix.attempts} valid,{" "}
+              {snapshot.replicatedPatterns.groupedSix.meanWallSeconds.toFixed(1)}
+              {" "}seconds mean wall time.
+            </p>
+            <dl><div><dt>Finding</dt><dd>More contention without a wall-time win in this test.</dd></div></dl>
+          </article>
+        </div>
+        <p className="architecture-note">
+          <strong>How OpenHands does it:</strong> Enterprise keeps each agent as
+          a first-class conversation. The user&apos;s sandbox grouping strategy
+          controls placement, but it is a heuristic—not a capacity lease.
+          Therefore the application controller still owns admission, bounded
+          cell size, drain, pause, and recycle. On this version, the safe
+          trusted-work default is four active agents, no more than six
+          conversations in a cell, then explicit recycle.
+        </p>
+      </section>
+    </>
+  );
+}
+
+function RobustnessGuide({ snapshot }: { snapshot: Snapshot }) {
+  const controls = [
+    ["Single owner", "A file lock rejects a second controller instead of allowing two schedulers to race."],
+    ["Stable identity", "Run, attempt, task, conversation, start-task, and sandbox IDs survive retries and restarts."],
+    ["Resume, do not duplicate", "An interrupted attempt reattaches to the persisted OpenHands start task."],
+    ["Independent validation", "Agent claims never promote themselves; deterministic code checks the candidate."],
+    ["Validated memory", "Only valid, improving, traceable lessons reach later agents."],
+    ["Backpressure", "The launch gate queues work before the small cluster reaches its runtime limit."],
+    ["Explicit cleanup", "The controller verifies completion, drains the cell, pauses the sandbox, and records the result."],
+  ];
+
+  return (
+    <>
+      <section className="section narrative">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">Production robustness</p>
+            <h1>The hard part is not starting agents. It is knowing what happened when something stops.</h1>
+          </div>
+          <p>
+            The controller treats OpenHands as the execution plane and keeps
+            research state outside it. Every transition is recorded so work
+            can be validated, resumed, rejected, or cleaned up without asking
+            an agent to remember the system state.
+          </p>
+        </div>
+        <div className="workflow">
+          {[
+            ["01", "Claim", "Record one owner, task, budget, and attempt ID."],
+            ["02", "Start", "Persist the OpenHands start-task ID before waiting."],
+            ["03", "Observe", "Track conversation, events, cost, tokens, and sandbox state."],
+            ["04", "Validate", "Check the candidate outside the agent."],
+            ["05", "Commit", "Save evidence and promote only validated memory."],
+            ["06", "Release", "Pause the sandbox and return capacity to the queue."],
+          ].map(([number, title, copy]) => (
+            <article className="workflow-step" key={number}>
+              <span>{number}</span>
+              <h3>{title}</h3>
+              <p>{copy}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="section implementation-section">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">Seven controls around every agent</p>
+            <h2>Reliability comes from the organization, not a longer prompt.</h2>
+          </div>
+          <p>
+            These controls apply whether workers use isolated Enterprise
+            sandboxes, bounded shared cells, Agent Canvas, or subagents.
+          </p>
+        </div>
+        <div className="implementation-grid deployment-grid">
+          {controls.map(([title, copy]) => (
+            <article className="implementation-card" key={title}>
+              <span className="implementation-status tested">Control</span>
+              <h3>{title}</h3>
+              <p>{copy}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="section comparison">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">Failure injection and scale evidence</p>
+            <h2>We killed the controller after OpenHands started the work.</h2>
+          </div>
+          <p>
+            Restart found the unfinished attempt, attached to the same live
+            conversation, validated the answer, recorded one completion, and
+            returned the cluster to zero active sandboxes.
+          </p>
+        </div>
+        <div className="comparison-grid">
+          <article className="finding-card">
+            <span className="finding-label">No duplicate work</span>
+            <strong>One start task. One conversation. One completed attempt.</strong>
+            <p>The original run and attempt identities were preserved across the controller restart.</p>
+          </article>
+          <article className="finding-card">
+            <span className="finding-label">Large ledger</span>
+            <strong>{formatNumber(snapshot.robustness.attempts)} attempts in {snapshot.robustness.elapsedSeconds.toFixed(2)} seconds.</strong>
+            <p>{formatNumber(snapshot.robustness.records)} parseable records occupied {snapshot.robustness.storeMb} MB.</p>
+          </article>
+          <article className="finding-card">
+            <span className="finding-label">Honest boundary</span>
+            <strong>Restartable single controller, not a distributed queue.</strong>
+            <p>Several controllers or tenants require application-owned database leases and idempotent claims.</p>
+          </article>
+        </div>
+      </section>
+    </>
+  );
+}
+
 export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
-  const [view, setView] = useState<View>("Overview");
+  const [view, setView] = useState<View>("Scale");
   const [arm, setArm] = useState("all");
 
   const visibleAgents = useMemo(
@@ -592,7 +867,7 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
         </div>
       </section>
 
-      {view === "Overview" && (
+      {view === "Scale" && (
         <>
           <section className="section narrative">
             <div className="section-heading">
@@ -1124,9 +1399,13 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
         </>
       )}
 
+      {view === "Deployment" && <DeploymentDecisionGuide snapshot={snapshot} />}
+
+      {view === "Robustness" && <RobustnessGuide snapshot={snapshot} />}
+
       {view === "Planner" && <CompetitionPlanner snapshot={snapshot} />}
 
-      {(view === "Overview" || view === "Runs") && (
+      {(view === "Scale" || view === "Robustness") && (
         <section className="section" id="live-agents">
           <div className="section-heading agents-heading">
             <div>
@@ -1195,7 +1474,7 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
         </section>
       )}
 
-      {(view === "Overview" || view === "Lessons") && (
+      {view === "Robustness" && (
         <section className="section memory-section">
           <div className="section-heading">
             <div>
@@ -1239,7 +1518,7 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
         </section>
       )}
 
-      {view === "Runs" && (
+      {view === "Robustness" && (
         <section className="section">
           <div className="section-heading">
             <div>
