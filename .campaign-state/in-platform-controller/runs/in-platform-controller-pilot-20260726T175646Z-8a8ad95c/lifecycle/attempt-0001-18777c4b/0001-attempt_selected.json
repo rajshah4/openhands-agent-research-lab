@@ -1,0 +1,19 @@
+{
+  "attempt_id": "attempt-0001-18777c4b",
+  "id": "0001-attempt_selected",
+  "kind": "attempt_selected",
+  "payload": {
+    "scheduler_decision": {
+      "policy": "managed",
+      "policy_version": "1",
+      "rationale": "prioritized task coverage, balanced attempt ownership, then the weakest validated score, with relevant validated memory",
+      "retrieved_lesson_ids": [],
+      "task_id": "color-01-crown-12"
+    },
+    "sequence": 1,
+    "task_id": "color-01-crown-12"
+  },
+  "recorded_at": "2026-07-26T17:56:47.208683+00:00",
+  "run_id": "in-platform-controller-pilot-20260726T175646Z-8a8ad95c",
+  "schema_version": 1
+}
