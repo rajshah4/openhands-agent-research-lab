@@ -23,11 +23,12 @@ sandbox and one long-running process.
 
 ### B. Scheduled polling automation
 
-A custom OpenHands automation runs on a cron schedule. Every run starts from a
-fresh checkout of the Git state branch, reconciles incomplete work, completes
-at most one new or recovered attempt, checkpoints the evidence, and exits. The
-automation service records each controller run and cleans up according to the
-deployment's configured lifecycle policy.
+A supported repository-backed OpenHands prompt automation runs on a cron
+schedule. Every run starts from a fresh checkout, invokes one deterministic
+controller command, reconciles incomplete work, completes at most one new or
+recovered attempt, checkpoints the evidence, and exits. The automation service
+records each controller run and cleans up according to the deployment's
+configured lifecycle policy.
 
 This is the recommended production shape for Rajistics. It survives controller
 sandbox loss because Git, not the sandbox filesystem, is authoritative.
@@ -117,15 +118,38 @@ The polling arm passes when:
 
 ## Automation package
 
-`automation/main.py` is a deterministic custom automation. It does not use an
-LLM for controller decisions. It:
+`automation/prompt.txt` and `automation/register-preset.sh` use the supported
+prompt-preset endpoint. OpenHands supplies the repository checkout, Git
+authentication, stored secrets, SDK workspace, completion callback, and
+sandbox cleanup. The prompt only invokes
+`automation/preset_tick.py`; it does not make controller decisions.
 
-1. fetches the stored OpenHands and GitHub credentials through the agent
-   server;
-2. clones the dedicated state branch, or creates it from `main`;
-3. runs `run_tick.py`;
-4. reports completion through the automation callback on every exit path.
+`automation/preset_tick.py`:
+
+1. checks out the dedicated state branch, or creates it from `main`;
+2. verifies that OpenHands injected the worker API credential;
+3. runs `run_tick.py`; and
+4. returns the tick's exit status to the OpenHands automation lifecycle.
 
 The controller's scheduler still makes domain decisions, and OpenHands workers
-still use the configured model. The hourly health/reconciliation loop itself
-does not consume model tokens.
+still use the configured model. The automation wrapper consumes a small amount
+of model work to invoke the audited command; the research decisions remain in
+deterministic code.
+
+### Replicated 0.24.0 custom-tarball gap
+
+The first live implementation used the lower-level custom tarball endpoint in
+`automation/main.py`. Three bounded diagnostic runs established that:
+
+- the service stored `keep_alive: false`;
+- the custom sandbox received a working agent-server session key and runtime
+  URL;
+- its agent-server secret store was empty, so it could not retrieve
+  `GITHUB_TOKEN` or `OPENHANDS_API_KEY`; and
+- the documented direct callback credential returned HTTP 401.
+
+Those runs were canceled and their sandboxes were cleaned up. The raw custom
+path remains in the repo as reproducible evidence, but it is not the
+recommended controller path on this Replicated build. The prompt preset binds
+the run to the creating user and uses the generated SDK workspace lifecycle,
+which is the current supported route for Git, secret, and callback handling.

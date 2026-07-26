@@ -1,0 +1,15 @@
+Run exactly one bounded NeuroGolf research-controller tick from the cloned
+`rajshah4/openhands-agent-research-lab` repository.
+
+Use the cloned repository path supplied in the repository context. Do not edit
+code, inspect or print secrets, create a pull request, or perform any additional
+research. From the repository root, run:
+
+```bash
+python3 experiments/in-platform-controller/automation/preset_tick.py
+```
+
+Wait for that command to finish. If it exits successfully, report the final
+JSON status printed by the command and finish. If it fails, report the error
+type and failing stage without printing environment variables or credential
+values, then finish with a failure.
