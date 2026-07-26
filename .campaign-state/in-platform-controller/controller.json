@@ -1,7 +1,7 @@
 {
-  "attempts_completed": 3,
+  "attempts_completed": 4,
   "campaign_id": "in-platform-controller-pilot",
   "run_id": "in-platform-controller-pilot-20260726T175646Z-8a8ad95c",
   "schema_version": 1,
-  "status": "running"
+  "status": "completed"
 }
