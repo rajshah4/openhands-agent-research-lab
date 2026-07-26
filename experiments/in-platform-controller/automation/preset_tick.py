@@ -38,6 +38,10 @@ def _prepare_state_branch() -> None:
         "user.email",
         "research-controller@users.noreply.github.com",
     )
+    # Enterprise repository preparation may use a shallow clone. A state branch
+    # created by an earlier run can then share history that is outside the
+    # shallow boundary, causing a valid merge to fail with exit 128.
+    _git("fetch", "--unshallow", "origin", check=False)
     remote_state = _git(
         "ls-remote",
         "--exit-code",

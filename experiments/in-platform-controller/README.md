@@ -142,6 +142,11 @@ validation. With `keep_alive: false`, the automation service is the single
 owner that cleans up the shared sandbox after the tick exits and its callback
 completes.
 
+The branch preparation also unshallows the Enterprise repository checkout
+before merging `origin/main`. Without that step, a valid state branch created
+by an earlier run can appear to have unrelated history and Git exits before
+the controller starts.
+
 The controller's scheduler still makes domain decisions, and OpenHands workers
 still use the configured model. The automation wrapper consumes a small amount
 of model work to invoke the audited command; the research decisions remain in
