@@ -86,18 +86,30 @@ class CampaignRunner:
         campaign: CampaignSpec,
         *,
         resume_run_id: str | None = None,
+        max_new_attempts: int | None = None,
     ) -> tuple[str, str]:
+        if max_new_attempts is not None and max_new_attempts < 1:
+            raise ValueError("max_new_attempts must be at least 1")
         lock = getattr(self.store, "controller_lock", None)
         if callable(lock):
             with lock():
-                return self._run_locked(campaign, resume_run_id=resume_run_id)
-        return self._run_locked(campaign, resume_run_id=resume_run_id)
+                return self._run_locked(
+                    campaign,
+                    resume_run_id=resume_run_id,
+                    max_new_attempts=max_new_attempts,
+                )
+        return self._run_locked(
+            campaign,
+            resume_run_id=resume_run_id,
+            max_new_attempts=max_new_attempts,
+        )
 
     def _run_locked(
         self,
         campaign: CampaignSpec,
         *,
         resume_run_id: str | None,
+        max_new_attempts: int | None,
     ) -> tuple[str, str]:
         if resume_run_id:
             run_id = resume_run_id
@@ -141,17 +153,24 @@ class CampaignRunner:
         if any(sequence < 1 or sequence > campaign.attempt_budget for sequence in sequences):
             raise ValueError(f"run {run_id} contains an out-of-budget attempt sequence")
 
+        attempts_completed_this_invocation = 0
         if resume_run_id:
-            self._reconcile_incomplete_attempts(
+            attempts_completed_this_invocation = self._reconcile_incomplete_attempts(
                 campaign=campaign,
                 run_id=run_id,
                 attempts=attempts,
+                max_attempts=max_new_attempts,
             )
 
         completed_sequences = {int(attempt["sequence"]) for attempt in attempts}
         for sequence in range(1, campaign.attempt_budget + 1):
             if sequence in completed_sequences:
                 continue
+            if (
+                max_new_attempts is not None
+                and attempts_completed_this_invocation >= max_new_attempts
+            ):
+                break
             task, decision = self.scheduler.choose(
                 campaign.tasks,
                 attempts,
@@ -167,6 +186,7 @@ class CampaignRunner:
             )
             attempts.append(record)
             completed_sequences.add(sequence)
+            attempts_completed_this_invocation += 1
 
         attempts.sort(key=lambda attempt: int(attempt["sequence"]))
         report = build_report(campaign, run_id, attempts)
@@ -179,7 +199,8 @@ class CampaignRunner:
         campaign: CampaignSpec,
         run_id: str,
         attempts: list[dict[str, Any]],
-    ) -> None:
+        max_attempts: int | None = None,
+    ) -> int:
         completed_ids = {str(attempt["id"]) for attempt in attempts}
         grouped: dict[str, list[dict[str, Any]]] = {}
         for event in self.store.list_lifecycle_events(run_id):
@@ -227,7 +248,10 @@ class CampaignRunner:
             )
 
         occupied_sequences = {int(attempt["sequence"]) for attempt in attempts}
+        reconciled = 0
         for sequence, attempt_id, task, decision, events in sorted(pending):
+            if max_attempts is not None and reconciled >= max_attempts:
+                break
             if sequence in occupied_sequences:
                 raise ValueError(
                     f"incomplete attempt {attempt_id} conflicts at sequence {sequence}"
@@ -244,6 +268,8 @@ class CampaignRunner:
             )
             attempts.append(record)
             occupied_sequences.add(sequence)
+            reconciled += 1
+        return reconciled
 
     def _execute_attempt(
         self,

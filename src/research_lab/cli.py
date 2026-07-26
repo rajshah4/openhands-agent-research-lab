@@ -184,6 +184,7 @@ def command_run(args: argparse.Namespace) -> int:
     run_id, report = runner.run(
         campaign,
         resume_run_id=args.resume_run,
+        max_new_attempts=args.max_new_attempts,
     )
     print(report)
     print(f"Artifacts: {args.store.resolve() / 'runs' / run_id}")
@@ -319,6 +320,14 @@ def build_parser() -> argparse.ArgumentParser:
         help=(
             "resume and reconcile this existing run ID instead of creating "
             "a new run"
+        ),
+    )
+    run.add_argument(
+        "--max-new-attempts",
+        type=int,
+        help=(
+            "finish at most this many new or recovered attempts before exiting; "
+            "useful for scheduled controller ticks"
         ),
     )
     run.add_argument("--live", action="store_true")

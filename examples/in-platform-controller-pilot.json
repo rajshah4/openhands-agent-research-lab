@@ -1,0 +1,15 @@
+{
+  "id": "in-platform-controller-pilot",
+  "name": "Replicated in-platform controller pilot",
+  "policy": "managed",
+  "attempt_budget": 4,
+  "repository": "rajshah4/openhands-agent-research-lab",
+  "branch": "main",
+  "model": null,
+  "task_paths": [
+    "tasks/hard/color-01-crown-12.json",
+    "tasks/hard/cover-01-constellations.json",
+    "tasks/hard/pack-01-pairs-12.json",
+    "tasks/hard/color-02-mycielski-11.json"
+  ]
+}

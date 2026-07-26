@@ -60,6 +60,52 @@ class CampaignRunnerTests(unittest.TestCase):
             runner.run(campaign)
             self.assertEqual(list_calls, 1)
 
+    def test_scheduled_ticks_bound_new_work_and_resume_same_run(self) -> None:
+        campaign = CampaignSpec.from_path(
+            PROJECT_ROOT / "examples" / "graph-coloring-campaign.json"
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            store = FileResearchStore(Path(directory))
+            runner = CampaignRunner(
+                store=store,
+                worker=LocalHeuristicWorker(),
+                scheduler=ManagedPolicy(),
+            )
+
+            run_id, _ = runner.run(campaign, max_new_attempts=1)
+            self.assertEqual(len(store.list_attempts(run_id)), 1)
+
+            resumed_run_id, _ = runner.run(
+                campaign,
+                resume_run_id=run_id,
+                max_new_attempts=1,
+            )
+            self.assertEqual(resumed_run_id, run_id)
+            self.assertEqual(len(store.list_attempts(run_id)), 2)
+
+            runner.run(
+                campaign,
+                resume_run_id=run_id,
+                max_new_attempts=campaign.attempt_budget,
+            )
+            self.assertEqual(
+                len(store.list_attempts(run_id)),
+                campaign.attempt_budget,
+            )
+
+    def test_scheduled_tick_limit_must_be_positive(self) -> None:
+        campaign = CampaignSpec.from_path(
+            PROJECT_ROOT / "examples" / "graph-coloring-campaign.json"
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            runner = CampaignRunner(
+                store=FileResearchStore(Path(directory)),
+                worker=LocalHeuristicWorker(),
+                scheduler=ManagedPolicy(),
+            )
+            with self.assertRaisesRegex(ValueError, "at least 1"):
+                runner.run(campaign, max_new_attempts=0)
+
     def test_resume_reuses_incomplete_attempt_and_skips_completed_work(self) -> None:
         campaign = CampaignSpec.from_path(
             PROJECT_ROOT / "examples" / "graph-coloring-campaign.json"
