@@ -1,0 +1,12 @@
+{
+  "attempt_id": "attempt-0004-37089f95",
+  "id": "0008-attempt_recorded",
+  "kind": "attempt_recorded",
+  "payload": {
+    "outcome": "completed",
+    "validation_valid": true
+  },
+  "recorded_at": "2026-07-26T18:10:17.860407+00:00",
+  "run_id": "in-platform-controller-pilot-20260726T175646Z-8a8ad95c",
+  "schema_version": 1
+}
