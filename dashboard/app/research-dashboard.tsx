@@ -57,8 +57,11 @@ type Snapshot = {
       attempts: number;
       runtimesPerBatch: number;
       activeAgents: number;
+      simultaneousSandboxes: number;
+      queuedAgents: number;
       meanWallSeconds: number;
       meanCost: number;
+      totalCost: number;
       controllerRetries: number;
     }
   >;
@@ -459,6 +462,8 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
       isolation: "Strongest",
       use: "Untrusted code, mixed tenants, or failures that must stay local",
       tradeoff: "Highest container count and startup churn",
+      concurrency: "N active agents require N simultaneous sandboxes",
+      cost: `$${snapshot.replicatedPatterns.isolatedFour.totalCost.toFixed(3)} total for 18 measured attempts`,
       status: "Measured",
     },
     {
@@ -468,6 +473,8 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
       isolation: "Shared within the cell",
       use: "One trusted team that needs audit history with fewer containers",
       tradeoff: "Shared compute and a larger failure boundary",
+      concurrency: "4 active conversations shared 1 sandbox; 2 waited",
+      cost: `$${snapshot.replicatedPatterns.groupedFour.totalCost.toFixed(3)} total for 18 measured attempts`,
       status: "Measured",
     },
     {
@@ -477,6 +484,8 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
       isolation: "Shared trust boundary",
       use: "Tightly coupled trusted work and lightweight demonstrations",
       tradeoff: "Less runtime isolation than Enterprise conversations",
+      concurrency: "Logical agents share one backend; size the backend for the workload",
+      cost: "Not measured in the matched Replicated cost study",
       status: "Compared",
     },
     {
@@ -486,6 +495,8 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
       isolation: "Shared parent context",
       use: "Low-overhead delegation when separate histories are unnecessary",
       tradeoff: "Least independent audit and failure isolation",
+      concurrency: "Delegated work shares one parent sandbox and its budgets",
+      cost: "Not measured in the matched Replicated cost study",
       status: "Architecture option",
     },
   ];
@@ -543,6 +554,8 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
                 <th>Runtime boundary</th>
                 <th>Isolation</th>
                 <th>Best fit</th>
+                <th>Concurrency requirement</th>
+                <th>Measured model cost</th>
                 <th>Main tradeoff</th>
                 <th>Evidence</th>
               </tr>
@@ -555,6 +568,8 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
                   <td>{pattern.runtime}</td>
                   <td>{pattern.isolation}</td>
                   <td>{pattern.use}</td>
+                  <td>{pattern.concurrency}</td>
+                  <td>{pattern.cost}</td>
                   <td>{pattern.tradeoff}</td>
                   <td><span className="arm-chip managed">{pattern.status}</span></td>
                 </tr>
@@ -586,7 +601,11 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
               {snapshot.replicatedPatterns.isolatedFour.meanWallSeconds.toFixed(1)}
               {" "}seconds mean wall time.
             </p>
-            <dl><div><dt>Choose for</dt><dd>Strong isolation and untrusted work.</dd></div></dl>
+            <dl>
+              <div><dt>Concurrency</dt><dd>{snapshot.replicatedPatterns.isolatedFour.activeAgents} agents · {snapshot.replicatedPatterns.isolatedFour.simultaneousSandboxes} simultaneous sandboxes · {snapshot.replicatedPatterns.isolatedFour.queuedAgents} queued</dd></div>
+              <div><dt>Total model cost</dt><dd>${snapshot.replicatedPatterns.isolatedFour.totalCost.toFixed(3)} across 18 attempts</dd></div>
+              <div><dt>Choose for</dt><dd>Strong isolation and untrusted work.</dd></div>
+            </dl>
           </article>
           <article className="implementation-card">
             <span className="implementation-status pilot">Bounded cell</span>
@@ -597,7 +616,11 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
               {snapshot.replicatedPatterns.groupedFour.meanWallSeconds.toFixed(1)}
               {" "}seconds mean wall time.
             </p>
-            <dl><div><dt>Choose for</dt><dd>Trusted production work with separate conversation histories.</dd></div></dl>
+            <dl>
+              <div><dt>Concurrency</dt><dd>{snapshot.replicatedPatterns.groupedFour.activeAgents} agents · {snapshot.replicatedPatterns.groupedFour.simultaneousSandboxes} simultaneous sandbox · {snapshot.replicatedPatterns.groupedFour.queuedAgents} queued</dd></div>
+              <div><dt>Total model cost</dt><dd>${snapshot.replicatedPatterns.groupedFour.totalCost.toFixed(3)} across 18 attempts</dd></div>
+              <div><dt>Choose for</dt><dd>Trusted production work with separate conversation histories.</dd></div>
+            </dl>
           </article>
           <article className="implementation-card">
             <span className="implementation-status next">Higher density</span>
@@ -608,7 +631,11 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
               {snapshot.replicatedPatterns.groupedSix.meanWallSeconds.toFixed(1)}
               {" "}seconds mean wall time.
             </p>
-            <dl><div><dt>Finding</dt><dd>More contention without a wall-time win in this test.</dd></div></dl>
+            <dl>
+              <div><dt>Concurrency</dt><dd>{snapshot.replicatedPatterns.groupedSix.activeAgents} agents · {snapshot.replicatedPatterns.groupedSix.simultaneousSandboxes} simultaneous sandbox · {snapshot.replicatedPatterns.groupedSix.queuedAgents} queued</dd></div>
+              <div><dt>Total model cost</dt><dd>${snapshot.replicatedPatterns.groupedSix.totalCost.toFixed(3)} across 18 attempts</dd></div>
+              <div><dt>Finding</dt><dd>More contention without a wall-time win in this test.</dd></div>
+            </dl>
           </article>
         </div>
         <p className="architecture-note">
@@ -618,7 +645,10 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
           Therefore the application controller still owns admission, bounded
           cell size, drain, pause, and recycle. On this version, the safe
           trusted-work default is four active agents, no more than six
-          conversations in a cell, then explicit recycle.
+          conversations in a cell, then explicit recycle. Model cost varied
+          substantially between otherwise matched batches, so these totals are
+          observed spend—not evidence that placement caused the difference.
+          Infrastructure cost was not measured.
         </p>
       </section>
     </>
@@ -1048,8 +1078,12 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
                     <dd>Six runtimes per batch. The controller needed {snapshot.replicatedPatterns.isolatedFour.controllerRetries} API retries.</dd>
                   </div>
                   <div>
-                    <dt>Measured cost</dt>
-                    <dd>${snapshot.replicatedPatterns.isolatedFour.meanCost.toFixed(3)} per six-task batch.</dd>
+                    <dt>Concurrency</dt>
+                    <dd>4 agents in 4 sandboxes; 2 jobs queued.</dd>
+                  </div>
+                  <div>
+                    <dt>Total model cost</dt>
+                    <dd>${snapshot.replicatedPatterns.isolatedFour.totalCost.toFixed(3)} across all 18 accepted attempts.</dd>
                   </div>
                 </dl>
               </article>
@@ -1079,7 +1113,15 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
                   </div>
                   <div>
                     <dt>Measured result</dt>
-                    <dd>One runtime, zero controller retries, ${snapshot.replicatedPatterns.groupedFour.meanCost.toFixed(3)} per batch.</dd>
+                    <dd>One runtime and zero controller retries.</dd>
+                  </div>
+                  <div>
+                    <dt>Concurrency</dt>
+                    <dd>4 agents in 1 sandbox; 2 jobs queued.</dd>
+                  </div>
+                  <div>
+                    <dt>Total model cost</dt>
+                    <dd>${snapshot.replicatedPatterns.groupedFour.totalCost.toFixed(3)} across all 18 accepted attempts.</dd>
                   </div>
                 </dl>
               </article>
@@ -1107,8 +1149,12 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
                     <dd>Larger contention and blast radius without a measured speed win here.</dd>
                   </div>
                   <div>
-                    <dt>Measured cost</dt>
-                    <dd>${snapshot.replicatedPatterns.groupedSix.meanCost.toFixed(3)} per six-task batch.</dd>
+                    <dt>Concurrency</dt>
+                    <dd>6 agents in 1 sandbox; no jobs queued.</dd>
+                  </div>
+                  <div>
+                    <dt>Total model cost</dt>
+                    <dd>${snapshot.replicatedPatterns.groupedSix.totalCost.toFixed(3)} across all 18 accepted attempts.</dd>
                   </div>
                 </dl>
               </article>

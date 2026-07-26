@@ -48,6 +48,10 @@ test("renders the NeuroGolf experiment for a new reader", async () => {
   assert.match(html, /One runtime, six active agents/);
   assert.match(html, /Recommended starting point/);
   assert.match(html, /FEWEST_CONVERSATIONS/);
+  assert.match(html, /Total model cost/);
+  assert.match(html, /across all 18 accepted attempts/);
+  assert.match(html, /4 agents in 4 sandboxes; 2 jobs queued/);
+  assert.match(html, /6 agents in 1 sandbox; no jobs queued/);
   assert.match(html, /These are real OpenHands runs/);
   assert.match(html, /Every one of 400 task owners received exactly 12 attempts/);
   assert.match(html, /I killed the controller after OpenHands started the work/);

@@ -45,8 +45,11 @@
       "attempts": 18,
       "runtimesPerBatch": 6,
       "activeAgents": 4,
+      "simultaneousSandboxes": 4,
+      "queuedAgents": 2,
       "meanWallSeconds": 284.941,
       "meanCost": 0.19292597,
+      "totalCost": 0.57877792,
       "controllerRetries": 12
     },
     "groupedFour": {
@@ -54,8 +57,11 @@
       "attempts": 18,
       "runtimesPerBatch": 1,
       "activeAgents": 4,
+      "simultaneousSandboxes": 1,
+      "queuedAgents": 2,
       "meanWallSeconds": 272.011,
       "meanCost": 0.24019233,
+      "totalCost": 0.720577,
       "controllerRetries": 0
     },
     "groupedSix": {
@@ -63,8 +69,11 @@
       "attempts": 18,
       "runtimesPerBatch": 1,
       "activeAgents": 6,
+      "simultaneousSandboxes": 1,
+      "queuedAgents": 0,
       "meanWallSeconds": 280.063,
       "meanCost": 0.15521366,
+      "totalCost": 0.46564099,
       "controllerRetries": 0
     }
   },

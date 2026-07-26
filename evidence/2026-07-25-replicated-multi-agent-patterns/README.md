@@ -24,19 +24,20 @@ repository-mounted and prompt-only arms would have biased the comparison.
 
 ## Result
 
-| Pattern | Valid | Runtimes per batch | Active agents | Mean wall | Mean throughput | Mean model cost | Controller retries |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Isolated, bounded | 18/18 | 6 | 4 | 284.9 s | 79.29 tasks/hr | $0.1929 | 12 |
-| Grouped, bounded | 18/18 | 1 | 4 | 272.0 s | 80.71 tasks/hr | $0.2402 | 0 |
-| Grouped, full | 18/18 | 1 | 6 | 280.1 s | 78.94 tasks/hr | $0.1552 | 0 |
+| Pattern | Valid | Simultaneous sandboxes | Active agents | Queued agents | Mean wall | Mean throughput | Total model cost (3 batches) | Controller retries |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Isolated, bounded | 18/18 | 4 | 4 | 2 | 284.9 s | 79.29 tasks/hr | $0.5788 | 12 |
+| Grouped, bounded | 18/18 | 1 | 4 | 2 | 272.0 s | 80.71 tasks/hr | $0.7206 | 0 |
+| Grouped, full | 18/18 | 1 | 6 | 0 | 280.1 s | 78.94 tasks/hr | $0.4656 | 0 |
 
 Grouped-four used 83.3% fewer runtimes than isolated-four and had 4.5% lower
 mean wall time. Raising the shared sandbox from four to six active agents did
 not improve mean performance: grouped-six was 3.0% slower than grouped-four.
 
-Model cost varied substantially between otherwise matched replicates, so the
-cost ordering is not treated as a placement effect. Infrastructure cost was
-not measured.
+The table reports total observed model cost across all three accepted batches
+for each approach. Model cost varied substantially between otherwise matched
+replicates, so the cost ordering is not treated as a placement effect.
+Infrastructure cost was not measured.
 
 ## What broke
 
