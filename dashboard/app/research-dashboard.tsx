@@ -140,7 +140,7 @@ type Snapshot = {
   }>;
 };
 
-const views = ["Overview", "Deployment", "Robustness", "Evidence", "Planner"] as const;
+const views = ["Overview", "Deployment", "Robustness", "Evidence", "Scaling"] as const;
 type View = (typeof views)[number];
 
 function pct(value: number) {
@@ -211,9 +211,7 @@ function CompetitionPlanner({ snapshot }: { snapshot: Snapshot }) {
   const ledgerEvents = totalJobs * 10;
   const pollingRequestsPerMinute = activeAgents * 15;
   const apiPressure = pollingRequestsPerMinute / 80;
-  const workerCpu = parallelCells * 4;
-  const workerMemoryGb = parallelCells * 8;
-  const capacityHeadroom = 1.3;
+  const workerSlotsWithHeadroom = Math.ceil(activeAgents * 1.3);
 
   const applyPreset = (name: "coverage" | "campaign" | "intensive") => {
     if (name === "coverage") {
@@ -235,7 +233,7 @@ function CompetitionPlanner({ snapshot }: { snapshot: Snapshot }) {
     <section className="section planner-section">
       <div className="section-heading">
         <div>
-          <p className="eyebrow">Full NeuroGolf capacity planner</p>
+          <p className="eyebrow">NeuroGolf scaling planner</p>
           <h1>What would it take to cover all 400 tasks?</h1>
         </div>
         <p>
@@ -356,8 +354,8 @@ function CompetitionPlanner({ snapshot }: { snapshot: Snapshot }) {
 
       <div className="planner-comparison">
         <article>
-          <span className="implementation-status tested">Placement proven</span>
-          <h2>Isolated queue</h2>
+          <span className="implementation-status tested">Higher isolation</span>
+          <h2>One sandbox per active agent</h2>
           <strong>{(isolatedHours / 24).toFixed(1)} days</strong>
           <p>
             {formatNumber(isolatedThroughput)} attempts/hour at the selected
@@ -379,8 +377,8 @@ function CompetitionPlanner({ snapshot }: { snapshot: Snapshot }) {
           </dl>
         </article>
         <article className="recommended-plan">
-          <span className="implementation-status pilot">Density option</span>
-          <h2>Bounded shared cells</h2>
+          <span className="implementation-status pilot">Fewer sandboxes</span>
+          <h2>Four agents per shared sandbox</h2>
           <strong>{(boundedHours / 24).toFixed(1)} days</strong>
           <p>
             {formatNumber(boundedThroughput)} attempts/hour at the selected
@@ -403,16 +401,27 @@ function CompetitionPlanner({ snapshot }: { snapshot: Snapshot }) {
         </article>
       </div>
 
+      <div className="section-heading">
+        <div>
+          <p className="eyebrow">Shared production services</p>
+          <h2>These estimates scale with the campaign, not sandbox placement.</h2>
+        </div>
+        <p>
+          Both execution options run the same number of agent attempts and keep
+          the same evidence. The cards above change sandbox count and isolation;
+          the requirements below change when the work volume, concurrency, or
+          retention assumptions change.
+        </p>
+      </div>
       <div className="planner-requirements">
         <article>
-          <span>Worker cluster</span>
-          <strong>
-            {Math.ceil(workerCpu * capacityHeadroom)} vCPU ·{" "}
-            {Math.ceil(workerMemoryGb * capacityHeadroom)} GB RAM
-          </strong>
+          <span>Concurrent worker capacity</span>
+          <strong>{workerSlotsWithHeadroom} worker slots</strong>
           <p>
-            {parallelCells} four-agent runtimes plus 30% operating headroom.
-            This assumes 4 vCPU and 8 GB per ONNX work cell.
+            {activeAgents} agents active at once plus 30% operating headroom.
+            The placement cards above show whether those agents use{" "}
+            {activeAgents} isolated sandboxes or {parallelCells} shared
+            sandboxes. CPU and memory still require an ONNX workload benchmark.
           </p>
         </article>
         <article className={apiPressure > 1 ? "requirement-warning" : ""}>
@@ -428,16 +437,18 @@ function CompetitionPlanner({ snapshot }: { snapshot: Snapshot }) {
           <span>Experiment ledger</span>
           <strong>{formatNumber(ledgerEvents)} lifecycle records</strong>
           <p>
-            Use application-owned PostgreSQL for claims, leases, idempotency,
-            task coverage, candidate state, and submission gates.
+            A planning allowance of 10 records per attempt for claims, leases,
+            status changes, validation, candidate state, and submission gates.
+            This is independent of sandbox placement.
           </p>
         </article>
         <article>
-          <span>Artifact storage</span>
+          <span>Durable evidence storage</span>
           <strong>{formatNumber(artifactStorageGb)} GB</strong>
           <p>
-            Candidate ONNX files, builders, validation logs, counterexamples,
-            and immutable evidence belong in object storage with hashes.
+            {formatNumber(totalJobs)} attempts × {artifactMb} MB retained per
+            attempt. Candidate ONNX files, validation logs, and counterexamples
+            are kept whether agents use isolated or shared sandboxes.
           </p>
         </article>
         <article>
@@ -1772,7 +1783,7 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
 
       {view === "Evidence" && <EvidenceGuide snapshot={snapshot} />}
 
-      {view === "Planner" && <CompetitionPlanner snapshot={snapshot} />}
+      {view === "Scaling" && <CompetitionPlanner snapshot={snapshot} />}
 
       {view === "Evidence" && (
         <section className="section" id="live-agents">

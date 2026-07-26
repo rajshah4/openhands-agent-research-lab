@@ -45,7 +45,7 @@ test("renders the NeuroGolf experiment for a new reader", async () => {
   assert.match(html, />Deployment</);
   assert.match(html, />Robustness</);
   assert.match(html, />Evidence</);
-  assert.match(html, />Planner</);
+  assert.match(html, />Scaling</);
   assert.match(html, /What the Kaggle competition required/);
   assert.match(html, /400 independent implementation problems/);
   assert.match(html, /Why teams used multiple agents/);
@@ -75,6 +75,12 @@ test("includes the Agent Canvas deployment evidence", async () => {
   assert.match(source, /Those waiting jobs\s+did not have sandboxes yet/);
   assert.match(source, /Removing the queue increased contention and did not produce a wall-time win/);
   assert.doesNotMatch(source, /simultaneous sandbox(?:es)? · .* queued/);
+  assert.match(source, /NeuroGolf scaling planner/);
+  assert.match(source, /One sandbox per active agent/);
+  assert.match(source, /Four agents per shared sandbox/);
+  assert.match(source, /These estimates scale with the campaign, not sandbox placement/);
+  assert.match(source, /CPU and memory still require an ONNX workload benchmark/);
+  assert.doesNotMatch(source, /Placement proven|Density option|Worker cluster/);
   assert.match(snapshot, /"clusterProvisionMinutes": 8/);
   assert.match(snapshot, /"wallSeconds": 113/);
   assert.match(snapshot, /"effectiveThroughput": 153\.55/);
