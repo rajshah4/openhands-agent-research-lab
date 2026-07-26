@@ -1,0 +1,38 @@
+{
+  "kind": "deterministic-orchestration-simulation",
+  "comparison_id": "neurogolf-400-task-orchestration-simulation-comparison-20260726T051607Z-6c01aad7",
+  "tasks": 400,
+  "attempts_per_task": 12,
+  "attempts_per_arm": 4800,
+  "total_attempts": 9600,
+  "elapsed_seconds": 16.01,
+  "store_megabytes": 192,
+  "ownership_checks": {
+    "naive_min_attempts_per_task": 12,
+    "naive_max_attempts_per_task": 12,
+    "managed_min_attempts_per_task": 12,
+    "managed_max_attempts_per_task": 12,
+    "unique_attempt_ids": true,
+    "unique_sequences": true,
+    "all_attempts_valid": true
+  },
+  "naive": {
+    "tasks_solved": 400,
+    "coverage": 1.0,
+    "normalized_quality": 0.6675,
+    "quality_auc": 0.6397455,
+    "improvements": 400,
+    "retrieved_lessons": 0,
+    "duplicate_experiments": 4400
+  },
+  "managed": {
+    "tasks_solved": 400,
+    "coverage": 1.0,
+    "normalized_quality": 1.0,
+    "quality_auc": 0.9582064,
+    "improvements": 402,
+    "retrieved_lessons": 14394,
+    "duplicate_experiments": 4398
+  },
+  "claim_boundary": "This validates orchestration and measurement behavior. It is not model or Kaggle performance."
+}

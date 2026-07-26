@@ -1,5 +1,40 @@
 # Live validation log
 
+## Rajistics Enterprise controller-recovery test
+
+Date: 2026-07-26
+
+The controller was deliberately killed after OpenHands persisted
+`start_task_created` and before the attempt completed. The same campaign was
+then restarted with `--resume-run`.
+
+Result:
+
+- the file-store ownership lock prevented a second controller;
+- restart found the same incomplete attempt and start-task ID;
+- the worker reattached instead of creating another conversation;
+- the final answer passed the independent validator with score 3;
+- one attempt record completed with unique sequence and ID;
+- exactly one `start_task_created` lifecycle event exists;
+- the sandbox was paused; and
+- the cluster returned to zero active sandboxes.
+
+Immutable identifiers:
+
+- Run: `graph-coloring-demo-20260726T050704Z-3f05efb6`
+- Attempt: `attempt-0001-b5962873`
+- Conversation: `5457d841cb304f96b45bb42e84677006`
+- Sandbox: `536qopFW7u6VHn75fVBtX3`
+
+Conversation:
+
+`https://app.replicated.rajistics.com/conversations/5457d841cb304f96b45bb42e84677006`
+
+Conclusion:
+
+The file-ledger implementation is restartable for one controller. It is not a
+multi-controller lease system; concurrent ownership is rejected deliberately.
+
 ## Rajistics Enterprise smoke test 1
 
 Date: 2026-07-25

@@ -14,8 +14,9 @@ It does not depend on Kaggle competition solutions or disputed solution dumps.
 - The application owns scheduling, deterministic validation, and promotion.
 - Every worker returns a strict machine-readable contract.
 - Execution metadata and immutable identifiers are preserved with each attempt.
-- Storage is replaceable. The included filesystem store is a single-writer
-  development backend; production stores implement the same interface.
+- Storage is replaceable. The included filesystem store is a restartable,
+  single-controller pilot backend; distributed production stores implement the
+  same interface.
 - The entire vertical slice can be tested offline before spending agent budget.
 - Naive and managed organizations can be compared with isolated stores and the
   same tasks, worker, model configuration, and attempt budget.
@@ -133,7 +134,10 @@ the experiment ledger, and deterministic validation is unchanged.
 
 `FileResearchStore` is intentionally limited to a single controller. It writes
 immutable attempt documents atomically and keeps validated lessons separate
-from proposed claims.
+from proposed claims. It locks controller ownership, resumes an existing run,
+reconciles incomplete attempts, and can reattach to a persisted OpenHands start
+task after a restart. A second controller is rejected rather than allowed to
+race.
 
 A production PostgreSQL implementation can replace it without changing:
 
@@ -160,6 +164,14 @@ three tasks optimally, while only the managed arm retrieved validated lessons.
 That tie shows the execution and memory architecture works but the bundled
 three-task benchmark is not yet discriminating enough for a production claim.
 
+The hardened scale path now covers the shape of a full NeuroGolf campaign:
+400 task owners, 4,800 attempts per arm, and exactly 12 attempts per task.
+A separate 4,800-attempt file-ledger run completed in 19.08 seconds with
+24,013 parseable records in 94 MB. A live failure-injection test killed the
+controller after Replicated created the start task; restart reattached to the
+same conversation, completed one attempt, and paused the sandbox. These are
+orchestration and recovery results, not ONNX or Kaggle performance.
+
 See [the design](docs/design.md), [the framing record](FRAMING.md), and the
 [live validation log](docs/live-validation.md). The metric definitions and
 comparison limits are in [the matched-comparison note](docs/matched-comparison.md).
@@ -169,3 +181,9 @@ the [three-pattern result](evidence/2026-07-25-replicated-multi-agent-patterns/R
 the [12-task scale study](evidence/2026-07-25-replicated-scale-study/README.md),
 the [full 400-task capacity plan](docs/neurogolf-full-competition-capacity-plan.md),
 and the [operator runbook](docs/replicated-multi-agent-operations.md).
+The [Kaggle parity review](docs/kaggle-neurogolf-parity-review.md) separates
+what is now proven from the ONNX workload, adversarial validation, artifact
+quarantine, and submission gate still required. The
+[multi-agent demo update plan](docs/multi-agent-demo-sandbox-update-plan.md)
+shows how to add sandbox placement and container-efficiency guidance to the
+companion demo.

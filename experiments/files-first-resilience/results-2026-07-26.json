@@ -1,0 +1,41 @@
+{
+  "date": "2026-07-26",
+  "large_campaign": {
+    "attempts": 4800,
+    "completed": 4800,
+    "elapsed_seconds": 19.08,
+    "previous_elapsed_seconds": 569.78,
+    "speedup": 29.86,
+    "store_megabytes": 94,
+    "json_records": 24013,
+    "all_json_parseable": true,
+    "unique_attempt_ids": true,
+    "unique_sequences": true
+  },
+  "local_kill_resume": {
+    "run_id": "multi-family-scale-20260726T050556Z-bc8e2bea",
+    "attempts": 100,
+    "completed": 100,
+    "run_count": 1,
+    "recovery_events": 1,
+    "created_second_run": false
+  },
+  "controller_ownership": {
+    "controllers_started": 2,
+    "controllers_completed": 1,
+    "controllers_rejected": 1,
+    "rejection": "another controller owns file store"
+  },
+  "live_replicated_recovery": {
+    "run_id": "graph-coloring-demo-20260726T050704Z-3f05efb6",
+    "attempt_id": "attempt-0001-b5962873",
+    "conversation_id": "5457d841cb304f96b45bb42e84677006",
+    "sandbox_id": "536qopFW7u6VHn75fVBtX3",
+    "start_task_created_events": 1,
+    "completed_attempts": 1,
+    "valid_score": 3,
+    "sandbox_paused": true,
+    "active_sandboxes_after_test": 0
+  },
+  "boundary": "Safe for one restartable controller; multiple controllers require a leased application database."
+}

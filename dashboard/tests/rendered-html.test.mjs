@@ -32,17 +32,21 @@ test("renders the NeuroGolf experiment for a new reader", async () => {
     html,
     /<title>NeuroGolf with OpenHands \| Multi-agent patterns on Replicated<\/title>/i,
   );
-  assert.match(html, /Can coding agents learn from each other/);
-  assert.match(html, /A Kaggle team used many agents/);
+  assert.match(html, /reproduced the organization behind a 400-task agent campaign/i);
+  assert.match(html, /NeuroGolf teams used many coding agents/);
   assert.match(html, />Planner</);
   assert.match(html, /I ran the same six problems two ways, three times/);
   assert.match(html, /The six live problems were too easy/);
-  assert.match(html, /This reproduces the multi-agent research setup/);
+  assert.match(html, /This separates the orchestration proof/);
   assert.match(html, /Separate runtime for each agent/);
   assert.match(html, /One runtime, four active agents/);
   assert.match(html, /One runtime, six active agents/);
   assert.match(html, /Recommended starting point/);
   assert.match(html, /FEWEST_CONVERSATIONS/);
   assert.match(html, /These are real OpenHands runs/);
+  assert.match(html, /Every one of 400 task owners received exactly 12 attempts/);
+  assert.match(html, /I killed the controller after OpenHands started the work/);
+  assert.match(html, /Four ways to use OpenHands/);
+  assert.match(html, /We reproduced the research organization, not a leaderboard score/);
   assert.doesNotMatch(html, /codex-preview|Your site is taking shape/);
 });

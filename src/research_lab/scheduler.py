@@ -56,10 +56,10 @@ class ManagedPolicy(SchedulerPolicy):
             if validation.get("valid") and validation.get("score") is not None:
                 valid_scores[str(attempt["task_id"])].append(float(validation["score"]))
 
-        def priority(task: TaskSpec) -> tuple[int, float, int, str]:
+        def priority(task: TaskSpec) -> tuple[int, int, float, str]:
             unattempted = 0 if counts[task.id] == 0 else 1
             best = min(valid_scores[task.id]) if valid_scores[task.id] else math.inf
-            return (unattempted, -best, counts[task.id], task.id)
+            return (unattempted, counts[task.id], -best, task.id)
 
         task = min(tasks, key=priority)
         lessons = store.find_lessons(task.tags, limit=3)
@@ -68,8 +68,8 @@ class ManagedPolicy(SchedulerPolicy):
             policy_version=self.version,
             task_id=task.id,
             rationale=(
-                "prioritized task coverage, then the weakest validated score, "
-                "with relevant validated memory"
+                "prioritized task coverage, balanced attempt ownership, then "
+                "the weakest validated score, with relevant validated memory"
             ),
             retrieved_lesson_ids=tuple(lesson.id for lesson in lessons),
         )

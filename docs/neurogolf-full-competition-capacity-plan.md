@@ -142,12 +142,22 @@ database tables. Git remains the release and audit layer. At this scale the
 research application owns PostgreSQL and object storage.
 
 For the current four-active-sandbox deployment, an application-owned database
-is not required yet. The 4,800-attempt resilience test showed that the
-files-first ledger fit in 94 MB and retained 24,013 parseable JSON records
-without corruption. Before using it for the full campaign, add automatic
-single-controller restart reconciliation and replace full-ledger reparsing
-with an indexed in-memory run view. Keep exactly one controller responsible
-for campaign ownership.
+is not required yet. The hardened 4,800-attempt resilience test completed in
+19.08 seconds, fit in 94 MB, and retained 24,013 parseable JSON records without
+corruption. The runner now keeps an indexed in-memory run view, caches validated
+lessons, takes an exclusive controller lock, resumes the same run and attempt
+IDs, and reattaches to a persisted OpenHands start task after a restart.
+
+Those changes make the files-first path a credible **single-controller
+production pilot**. They do not turn files into a distributed queue. Keep
+exactly one controller responsible for campaign ownership. Move to
+application-owned PostgreSQL with leases and idempotent claims when multiple
+controllers, multiple tenants, or operational queries become requirements.
+
+The 400-task deterministic scale simulation also completed 4,800 attempts in
+each arm: 9,600 total attempts, exactly 12 per task, in 16.01 seconds. It proves
+the bookkeeping shape of a full NeuroGolf campaign, not ONNX or model
+performance.
 
 ## OpenHands product gap
 
@@ -163,6 +173,8 @@ sandbox-targeting lease:
 4. use isolated placement where parallel cell ownership cannot be guaranteed;
 5. do not treat `FEWEST_CONVERSATIONS` as a lease.
 
-The next scale gate is not 100 agents. It is a matched 24-job test after the
-rollover failure is fixed, followed by two explicitly leased shared cells
-running in parallel.
+The next infrastructure scale gate is not 100 agents. It is a matched 24-job
+test after the rollover failure is fixed, followed by two explicitly leased
+shared cells running in parallel. The next domain gate is a licensed NeuroGolf
+workload adapter with ONNX execution, adversarial validation, artifact
+quarantine, and a single-writer archive audit.

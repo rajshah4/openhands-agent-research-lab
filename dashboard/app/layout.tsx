@@ -26,7 +26,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const socialImage = `${protocol}://${host}/og.png`;
   const title = "NeuroGolf with OpenHands | Multi-agent patterns on Replicated";
   const description =
-    "I ran matched OpenHands experiments to compare isolated and shared-runtime multi-agent setups on Replicated. See the measured tradeoffs and reproducible commands.";
+    "A 400-task OpenHands orchestration test: Replicated sandbox tradeoffs, restart recovery, validated memory, capacity planning, and the remaining Kaggle gap.";
 
   return {
     title,

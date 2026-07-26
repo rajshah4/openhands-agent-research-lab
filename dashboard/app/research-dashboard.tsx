@@ -73,6 +73,23 @@ type Snapshot = {
       controllerRetries: number;
     }
   >;
+  robustness: {
+    attempts: number;
+    elapsedSeconds: number;
+    records: number;
+    storeMb: number;
+    speedup: number;
+    liveRecoveryConversations: number;
+  };
+  portfolioScale: {
+    tasks: number;
+    attemptsPerArm: number;
+    totalAttempts: number;
+    elapsedSeconds: number;
+    naiveQuality: number;
+    managedQuality: number;
+    exactAttemptsPerTask: number;
+  };
   agents: AgentRecord[];
   lessons: Array<{
     id: string;
@@ -446,8 +463,6 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
   );
 
   const utilization = snapshot.capacity.active / snapshot.capacity.limit;
-  const taskProgress = snapshot.proof.tasks / snapshot.proof.targetTasks;
-
   return (
     <main>
       <header className="topbar">
@@ -478,13 +493,13 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
 
       <section className="hero" id="top">
         <div className="hero-copy">
-          <p className="eyebrow">A question I wanted to test</p>
-          <h1>Can coding agents learn from each other&apos;s experiments?</h1>
+          <p className="eyebrow">A public multi-agent systems test</p>
+          <h1>We reproduced the organization behind a 400-task agent campaign.</h1>
           <p className="lede">
-            A Kaggle team used many agents to search for better solutions. I
-            wanted a smaller public example that people could inspect and build
-            on. So I used OpenHands to run the same problems with and without
-            shared memory, then saved every result.
+            NeuroGolf teams used many coding agents to search for better
+            solutions. I rebuilt the coordination layer with OpenHands: who
+            owns each task, what gets remembered, how results are checked, how
+            work survives a restart, and how many containers it really needs.
           </p>
           <div className="hero-actions">
             <a href="#live-agents" className="primary-action">
@@ -568,13 +583,11 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
           <small>failed answers stay out</small>
         </div>
         <div>
-          <span>Example problems</span>
-          <strong>
-            {snapshot.proof.tasks}/{snapshot.proof.targetTasks}
-          </strong>
-          <small>built so far</small>
+          <span>Scale simulation</span>
+          <strong>{snapshot.portfolioScale.tasks}</strong>
+          <small>task owners, fully covered</small>
           <div className="mini-meter">
-            <span style={{ width: pct(taskProgress) }} />
+            <span style={{ width: pct(1) }} />
           </div>
         </div>
       </section>
@@ -585,7 +598,7 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
             <div className="section-heading">
               <div>
                 <p className="eyebrow">Where the idea came from</p>
-                <h2>NeuroGolf showed what many agents can try. I wanted to know what they should remember.</h2>
+                <h2>NeuroGolf showed what many agents can try. This tests what keeps the whole campaign under control.</h2>
               </div>
               <p>
                 OpenHands runs each coding agent in a separate workspace. My
@@ -609,13 +622,12 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
               ))}
             </div>
             <p className="architecture-note">
-              Each of the 36 attempts was a separate OpenHands conversation
-              with its own context and workspace. The controller chose the next
-              problem, passed in earlier lessons, waited for the answer, ran
-              the checker, saved the result, and paused the workspace. The next
-              agent received only lessons that survived that loop. This
-              reproduces the multi-agent research setup on small public
-              problems that anyone can rerun.
+              The live test now covers 37 OpenHands conversations. The larger
+              deterministic run covers 400 task owners and 9,600 attempts. In
+              both cases the controller chooses the work, records ownership,
+              passes only validated lessons, checks the result, and preserves
+              the evidence. This separates the orchestration proof from the
+              still-open question of building a competitive ONNX solver.
             </p>
           </section>
 
@@ -896,6 +908,174 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
               provide that contract.
             </p>
           </section>
+
+          <section className="section implementation-section">
+            <div className="section-heading">
+              <div>
+                <p className="eyebrow">The full-campaign shape</p>
+                <h2>Every one of 400 task owners received exactly 12 attempts.</h2>
+              </div>
+              <p>
+                This is a deterministic stress test of the scheduler, memory,
+                ledger, and reporting—not a claim about model quality. It gives
+                the system a known signal and verifies that no task disappears
+                when the queue gets large.
+              </p>
+            </div>
+            <div className="implementation-grid">
+              <article className="implementation-card">
+                <span className="implementation-status tested">Coverage</span>
+                <h3>{formatNumber(snapshot.portfolioScale.totalAttempts)} recorded attempts</h3>
+                <p>
+                  Naive and managed campaigns each ran{" "}
+                  {formatNumber(snapshot.portfolioScale.attemptsPerArm)} times.
+                  All {snapshot.portfolioScale.tasks} tasks received exactly{" "}
+                  {snapshot.portfolioScale.exactAttemptsPerTask} attempts.
+                </p>
+              </article>
+              <article className="implementation-card">
+                <span className="implementation-status tested">Bookkeeping speed</span>
+                <h3>{snapshot.portfolioScale.elapsedSeconds.toFixed(2)} seconds</h3>
+                <p>
+                  The matched 9,600-attempt run completed locally with unique
+                  IDs and sequences. This measures the control path, not ONNX
+                  build time or model latency.
+                </p>
+              </article>
+              <article className="implementation-card">
+                <span className="implementation-status pilot">Known signal</span>
+                <h3>
+                  {snapshot.portfolioScale.naiveQuality.toFixed(3)} →{" "}
+                  {snapshot.portfolioScale.managedQuality.toFixed(3)}
+                </h3>
+                <p>
+                  The deterministic worker intentionally rewards validated
+                  memory. The result proves the comparison can detect an
+                  effect; it does not predict a Kaggle score.
+                </p>
+              </article>
+            </div>
+          </section>
+
+          <section className="section implementation-section">
+            <div className="section-heading">
+              <div>
+                <p className="eyebrow">Failure was part of the test</p>
+                <h2>I killed the controller after OpenHands started the work.</h2>
+              </div>
+              <p>
+                Restarting the same campaign reattached to the existing
+                Replicated conversation, completed one attempt, and paused the
+                sandbox. It did not create duplicate work.
+              </p>
+            </div>
+            <div className="implementation-grid">
+              <article className="implementation-card">
+                <span className="implementation-status tested">Large ledger</span>
+                <h3>{formatNumber(snapshot.robustness.attempts)} attempts</h3>
+                <p>
+                  {formatNumber(snapshot.robustness.records)} parseable records
+                  occupied {snapshot.robustness.storeMb} MB and completed in{" "}
+                  {snapshot.robustness.elapsedSeconds.toFixed(2)} seconds.
+                </p>
+              </article>
+              <article className="implementation-card">
+                <span className="implementation-status tested">Restart</span>
+                <h3>One conversation, not two</h3>
+                <p>
+                  The attempt kept its run ID and attempt ID, recovered the
+                  persisted OpenHands start task, passed validation, and
+                  returned the server to zero active sandboxes.
+                </p>
+              </article>
+              <article className="implementation-card">
+                <span className="implementation-status next">Production boundary</span>
+                <h3>One controller owns the files</h3>
+                <p>
+                  A lock rejects a second controller. Multiple controllers or
+                  tenants need an application-owned database with leases; they
+                  should not write to OpenHands&apos; internal database.
+                </p>
+              </article>
+            </div>
+          </section>
+
+          <section className="section implementation-section">
+            <div className="section-heading">
+              <div>
+                <p className="eyebrow">Four ways to use OpenHands</p>
+                <h2>The right deployment depends on the isolation you need.</h2>
+              </div>
+              <p>
+                Agent orchestration and sandbox placement are separate choices.
+                OpenHands gives us several useful boundaries instead of forcing
+                every agent into a new container.
+              </p>
+            </div>
+            <div className="implementation-grid deployment-grid">
+              {[
+                ["Enterprise isolated", "One conversation and sandbox per agent.", "Untrusted code, mixed tenants, strongest failure isolation."],
+                ["Enterprise bounded cell", "Several trusted conversations share one sandbox, then drain and recycle.", "Production controls with substantially fewer containers."],
+                ["Agent Canvas", "Several agents share a backend and workspace.", "Tightly coupled trusted work and lightweight demonstrations."],
+                ["Subagents in one conversation", "Delegated work stays inside one parent runtime.", "Lowest infrastructure overhead when separate histories are unnecessary."],
+              ].map(([title, copy, use]) => (
+                <article className="implementation-card" key={title}>
+                  <span className="implementation-status pilot">OpenHands pattern</span>
+                  <h3>{title}</h3>
+                  <p>{copy}</p>
+                  <dl>
+                    <div>
+                      <dt>Best fit</dt>
+                      <dd>{use}</dd>
+                    </div>
+                  </dl>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <section className="section comparison">
+            <div className="section-heading">
+              <div>
+                <p className="eyebrow">Compared with public Kaggle work</p>
+                <h2>The organization is credible. The ONNX solver is still the next benchmark.</h2>
+              </div>
+              <p>
+                Public NeuroGolf teams used task owners, watchdogs, persistent
+                failures, promoted candidates, adversarial validation, and a
+                serial submission gate. We now have the first five orchestration
+                pieces, but not the competition artifact pipeline.
+              </p>
+            </div>
+            <div className="comparison-grid">
+              <article className="finding-card">
+                <span className="finding-label">Proven here</span>
+                <strong>Ownership, validation, memory, recovery, and capacity control.</strong>
+                <p>
+                  The live Replicated run and 400-task simulation exercise the
+                  control system from selection through cleanup.
+                </p>
+              </article>
+              <article className="finding-card">
+                <span className="finding-label">Still required</span>
+                <strong>ONNX builders, ARC execution, fuzzing, quarantine, and a 400/400 release audit.</strong>
+                <p>
+                  The next phase will use a clearly licensed public solution as
+                  a workload reference. Unlicensed competition dumps will not
+                  become dependencies.
+                </p>
+              </article>
+              <article className="finding-card">
+                <span className="finding-label">Honest claim</span>
+                <strong>We reproduced the research organization, not a leaderboard score.</strong>
+                <p>
+                  That is already useful for people building agent research
+                  systems, and it gives the domain benchmark a production-ready
+                  place to run.
+                </p>
+              </article>
+            </div>
+          </section>
         </>
       )}
 
@@ -1046,23 +1226,29 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
 
       <section className="section next-gate">
         <div>
-          <p className="eyebrow">What I would test next</p>
-          <h2>The next scale step needs a rollover fix.</h2>
+          <p className="eyebrow">What comes next</p>
+          <h2>Put the real NeuroGolf workload on the proven control path.</h2>
         </div>
         <ol>
           <li>
             <span>✓</span>
-            Keep this version as the working reference: 36/36 valid agent runs.
+            Keep this version as the working reference: 37/37 valid live runs,
+            restart recovery, and 400/400 task-owner coverage.
           </li>
           <li>
             <span>1</span>
-            Fix and retest shared-sandbox rollover before increasing the queue
-            from 12 to 24 jobs.
+            Add a licensed ONNX workload adapter with official, fresh,
+            adversarial, and metamorphic validation.
           </li>
           <li>
             <span>2</span>
-            Keep using files until more than one controller needs to claim work
-            at the same time. Then add a separate PostgreSQL database.
+            Fix shared-sandbox rollover, then run two explicitly owned cells in
+            parallel before increasing the queue from 12 to 24 live jobs.
+          </li>
+          <li>
+            <span>3</span>
+            Keep files for one controller. Add application-owned PostgreSQL
+            leases only when several controllers must claim work concurrently.
           </li>
         </ol>
       </section>

@@ -11,6 +11,7 @@ class FileResearchStoreTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             store = FileResearchStore(Path(directory))
             store.create_run("run-1", {"id": "run-1"})
+            self.assertEqual(store.read_run_manifest("run-1")["id"], "run-1")
             store.append_lifecycle_event(
                 "run-1",
                 "attempt-1",
@@ -31,6 +32,10 @@ class FileResearchStoreTests(unittest.TestCase):
                 {"id": "attempt-1", "sequence": 1, "task_id": "task-1"},
             )
             self.assertEqual(store.list_attempts("run-1")[0]["id"], "attempt-1")
+            self.assertEqual(
+                store.list_lifecycle_events("run-1", "attempt-1")[0]["kind"],
+                "attempt_selected",
+            )
             with self.assertRaises(FileExistsError):
                 store.append_attempt(
                     "run-1",
@@ -47,9 +52,20 @@ class FileResearchStoreTests(unittest.TestCase):
                 source_task_id="task-1",
                 created_at="2026-07-25T00:00:00+00:00",
             )
+            self.assertEqual(store.find_lessons(("graph-coloring",)), [])
             store.save_validated_lesson(lesson)
             results = store.find_lessons(("graph-coloring",), limit=3)
             self.assertEqual([item.id for item in results], ["lesson-1"])
+
+    def test_controller_lock_rejects_a_second_owner(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            store = FileResearchStore(Path(directory))
+            with store.controller_lock():
+                with self.assertRaisesRegex(RuntimeError, "another controller"):
+                    with store.controller_lock():
+                        self.fail("a second controller acquired the same store")
+            with store.controller_lock():
+                pass
 
 
 if __name__ == "__main__":

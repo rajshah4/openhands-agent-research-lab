@@ -527,3 +527,73 @@ class CanvasWorker:
                 "shared_execution_backend": True,
             },
         )
+
+    def recover(
+        self,
+        *,
+        campaign: CampaignSpec,
+        task: TaskSpec,
+        run_id: str,
+        attempt_id: str,
+        lessons: list[Lesson],
+        lifecycle_events: list[dict[str, Any]],
+        on_lifecycle: Callable[[str, dict[str, Any]], None],
+    ) -> WorkerExecution:
+        del campaign, task, run_id, attempt_id, lessons
+        conversation_id = ""
+        workspace = ""
+        for event in lifecycle_events:
+            if event.get("kind") == "conversation_ready":
+                payload = event.get("payload", {})
+                conversation_id = str(payload.get("conversation_id", ""))
+                workspace = str(payload.get("workspace", ""))
+        if not conversation_id:
+            raise RuntimeError(
+                "Canvas recovery requires a persisted conversation ID"
+            )
+        on_lifecycle(
+            "canvas_recovery_attached",
+            {"conversation_id": conversation_id, "workspace": workspace},
+        )
+        terminal, events = self.client.wait_for_terminal(
+            conversation_id,
+            timeout_seconds=self.execution_timeout_seconds,
+            poll_seconds=self.poll_seconds,
+        )
+        on_lifecycle(
+            "conversation_terminal",
+            {
+                "conversation_id": conversation_id,
+                "execution_status": terminal.get("execution_status"),
+                "recovered_after_controller_restart": True,
+            },
+        )
+        final_text = self.client.final_response(conversation_id)
+        on_lifecycle(
+            "final_response_ready",
+            {
+                "conversation_id": conversation_id,
+                "present": bool(final_text),
+                "event_count": len(events),
+            },
+        )
+        event_counts = Counter(
+            str(event.get("kind", "unknown")) for event in events
+        )
+        return WorkerExecution(
+            final_text=final_text,
+            worker_kind="canvas",
+            conversation={
+                "conversation_id": conversation_id,
+                "ui_url": self.client.conversation_url(conversation_id),
+                "execution_status": terminal.get("execution_status"),
+                "workspace": workspace,
+            },
+            metadata={
+                "conversation_snapshot": terminal,
+                "event_count": len(events),
+                "event_counts": dict(sorted(event_counts.items())),
+                "shared_execution_backend": True,
+                "recovered_after_controller_restart": True,
+            },
+        )

@@ -348,6 +348,48 @@ class OpenHandsWorker:
         )
         start_task_id = str(start["id"])
         on_lifecycle("start_task_created", {"start_task_id": start_task_id})
+        return self._complete_started_attempt(
+            start_task_id=start_task_id,
+            on_lifecycle=on_lifecycle,
+        )
+
+    def recover(
+        self,
+        *,
+        campaign: CampaignSpec,
+        task: TaskSpec,
+        run_id: str,
+        attempt_id: str,
+        lessons: list[Lesson],
+        lifecycle_events: list[dict[str, Any]],
+        on_lifecycle: Callable[[str, dict[str, Any]], None],
+    ) -> WorkerExecution:
+        del campaign, task, run_id, attempt_id, lessons
+        start_task_id = ""
+        for event in lifecycle_events:
+            if event.get("kind") == "start_task_created":
+                start_task_id = str(
+                    event.get("payload", {}).get("start_task_id", "")
+                )
+        if not start_task_id:
+            raise RuntimeError(
+                "OpenHands recovery requires a persisted start-task ID"
+            )
+        on_lifecycle(
+            "openhands_recovery_attached",
+            {"start_task_id": start_task_id},
+        )
+        return self._complete_started_attempt(
+            start_task_id=start_task_id,
+            on_lifecycle=on_lifecycle,
+        )
+
+    def _complete_started_attempt(
+        self,
+        *,
+        start_task_id: str,
+        on_lifecycle: Callable[[str, dict[str, Any]], None],
+    ) -> WorkerExecution:
         try:
             ready = self.client.poll_start_task(
                 start_task_id,

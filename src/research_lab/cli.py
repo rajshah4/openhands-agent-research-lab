@@ -181,7 +181,10 @@ def command_run(args: argparse.Namespace) -> int:
         worker=worker,
         scheduler=policy_for(campaign.policy),
     )
-    run_id, report = runner.run(campaign)
+    run_id, report = runner.run(
+        campaign,
+        resume_run_id=args.resume_run,
+    )
     print(report)
     print(f"Artifacts: {args.store.resolve() / 'runs' / run_id}")
     return 0
@@ -311,6 +314,13 @@ def build_parser() -> argparse.ArgumentParser:
     run = subparsers.add_parser("run", help="execute a campaign")
     common(run)
     run.add_argument("--store", type=Path, default=Path(".lab"))
+    run.add_argument(
+        "--resume-run",
+        help=(
+            "resume and reconcile this existing run ID instead of creating "
+            "a new run"
+        ),
+    )
     run.add_argument("--live", action="store_true")
     run.add_argument("--start-timeout", type=int, default=600)
     run.add_argument("--execution-timeout", type=int, default=1800)
@@ -348,7 +358,7 @@ def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     try:
         return int(args.func(args))
-    except (OpenHandsAPIError, TimeoutError, ValueError, OSError) as exc:
+    except (OpenHandsAPIError, TimeoutError, RuntimeError, ValueError, OSError) as exc:
         print(f"research-lab: {exc}", file=sys.stderr)
         return 2
 

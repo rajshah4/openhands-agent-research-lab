@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Any
 
 from .domain import CampaignSpec, utc_now
-from .runner import CampaignRunner, _best_score, _normalized_quality
+from .runner import CampaignRunner
 from .scheduler import policy_for
 from .store import FileResearchStore
 from .workers import WorkerBackend
@@ -47,14 +47,37 @@ def summarize_arm(
         for attempt in attempts
         if attempt.get("validation", {}).get("valid")
     }
-    best_scores = {
-        task.id: _best_score(attempts, task.id)
-        for task in campaign.tasks
+    tasks_by_id = {task.id: task for task in campaign.tasks}
+    best_scores: dict[str, float | None] = {
+        task.id: None for task in campaign.tasks
     }
-    quality_trajectory = [
-        _normalized_quality(campaign, attempts[:sequence])
-        for sequence in range(1, len(attempts) + 1)
-    ]
+    total_quality = 0.0
+    quality_sum = 0.0
+
+    def quality(task_id: str, score: float | None) -> float:
+        if score is None:
+            return 0.0
+        target = tasks_by_id[task_id].target_score
+        if target is None:
+            return 1.0
+        if score <= 0:
+            return 0.0
+        return min(1.0, target / score)
+
+    for attempt in attempts:
+        task_id = str(attempt["task_id"])
+        validation = attempt.get("validation") or {}
+        score_value = validation.get("score")
+        if validation.get("valid") and score_value is not None:
+            score = float(score_value)
+            previous = best_scores[task_id]
+            if previous is None or score < previous:
+                total_quality += quality(task_id, score) - quality(
+                    task_id,
+                    previous,
+                )
+                best_scores[task_id] = score
+        quality_sum += total_quality / len(task_ids)
 
     def usage_metrics(attempt: dict[str, Any]) -> dict[str, Any]:
         metadata = attempt.get("metadata") or {}
@@ -91,10 +114,10 @@ def summarize_arm(
             if all(score is not None for score in best_scores.values())
             else None
         ),
-        "normalized_solution_quality": _normalized_quality(campaign, attempts),
+        "normalized_solution_quality": total_quality / len(task_ids),
         "quality_auc": (
-            sum(quality_trajectory) / len(quality_trajectory)
-            if quality_trajectory
+            quality_sum / len(attempts)
+            if attempts
             else 0.0
         ),
         "duplicate_experiments": sum(
