@@ -1,0 +1,171 @@
+{
+  "candidate": {
+    "bins": [
+      [
+        "amber",
+        "dune"
+      ],
+      [
+        "gale",
+        "jade"
+      ],
+      [
+        "elm",
+        "birch"
+      ],
+      [
+        "kelp",
+        "heath"
+      ],
+      [
+        "coral",
+        "frost"
+      ],
+      [
+        "iris",
+        "lumen"
+      ]
+    ]
+  },
+  "candidate_hash": "2a35ad06dd8b3ea3ce9062ee29da6c9a33c3d8c3c7935011f5b4abf0510c68f9",
+  "contract": {
+    "next_gate": "validate",
+    "status": "done",
+    "summary": [
+      "Identified complementary pairs: 8+2, 7+3, 6+4",
+      "Packed all 12 items into 6 bins",
+      "Each bin uses exactly capacity 10",
+      "Achieved theoretical minimum bin count"
+    ],
+    "transport": "fenced-json-fallback",
+    "transport_compliant": false
+  },
+  "conversation": {
+    "conversation_id": "f8cba25f06474b548f758b2bb1e52d0b",
+    "execution_status": "finished",
+    "sandbox_id": "1fC8eUDOIO13ED3BkoeoVh",
+    "sandbox_status": "RUNNING",
+    "start_task_id": "d98c0c543d1b4cfcb33295f4c2d5cc59",
+    "terminal_status_recovered_from_events": false,
+    "ui_url": "https://app.replicated.rajistics.com/conversations/f8cba25f06474b548f758b2bb1e52d0b"
+  },
+  "duplicate_candidate": false,
+  "final_response": {
+    "length": 1457,
+    "sha256": "e1a5bdadf06ccaa9e4595bffc13977bf794aa597046ef06745b63e1d89087329"
+  },
+  "finished_at": "2026-07-26T18:10:16.798258+00:00",
+  "id": "attempt-0004-37089f95",
+  "improved": true,
+  "metadata": {
+    "conversation_snapshot": {
+      "acp_server": null,
+      "agent_kind": "openhands",
+      "conversation_url": "https://rdfdmetfzccdlxpg.runtime.replicated.rajistics.com/api/conversations/f8cba25f06474b548f758b2bb1e52d0b",
+      "created_at": "2026-07-26T18:09:18.015315Z",
+      "created_by_user_id": "69c4fcfd-fb0e-4372-b9fd-68c860387888",
+      "execution_status": "finished",
+      "git_provider": null,
+      "id": "f8cba25f06474b548f758b2bb1e52d0b",
+      "launched_agent_profile": {
+        "agent_profile_id": "c3c5742a-eb28-40a1-8a66-210fa9b98cd7",
+        "revision": 0
+      },
+      "llm_model": "litellm_proxy/us.anthropic.claude-sonnet-4-5-20250929-v1:0",
+      "metrics": {
+        "accumulated_cost": 0.0177672,
+        "accumulated_token_usage": {
+          "cache_read_tokens": 0,
+          "cache_write_tokens": 0,
+          "completion_tokens": 942,
+          "context_window": 200000,
+          "model": "",
+          "per_turn_token": 1616,
+          "prompt_tokens": 674,
+          "reasoning_tokens": 0,
+          "response_id": ""
+        },
+        "max_budget_per_task": null,
+        "model_name": "default"
+      },
+      "parent_conversation_id": null,
+      "pr_number": [],
+      "public": null,
+      "sandbox_id": "1fC8eUDOIO13ED3BkoeoVh",
+      "sandbox_status": "RUNNING",
+      "selected_branch": "main",
+      "selected_repository": "rajshah4/openhands-agent-research-lab",
+      "sub_conversation_ids": [],
+      "tags": {
+        "agentprofileid": "c3c5742a-eb28-40a1-8a66-210fa9b98cd7",
+        "agentprofilerevision": "0",
+        "archiveworkspacepath": "/workspace/project/f8cba25f06474b548f758b2bb1e52d0b",
+        "repo_name": "rajshah4/openhands-agent-research-lab",
+        "selected_branch": "main"
+      },
+      "title": "Conversation f8cba",
+      "trigger": "openhands_api",
+      "updated_at": "2026-07-26T18:09:32.742799Z"
+    },
+    "event_count": 319,
+    "event_counts": {
+      "ConversationStateUpdateEvent": 7,
+      "MessageEvent": 2,
+      "StreamingDeltaEvent": 309,
+      "SystemPromptEvent": 1
+    },
+    "start_task_snapshot": {
+      "agent_server_url": "https://rdfdmetfzccdlxpg.runtime.replicated.rajistics.com",
+      "app_conversation_id": "f8cba25f06474b548f758b2bb1e52d0b",
+      "created_at": "2026-07-26T18:09:08.766853Z",
+      "created_by_user_id": "69c4fcfd-fb0e-4372-b9fd-68c860387888",
+      "detail": null,
+      "id": "d98c0c543d1b4cfcb33295f4c2d5cc59",
+      "request": {
+        "agent_profile_id": null,
+        "agent_type": "default",
+        "conversation_id": null,
+        "git_provider": null,
+        "initial_message": "<redacted-content>",
+        "llm_model": null,
+        "parent_conversation_id": null,
+        "plugins": null,
+        "pr_number": [],
+        "processors": null,
+        "public": null,
+        "sandbox_id": null,
+        "secrets": null,
+        "selected_branch": "main",
+        "selected_repository": "rajshah4/openhands-agent-research-lab",
+        "suggested_task": null,
+        "system_message_suffix": null,
+        "title": "[research-lab] in-platform-controller-pilot-20260726T175646Z-8a8ad95c / pack-01-pairs-12 / attempt-0004-37089f95",
+        "trigger": "openhands_api"
+      },
+      "sandbox_id": "1fC8eUDOIO13ED3BkoeoVh",
+      "status": "READY",
+      "updated_at": "2026-07-26T18:09:18.032512Z"
+    }
+  },
+  "outcome": "completed",
+  "promoted_lesson_id": "lesson-5a55f18544f18ef6",
+  "retrieved_lesson_ids": [],
+  "run_id": "in-platform-controller-pilot-20260726T175646Z-8a8ad95c",
+  "scheduler_decision": {
+    "policy": "managed",
+    "policy_version": "1",
+    "rationale": "prioritized task coverage, balanced attempt ownership, then the weakest validated score, with relevant validated memory",
+    "retrieved_lesson_ids": [],
+    "task_id": "pack-01-pairs-12"
+  },
+  "schema_version": 1,
+  "sequence": 4,
+  "started_at": "2026-07-26T18:09:05.377739+00:00",
+  "task_id": "pack-01-pairs-12",
+  "validation": {
+    "errors": [],
+    "score": 6.0,
+    "valid": true
+  },
+  "worker_kind": "openhands"
+}
