@@ -1,0 +1,162 @@
+{
+  "candidate": {
+    "assignments": {
+      "p1": 0,
+      "p2": 0,
+      "p3": 0,
+      "p4": 0,
+      "p5": 0,
+      "p6": 0,
+      "q1": 1,
+      "q2": 1,
+      "q3": 1,
+      "q4": 1,
+      "q5": 1,
+      "q6": 1
+    }
+  },
+  "candidate_hash": "31ac9ebdba829cd1263a34c500ef0d291a48dffe0de2214f781eedac3c9392f0",
+  "contract": {
+    "next_gate": "validate",
+    "status": "done",
+    "summary": [
+      "Identified bipartite structure with p and q node sets",
+      "Confirmed no edges within p nodes or q nodes",
+      "Applied 2-coloring: all p nodes color 0, all q nodes color 1",
+      "Validated all edges have different endpoint colors",
+      "Solution uses 2 colors"
+    ],
+    "transport": "fenced-json-fallback",
+    "transport_compliant": false
+  },
+  "conversation": {
+    "conversation_id": "51e844ee080041bc999420d4837ddda9",
+    "execution_status": "finished",
+    "sandbox_id": "3Vkmr5jzsm2hDLjmpKz7ab",
+    "sandbox_status": "RUNNING",
+    "start_task_id": "6d5783203c9d421e9a77c74bcae9a418",
+    "terminal_status_recovered_from_events": false,
+    "ui_url": "https://app.replicated.rajistics.com/conversations/51e844ee080041bc999420d4837ddda9"
+  },
+  "duplicate_candidate": false,
+  "final_response": {
+    "length": 933,
+    "sha256": "aa9bd1861d5304d687f26d57b784f34aabb836f3e11d96e1fe7f575bfce286c3"
+  },
+  "finished_at": "2026-07-26T18:00:32.994652+00:00",
+  "id": "attempt-0001-18777c4b",
+  "improved": true,
+  "metadata": {
+    "conversation_snapshot": {
+      "acp_server": null,
+      "agent_kind": "openhands",
+      "conversation_url": "https://madjdfbivgvxizyq.runtime.replicated.rajistics.com/api/conversations/51e844ee080041bc999420d4837ddda9",
+      "created_at": "2026-07-26T17:56:59.142395Z",
+      "created_by_user_id": "69c4fcfd-fb0e-4372-b9fd-68c860387888",
+      "execution_status": "finished",
+      "git_provider": null,
+      "id": "51e844ee080041bc999420d4837ddda9",
+      "launched_agent_profile": {
+        "agent_profile_id": "c3c5742a-eb28-40a1-8a66-210fa9b98cd7",
+        "revision": 0
+      },
+      "llm_model": "litellm_proxy/us.anthropic.claude-sonnet-4-5-20250929-v1:0",
+      "metrics": {
+        "accumulated_cost": 0.21243766500000003,
+        "accumulated_token_usage": {
+          "cache_read_tokens": 51683,
+          "cache_write_tokens": 28595,
+          "completion_tokens": 4547,
+          "context_window": 200000,
+          "model": "",
+          "per_turn_token": 28936,
+          "prompt_tokens": 81006,
+          "reasoning_tokens": 0,
+          "response_id": ""
+        },
+        "max_budget_per_task": null,
+        "model_name": "default"
+      },
+      "parent_conversation_id": null,
+      "pr_number": [],
+      "public": null,
+      "sandbox_id": "3Vkmr5jzsm2hDLjmpKz7ab",
+      "sandbox_status": "RUNNING",
+      "selected_branch": "main",
+      "selected_repository": "rajshah4/openhands-agent-research-lab",
+      "sub_conversation_ids": [],
+      "tags": {
+        "agentprofileid": "c3c5742a-eb28-40a1-8a66-210fa9b98cd7",
+        "agentprofilerevision": "0",
+        "archiveworkspacepath": "/workspace/project/51e844ee080041bc999420d4837ddda9",
+        "repo_name": "rajshah4/openhands-agent-research-lab",
+        "selected_branch": "main"
+      },
+      "title": "\ud83d\udc54 12-Node Graph Coloring Optimization",
+      "trigger": "openhands_api",
+      "updated_at": "2026-07-26T17:58:36.412663Z"
+    },
+    "event_count": 1000,
+    "event_counts": {
+      "ActionEvent": 2,
+      "ConversationStateUpdateEvent": 9,
+      "MessageEvent": 2,
+      "ObservationEvent": 2,
+      "StreamingDeltaEvent": 984,
+      "SystemPromptEvent": 1
+    },
+    "start_task_snapshot": {
+      "agent_server_url": "https://madjdfbivgvxizyq.runtime.replicated.rajistics.com",
+      "app_conversation_id": "51e844ee080041bc999420d4837ddda9",
+      "created_at": "2026-07-26T17:56:50.433925Z",
+      "created_by_user_id": "69c4fcfd-fb0e-4372-b9fd-68c860387888",
+      "detail": null,
+      "id": "6d5783203c9d421e9a77c74bcae9a418",
+      "request": {
+        "agent_profile_id": null,
+        "agent_type": "default",
+        "conversation_id": null,
+        "git_provider": null,
+        "initial_message": "<redacted-content>",
+        "llm_model": null,
+        "parent_conversation_id": null,
+        "plugins": null,
+        "pr_number": [],
+        "processors": null,
+        "public": null,
+        "sandbox_id": null,
+        "secrets": null,
+        "selected_branch": "main",
+        "selected_repository": "rajshah4/openhands-agent-research-lab",
+        "suggested_task": null,
+        "system_message_suffix": null,
+        "title": "[research-lab] in-platform-controller-pilot-20260726T175646Z-8a8ad95c / color-01-crown-12 / attempt-0001-18777c4b",
+        "trigger": "openhands_api"
+      },
+      "sandbox_id": "3Vkmr5jzsm2hDLjmpKz7ab",
+      "status": "READY",
+      "updated_at": "2026-07-26T17:56:59.154551Z"
+    }
+  },
+  "outcome": "completed",
+  "promoted_lesson_id": "lesson-b300e088230f5291",
+  "retrieved_lesson_ids": [],
+  "run_id": "in-platform-controller-pilot-20260726T175646Z-8a8ad95c",
+  "scheduler_decision": {
+    "policy": "managed",
+    "policy_version": "1",
+    "rationale": "prioritized task coverage, balanced attempt ownership, then the weakest validated score, with relevant validated memory",
+    "retrieved_lesson_ids": [],
+    "task_id": "color-01-crown-12"
+  },
+  "schema_version": 1,
+  "sequence": 1,
+  "started_at": "2026-07-26T17:56:47.208683+00:00",
+  "task_id": "color-01-crown-12",
+  "validation": {
+    "errors": [],
+    "score": 2.0,
+    "valid": true
+  },
+  "worker_kind": "openhands"
+}
