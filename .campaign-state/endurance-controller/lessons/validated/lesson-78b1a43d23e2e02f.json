@@ -1,0 +1,12 @@
+{
+  "created_at": "2026-07-27T09:11:09.917343+00:00",
+  "evidence": "Exhaustive search up to size 6 found optimal 4-set partition (arc-a through arc-d covering all 24 checkpoints). Standard greedy matched optimum. Randomized greedy across 12 seeds produced solutions ranging from size 4 to 6; seeds 1, 2, 4, 5, 11 chose splice sets early, fragmenting the partition and requiring 6 sets total.",
+  "id": "lesson-78b1a43d23e2e02f",
+  "source_attempt_id": "attempt-0004-e663075a",
+  "source_run_id": "neurogolf-endurance-live-20260727T050720Z-c2919492",
+  "source_task_id": "cover-02-bridges",
+  "statement": "When interleaved sets fragment optimal partitions, greedy randomization degrades by picking splice or partial-overlap sets before recognizing full partition structure.",
+  "tags": [
+    "set-cover"
+  ]
+}
