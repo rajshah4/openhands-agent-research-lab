@@ -1,0 +1,37 @@
+{
+  "conversation": {},
+  "failure": {
+    "message": "conversation 9edca9164d50497fa492f06731c17b51 sandbox is MISSING",
+    "type": "OpenHandsAPIError"
+  },
+  "final_response": null,
+  "finished_at": "2026-07-27T13:01:20.343459+00:00",
+  "id": "attempt-0007-645374df",
+  "metadata": {},
+  "outcome": "failed",
+  "retrieved_lesson_ids": [
+    "lesson-4e231d44f0f92131",
+    "lesson-e66c6a16c751e399"
+  ],
+  "run_id": "neurogolf-endurance-live-20260727T050720Z-c2919492",
+  "scheduler_decision": {
+    "policy": "managed",
+    "policy_version": "1",
+    "rationale": "prioritized task coverage, balanced attempt ownership, then the weakest validated score, with relevant validated memory",
+    "retrieved_lesson_ids": [
+      "lesson-4e231d44f0f92131",
+      "lesson-e66c6a16c751e399"
+    ],
+    "task_id": "pack-02-pairs-16"
+  },
+  "schema_version": 1,
+  "sequence": 7,
+  "started_at": "2026-07-27T12:00:57.271843+00:00",
+  "task_id": "pack-02-pairs-16",
+  "validation": {
+    "errors": [],
+    "score": null,
+    "valid": false
+  },
+  "worker_kind": null
+}
