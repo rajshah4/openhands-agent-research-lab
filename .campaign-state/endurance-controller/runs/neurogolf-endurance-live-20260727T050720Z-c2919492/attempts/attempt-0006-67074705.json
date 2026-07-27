@@ -1,0 +1,184 @@
+{
+  "candidate": {
+    "bins": [
+      [
+        "aqua",
+        "flint"
+      ],
+      [
+        "ivory",
+        "navy"
+      ],
+      [
+        "ember",
+        "brass"
+      ],
+      [
+        "moss",
+        "juniper"
+      ],
+      [
+        "cedar",
+        "honey"
+      ],
+      [
+        "khaki",
+        "pearl"
+      ],
+      [
+        "grove",
+        "denim"
+      ],
+      [
+        "ochre",
+        "linen"
+      ]
+    ]
+  },
+  "candidate_hash": "44195a256971754052370a743b8a696d0c53399b1c5b89f094db4c90c45431cd",
+  "contract": {
+    "next_gate": "validate",
+    "status": "done",
+    "summary": [
+      "Compared FFD, BFD, exact pairing, and 15 randomized orderings",
+      "FFD/BFD/Pairs converged to 8 bins (optimal) immediately",
+      "Random first-fit used 9-10 bins (suboptimal)",
+      "All 16 items packed with perfect complementary pairs",
+      "Final verification confirms valid 8-bin solution"
+    ],
+    "transport": "exact-json",
+    "transport_compliant": true
+  },
+  "conversation": {
+    "conversation_id": "8d1df5e5760145d792c2952ad57e6ff5",
+    "execution_status": "finished",
+    "sandbox_id": "6kBvy0G2PEM9A1Zc8CcKOz",
+    "sandbox_status": "RUNNING",
+    "start_task_id": "8f7292233ceb44e0aa9889da30915fda",
+    "terminal_status_recovered_from_events": false,
+    "ui_url": "https://app.replicated.rajistics.com/conversations/8d1df5e5760145d792c2952ad57e6ff5"
+  },
+  "duplicate_candidate": false,
+  "final_response": {
+    "length": 1108,
+    "sha256": "e90c94255e37ebc90bfca5f3110e565140a5c6f1c3aa557263a0350904323e06"
+  },
+  "finished_at": "2026-07-27T11:11:16.001603+00:00",
+  "id": "attempt-0006-67074705",
+  "improved": true,
+  "metadata": {
+    "conversation_snapshot": {
+      "acp_server": null,
+      "agent_kind": "openhands",
+      "conversation_url": "https://ucejayrqijeinyke.runtime.replicated.rajistics.com/api/conversations/8d1df5e5760145d792c2952ad57e6ff5",
+      "created_at": "2026-07-27T11:01:09.352835Z",
+      "created_by_user_id": "69c4fcfd-fb0e-4372-b9fd-68c860387888",
+      "execution_status": "finished",
+      "git_provider": null,
+      "id": "8d1df5e5760145d792c2952ad57e6ff5",
+      "launched_agent_profile": {
+        "agent_profile_id": "c3c5742a-eb28-40a1-8a66-210fa9b98cd7",
+        "revision": 0
+      },
+      "llm_model": "litellm_proxy/us.anthropic.claude-sonnet-4-5-20250929-v1:0",
+      "metrics": {
+        "accumulated_cost": 0.14202457500000001,
+        "accumulated_token_usage": {
+          "cache_read_tokens": 0,
+          "cache_write_tokens": 26943,
+          "completion_tokens": 1732,
+          "context_window": 200000,
+          "model": "",
+          "per_turn_token": 27768,
+          "prompt_tokens": 27642,
+          "reasoning_tokens": 0,
+          "response_id": ""
+        },
+        "max_budget_per_task": null,
+        "model_name": "default"
+      },
+      "parent_conversation_id": null,
+      "pr_number": [],
+      "public": null,
+      "sandbox_id": "6kBvy0G2PEM9A1Zc8CcKOz",
+      "sandbox_status": "RUNNING",
+      "selected_branch": "main",
+      "selected_repository": "rajshah4/openhands-agent-research-lab",
+      "sub_conversation_ids": [],
+      "tags": {
+        "agentprofileid": "c3c5742a-eb28-40a1-8a66-210fa9b98cd7",
+        "agentprofilerevision": "0",
+        "archiveworkspacepath": "/workspace/project/8d1df5e5760145d792c2952ad57e6ff5",
+        "repo_name": "rajshah4/openhands-agent-research-lab",
+        "selected_branch": "main"
+      },
+      "title": "Conversation 8d1df",
+      "trigger": "openhands_api",
+      "updated_at": "2026-07-27T11:01:45.040642Z"
+    },
+    "event_count": 201,
+    "event_counts": {
+      "ActionEvent": 3,
+      "ControllerRecoveredStreamingText": 1,
+      "StreamingDeltaEvent": 197
+    },
+    "final_response_source": "git_artifact",
+    "start_task_snapshot": {
+      "agent_server_url": "https://ucejayrqijeinyke.runtime.replicated.rajistics.com",
+      "app_conversation_id": "8d1df5e5760145d792c2952ad57e6ff5",
+      "created_at": "2026-07-27T11:00:59.593662Z",
+      "created_by_user_id": "69c4fcfd-fb0e-4372-b9fd-68c860387888",
+      "detail": null,
+      "id": "8f7292233ceb44e0aa9889da30915fda",
+      "request": {
+        "agent_profile_id": null,
+        "agent_type": "default",
+        "conversation_id": null,
+        "git_provider": null,
+        "initial_message": "<redacted-content>",
+        "llm_model": null,
+        "parent_conversation_id": null,
+        "plugins": null,
+        "pr_number": [],
+        "processors": null,
+        "public": null,
+        "sandbox_id": null,
+        "secrets": null,
+        "selected_branch": "main",
+        "selected_repository": "rajshah4/openhands-agent-research-lab",
+        "suggested_task": null,
+        "system_message_suffix": null,
+        "title": "[research-lab] neurogolf-endurance-live-20260727T050720Z-c2919492 / pack-02-pairs-16 / attempt-0006-67074705",
+        "trigger": "openhands_api"
+      },
+      "sandbox_id": "6kBvy0G2PEM9A1Zc8CcKOz",
+      "status": "READY",
+      "updated_at": "2026-07-27T11:01:09.386609Z"
+    }
+  },
+  "outcome": "completed",
+  "promoted_lesson_id": "lesson-4e231d44f0f92131",
+  "retrieved_lesson_ids": [
+    "lesson-e66c6a16c751e399"
+  ],
+  "run_id": "neurogolf-endurance-live-20260727T050720Z-c2919492",
+  "scheduler_decision": {
+    "policy": "managed",
+    "policy_version": "1",
+    "rationale": "prioritized task coverage, balanced attempt ownership, then the weakest validated score, with relevant validated memory",
+    "retrieved_lesson_ids": [
+      "lesson-e66c6a16c751e399"
+    ],
+    "task_id": "pack-02-pairs-16"
+  },
+  "schema_version": 1,
+  "sequence": 6,
+  "started_at": "2026-07-27T11:00:56.008636+00:00",
+  "task_id": "pack-02-pairs-16",
+  "validation": {
+    "errors": [],
+    "score": 8.0,
+    "valid": true
+  },
+  "worker_kind": "openhands"
+}
