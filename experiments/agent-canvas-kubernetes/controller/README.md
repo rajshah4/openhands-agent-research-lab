@@ -33,6 +33,17 @@ docker build \
 docker push REGION-docker.pkg.dev/PROJECT/REPOSITORY/research-controller:COMMIT
 ```
 
+When Docker is not running locally, use the checked-in Cloud Build definition:
+
+```bash
+gcloud builds submit \
+  --project PROJECT \
+  --config experiments/agent-canvas-kubernetes/controller/cloudbuild.yaml \
+  --substitutions \
+  _IMAGE=REGION-docker.pkg.dev/PROJECT/REPOSITORY/research-controller:COMMIT \
+  .
+```
+
 Create the secret without placing its values in shell history:
 
 ```bash
@@ -40,6 +51,17 @@ kubectl -n agent-canvas-research create secret generic \
   agent-canvas-controller \
   --from-file=canvas-api-key=/path/to/private/api-key.txt \
   --from-literal=canvas-profile=PROFILE_NAME
+```
+
+For a fresh disposable Canvas deployment, the included profile helper can load
+an Anthropic key from a private environment file and verifies only non-secret
+settings:
+
+```bash
+CANVAS_API_KEY="<private session key>" PYTHONPATH=src python3 \
+  experiments/agent-canvas-kubernetes/controller/configure_canvas_llm.py \
+  --env-file /path/to/private/provider.env \
+  --profile neurogolf-haiku
 ```
 
 Replace the `replace-me` image tag in a temporary copy of `kubernetes.yaml`,
@@ -80,5 +102,9 @@ kubectl -n agent-canvas-research patch cronjob \
 5. Confirm the CronJob stops launching workers when the attempt budget is
    complete.
 
-The original GKE cluster was deleted after the earlier experiments. Recreating
-it and running these gates requires an authenticated GCP session.
+All five gates were run on 2026-07-27. The measured campaign, forced-termination
+recovery, overlap test, immutable identifiers, and reproduction commands are in
+[`results-2026-07-27.md`](results-2026-07-27.md).
+
+The test cluster remains running. The controller CronJob is suspended, so it
+cannot launch scheduled work until an operator enables it.

@@ -142,8 +142,21 @@ controller command as a Kubernetes CronJob beside Canvas is implemented in
 [`experiments/agent-canvas-kubernetes/controller`](../experiments/agent-canvas-kubernetes/controller/README.md).
 The checked-in CronJob is suspended by default, runs one attempt per tick,
 prevents overlapping controller jobs, and keeps its single-writer ledger on a
-dedicated PVC. Its live interruption and resume gates have not yet been run
-because the disposable GKE pilot was deleted after the earlier comparison.
+dedicated PVC.
+
+The in-cluster controller completed six separate ticks against one durable
+campaign: 6/6 valid attempts, six tasks covered, no duplicate candidates, and
+no Agent Canvas restarts. The campaign used 140,228 prompt tokens, 15,423
+completion tokens, $0.1748943 of model cost, and 509.953 seconds from the first
+attempt start to the last finish.
+
+A zero-grace controller termination was also recovered. The replacement
+attached to the persisted Canvas conversation, recorded
+`recovered_after_controller_restart: true`, and did not create another
+conversation. In a separate overlap test, one of two simultaneous controllers
+acquired the file ledger and the other was rejected before it could launch a
+worker. Full evidence is in
+[`results-2026-07-27.md`](../experiments/agent-canvas-kubernetes/controller/results-2026-07-27.md).
 
 Canvas is efficient because conversations share one Agent Server pod and
 volume. That is also its trust boundary. Use it for one trusted team, not as a

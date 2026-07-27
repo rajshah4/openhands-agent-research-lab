@@ -1,8 +1,12 @@
 .git
 .venv
 .lab*
+.pytest_cache
 __pycache__
 *.pyc
+dashboard
+docs
 evidence
 site
+tests
 work
