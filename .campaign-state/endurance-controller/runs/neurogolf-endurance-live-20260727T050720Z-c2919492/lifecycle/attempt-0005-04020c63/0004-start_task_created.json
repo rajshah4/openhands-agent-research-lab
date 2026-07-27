@@ -1,0 +1,11 @@
+{
+  "attempt_id": "attempt-0005-04020c63",
+  "id": "0004-start_task_created",
+  "kind": "start_task_created",
+  "payload": {
+    "start_task_id": "c0b0dd7a522b427cbd00d75be1f44f92"
+  },
+  "recorded_at": "2026-07-27T10:00:52.453253+00:00",
+  "run_id": "neurogolf-endurance-live-20260727T050720Z-c2919492",
+  "schema_version": 1
+}
