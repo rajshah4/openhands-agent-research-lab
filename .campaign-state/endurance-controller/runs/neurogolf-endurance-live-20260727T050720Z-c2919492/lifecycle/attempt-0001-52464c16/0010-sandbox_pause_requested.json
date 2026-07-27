@@ -1,0 +1,12 @@
+{
+  "attempt_id": "attempt-0001-52464c16",
+  "id": "0010-sandbox_pause_requested",
+  "kind": "sandbox_pause_requested",
+  "payload": {
+    "conversation_id": "3c59585ca21e49458f1eed767dff5b8c",
+    "sandbox_id": "2lEcO8VVhxrncnHfTHWBna"
+  },
+  "recorded_at": "2026-07-27T05:17:21.688389+00:00",
+  "run_id": "neurogolf-endurance-live-20260727T050720Z-c2919492",
+  "schema_version": 1
+}
