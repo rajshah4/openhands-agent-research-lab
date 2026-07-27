@@ -140,6 +140,31 @@ class OpenHandsHelpersTests(unittest.TestCase):
         self.assertEqual(latest_agent_text(events), "")
         self.assertEqual(streaming_agent_text(events), '{"status":"do')
 
+    def test_streaming_recovery_uses_only_latest_contiguous_agent_block(self) -> None:
+        events = [
+            {
+                "kind": "StreamingDeltaEvent",
+                "source": "agent",
+                "content": "old reasoning",
+            },
+            {
+                "kind": "ObservationEvent",
+                "source": "environment",
+                "content": "tool result",
+            },
+            {
+                "kind": "StreamingDeltaEvent",
+                "source": "agent",
+                "content": '{"status":"done"',
+            },
+            {
+                "kind": "StreamingDeltaEvent",
+                "source": "agent",
+                "content": "}",
+            },
+        ]
+        self.assertEqual(streaming_agent_text(events), '{"status":"done"}')
+
     def test_final_response_recovers_terminal_streaming_text(self) -> None:
         def requester(method, url, headers, body=None, timeout=60):
             if "sort_order=TIMESTAMP_DESC" in url:
@@ -201,6 +226,66 @@ class OpenHandsHelpersTests(unittest.TestCase):
         self.assertEqual(record["execution_status"], "finished")
         self.assertTrue(recovered)
         self.assertEqual(len(events), 1)
+
+    def test_wait_for_terminal_does_not_scan_events_while_runtime_is_active(
+        self,
+    ) -> None:
+        conversation_reads = 0
+        event_reads = 0
+
+        def requester(method, url, headers, body=None, timeout=60):
+            nonlocal conversation_reads, event_reads
+            if "/api/v1/app-conversations?" in url:
+                conversation_reads += 1
+                if conversation_reads == 1:
+                    return [{"sandbox_status": "RUNNING", "execution_status": ""}]
+                return [
+                    {
+                        "sandbox_status": "RUNNING",
+                        "execution_status": "finished",
+                    }
+                ]
+            if "/events/search" in url:
+                event_reads += 1
+                return {"items": [], "next_page_id": None}
+            raise AssertionError(url)
+
+        client = OpenHandsClient(
+            "https://example.test",
+            "not-logged",
+            requester=requester,
+            sleeper=lambda _: None,
+            monotonic=lambda: 0,
+        )
+        record, events, recovered = client.wait_for_terminal("conversation-1")
+        self.assertEqual(record["execution_status"], "finished")
+        self.assertFalse(recovered)
+        self.assertEqual(events, [])
+        self.assertEqual(event_reads, 1)
+
+    def test_fetch_events_can_bound_page_scans(self) -> None:
+        calls = 0
+
+        def requester(method, url, headers, body=None, timeout=60):
+            nonlocal calls
+            calls += 1
+            return {
+                "items": [{"kind": "MessageEvent", "source": "agent"}],
+                "next_page_id": f"page-{calls + 1}",
+            }
+
+        client = OpenHandsClient(
+            "https://example.test",
+            "not-logged",
+            requester=requester,
+        )
+        events = client.fetch_events(
+            "conversation-1",
+            sort_order="TIMESTAMP_DESC",
+            max_pages=2,
+        )
+        self.assertEqual(calls, 2)
+        self.assertEqual(len(events), 2)
 
     def test_final_response_reads_descending_tail_when_head_is_truncated(self) -> None:
         calls = []

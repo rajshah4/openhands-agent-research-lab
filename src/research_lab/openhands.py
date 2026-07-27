@@ -256,19 +256,33 @@ def latest_agent_text(events: list[dict[str, Any]]) -> str:
 
 
 def streaming_agent_text(events: list[dict[str, Any]]) -> str:
-    """Reconstruct a terminal agent response when its MessageEvent is absent."""
+    """Reconstruct the latest terminal streaming block.
+
+    Long conversations may contain streaming deltas from many separate model
+    turns. Only the newest contiguous block can represent the final response;
+    concatenating the entire conversation produces an invalid contract.
+    """
     chunks: list[str] = []
+    latest_chunks: list[str] = []
     for event in events:
         if str(event.get("source", "")).lower() not in {"agent", "assistant"}:
+            if chunks:
+                latest_chunks = chunks
+                chunks = []
             continue
         if str(event.get("kind", "")) != "StreamingDeltaEvent":
+            if chunks:
+                latest_chunks = chunks
+                chunks = []
             continue
         content = event.get("content")
         if isinstance(content, str):
             chunks.append(content)
         elif isinstance(content, list):
             chunks.append(_content_text(content))
-    return "".join(chunks).strip()
+    if chunks:
+        latest_chunks = chunks
+    return "".join(latest_chunks).strip()
 
 
 def terminal_status_from_events(events: list[dict[str, Any]]) -> str | None:
@@ -553,11 +567,15 @@ class OpenHandsClient:
         *,
         limit: int = 100,
         sort_order: str = "TIMESTAMP",
+        max_pages: int | None = None,
     ) -> list[dict[str, Any]]:
         if sort_order not in {"TIMESTAMP", "TIMESTAMP_DESC"}:
             raise ValueError(f"unknown event sort order: {sort_order}")
+        if max_pages is not None and max_pages < 1:
+            raise ValueError("max_pages must be at least 1")
         events: list[dict[str, Any]] = []
         page_id: str | None = None
+        pages = 0
         while True:
             query: dict[str, Any] = {
                 "sort_order": sort_order,
@@ -578,8 +596,9 @@ class OpenHandsClient:
             if not isinstance(page, dict):
                 return events
             events.extend(item for item in page.get("items", []) if isinstance(item, dict))
+            pages += 1
             page_id = page.get("next_page_id")
-            if not page_id:
+            if not page_id or (max_pages is not None and pages >= max_pages):
                 return (
                     list(reversed(events))
                     if sort_order == "TIMESTAMP_DESC"
@@ -600,11 +619,23 @@ class OpenHandsClient:
             last_record = self.get_conversation(conversation_id)
             status = str(last_record.get("execution_status", "")).lower()
             if status in TERMINAL_STATUSES:
-                return last_record, self.fetch_events(conversation_id), False
+                return (
+                    last_record,
+                    self.fetch_events(
+                        conversation_id,
+                        sort_order="TIMESTAMP_DESC",
+                        max_pages=2,
+                    ),
+                    False,
+                )
 
             sandbox_status = str(last_record.get("sandbox_status", "")).upper()
-            if not status or sandbox_status in {"PAUSED", "ERROR", "MISSING"}:
-                last_events = self.fetch_events(conversation_id)
+            if sandbox_status in {"PAUSED", "ERROR", "MISSING"}:
+                last_events = self.fetch_events(
+                    conversation_id,
+                    sort_order="TIMESTAMP_DESC",
+                    max_pages=2,
+                )
                 recovered = terminal_status_from_events(last_events)
                 if recovered:
                     recovered_record = dict(last_record)
@@ -629,28 +660,22 @@ class OpenHandsClient:
         events = initial_events or []
         for attempt in range(retries + 1):
             if not events or attempt:
-                events = self.fetch_events(conversation_id)
+                events = self.fetch_events(
+                    conversation_id,
+                    sort_order="TIMESTAMP_DESC",
+                    max_pages=2,
+                )
             text = latest_agent_text(events)
             if text:
                 return text, events
-            # Enterprise can cap the chronological result before the terminal
-            # MessageEvent without returning next_page_id. Read the newest
-            # events and normalize them back to chronology.
-            tail_events = self.fetch_events(
-                conversation_id,
-                sort_order="TIMESTAMP_DESC",
-            )
-            tail_text = latest_agent_text(tail_events)
-            if tail_text:
-                return tail_text, tail_events
             # A tested Enterprise edge case marked the conversation finished
             # but indexed only StreamingDeltaEvents. At this point the caller
             # has already observed terminal state, so reconstruct the bounded
             # response rather than treating an absent MessageEvent as no work.
-            streamed_text = streaming_agent_text(tail_events)
+            streamed_text = streaming_agent_text(events)
             if streamed_text:
                 return streamed_text, [
-                    *tail_events,
+                    *events,
                     {
                         "kind": "ControllerRecoveredStreamingText",
                         "source": "controller",
