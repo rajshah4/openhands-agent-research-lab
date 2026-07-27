@@ -1121,7 +1121,7 @@ function ExecutionGuide({ snapshot }: { snapshot: Snapshot }) {
         </div>
         <figure className="deployment-illustration">
           <img
-            src="/deployment-options.png"
+            src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/deployment-options.png`}
             alt="Four OpenHands execution structures: separate Enterprise sandboxes, grouped Enterprise conversations in one sandbox, Agent Canvas records in one shared backend and workspace, and parent-managed subagents in one sandbox."
           />
           <figcaption>

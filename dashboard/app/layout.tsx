@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Mono, Manrope } from "next/font/google";
-import { headers } from "next/headers";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -14,41 +13,40 @@ const plexMono = IBM_Plex_Mono({
   weight: ["400", "500", "600"],
 });
 
-export async function generateMetadata(): Promise<Metadata> {
-  const requestHeaders = await headers();
-  const host =
-    requestHeaders.get("x-forwarded-host") ??
-    requestHeaders.get("host") ??
-    "localhost:3000";
-  const protocol =
-    requestHeaders.get("x-forwarded-proto") ??
-    (host.startsWith("localhost") ? "http" : "https");
-  const socialImage = `${protocol}://${host}/og.png`;
-  const title = "NeuroGolf with OpenHands | Reproducing a Kaggle multi-agent workflow";
-  const description =
-    "How we used OpenHands to coordinate the 400-task NeuroGolf workload, compare deployment structures, preserve experiment history, and recover incomplete agent work.";
+const publicBaseUrl =
+  "https://rajshah4.github.io/openhands-agent-research-lab";
+const title =
+  "NeuroGolf with OpenHands | Reproducing a Kaggle multi-agent workflow";
+const description =
+  "How we used OpenHands to coordinate the 400-task NeuroGolf workload, compare deployment structures, preserve experiment history, and recover incomplete agent work.";
 
-  return {
+export const metadata: Metadata = {
+  metadataBase: new URL(publicBaseUrl),
+  title,
+  description,
+  icons: {
+    icon: "favicon.svg",
+    shortcut: "favicon.svg",
+  },
+  openGraph: {
     title,
     description,
-    icons: {
-      icon: "/favicon.svg",
-      shortcut: "/favicon.svg",
-    },
-    openGraph: {
-      title,
-      description,
-      type: "website",
-      images: [{ url: socialImage, width: 1672, height: 941 }],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-      images: [socialImage],
-    },
-  };
-}
+    type: "website",
+    images: [
+      {
+        url: `${publicBaseUrl}/og.png`,
+        width: 1672,
+        height: 941,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+    images: [`${publicBaseUrl}/og.png`],
+  },
+};
 
 export default function RootLayout({
   children,
