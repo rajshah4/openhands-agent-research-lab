@@ -1,0 +1,14 @@
+{
+  "attempt_id": "attempt-0008-e1972512",
+  "id": "0006-conversation_terminal",
+  "kind": "conversation_terminal",
+  "payload": {
+    "conversation_id": "f1ddde68ef764e0fa10c13f36171c8f2",
+    "execution_status": "finished",
+    "sandbox_status": "RUNNING",
+    "terminal_status_recovered_from_events": false
+  },
+  "recorded_at": "2026-07-27T14:04:27.880393+00:00",
+  "run_id": "neurogolf-endurance-live-20260727T050720Z-c2919492",
+  "schema_version": 1
+}
