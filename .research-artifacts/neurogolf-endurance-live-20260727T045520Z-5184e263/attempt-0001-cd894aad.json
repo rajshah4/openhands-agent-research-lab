@@ -1,0 +1,34 @@
+{
+  "candidate": {
+    "assignments": {
+      "p1": 0,
+      "q1": 1,
+      "p2": 0,
+      "q2": 1,
+      "p3": 0,
+      "q3": 1,
+      "p4": 0,
+      "q4": 1,
+      "p5": 0,
+      "q5": 1,
+      "p6": 0,
+      "q6": 1
+    }
+  },
+  "lesson": {
+    "evidence": "Crown-12 graph is bipartite (p-nodes vs q-nodes, no internal edges). Greedy coloring with adversarial node order (p1,q1,p2,q2,...) uses 6 colors; bipartite recognition uses optimal 2. Randomized greedy found 2 colors in 11/12 seeds.",
+    "statement": "Crown graphs are bipartite; structure recognition beats order-dependent greedy by 3× in color count.",
+    "tags": [
+      "graph-coloring"
+    ]
+  },
+  "next_gate": "validate",
+  "status": "done",
+  "summary": [
+    "Compared bipartite-exact, greedy-heuristic, 12-seed randomized, and local-search approaches",
+    "Bipartite structure yields optimal 2-coloring: p-nodes=0, q-nodes=1",
+    "Greedy with bad ordering uses 6 colors; demonstrates importance of structure recognition",
+    "All 30 edge constraints verified independently; 12 trials completed",
+    "Best valid score: 2 colors (optimal for bipartite graph)"
+  ]
+}
