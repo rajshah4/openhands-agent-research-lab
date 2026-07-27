@@ -1,0 +1,12 @@
+{
+  "created_at": "2026-07-27T11:11:14.784154+00:00",
+  "evidence": "FFD, BFD, and exact pairing all achieved 8 bins (optimal). Random ordering with first-fit produced 9-10 bins in 15 trials. Items form perfect complementary pairs (9+1, 8+2, 7+3, 6+4) that fill capacity-10 bins exactly.",
+  "id": "lesson-4e231d44f0f92131",
+  "source_attempt_id": "attempt-0006-67074705",
+  "source_run_id": "neurogolf-endurance-live-20260727T050720Z-c2919492",
+  "source_task_id": "pack-02-pairs-16",
+  "statement": "When all items form exact complementary pairs summing to bin capacity, any weight-based ordering (FFD, BFD) achieves optimal packing; random ordering consistently produces one extra bin.",
+  "tags": [
+    "bin-packing"
+  ]
+}
