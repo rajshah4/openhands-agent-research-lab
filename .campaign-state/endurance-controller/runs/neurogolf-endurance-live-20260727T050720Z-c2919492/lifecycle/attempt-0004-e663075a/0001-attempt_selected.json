@@ -1,0 +1,21 @@
+{
+  "attempt_id": "attempt-0004-e663075a",
+  "id": "0001-attempt_selected",
+  "kind": "attempt_selected",
+  "payload": {
+    "scheduler_decision": {
+      "policy": "managed",
+      "policy_version": "1",
+      "rationale": "prioritized task coverage, balanced attempt ownership, then the weakest validated score, with relevant validated memory",
+      "retrieved_lesson_ids": [
+        "lesson-fcdf92ed8a09f2e5"
+      ],
+      "task_id": "cover-02-bridges"
+    },
+    "sequence": 4,
+    "task_id": "cover-02-bridges"
+  },
+  "recorded_at": "2026-07-27T09:00:51.279818+00:00",
+  "run_id": "neurogolf-endurance-live-20260727T050720Z-c2919492",
+  "schema_version": 1
+}
