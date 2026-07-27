@@ -15,11 +15,10 @@ eight-hour campaign instead of a single short batch.
 
 The worker compares an exact baseline, a greedy heuristic, and a seeded search
 across at least 30 deterministic trials. Independent application code still
-validates the final candidate. After its research and self-checks, the worker
-runs a controlled seven-minute idle command before returning the contract.
-That dwell time tests long-lived conversation polling, controller timeouts, and
-runtime stability; it is recorded separately and is not presented as research
-complexity.
+validates the final candidate. The controller then keeps the work cell alive
+until ten minutes have elapsed since conversation readiness. That controlled
+dwell period tests long-lived controller state, timeouts, and runtime stability;
+it is recorded separately and is not presented as research complexity.
 
 ## Durable state
 

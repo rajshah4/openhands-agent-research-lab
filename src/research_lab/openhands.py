@@ -49,6 +49,20 @@ class OpenHandsCapacityError(OpenHandsAPIError):
     """Raised before launch when the configured runtime safety gate is closed."""
 
 
+def is_transient_api_error(exc: BaseException) -> bool:
+    if isinstance(exc, (TimeoutError, ConnectionError)):
+        return True
+    if not isinstance(exc, OpenHandsAPIError):
+        return False
+    message = str(exc)
+    return (
+        ("HTTP 401" in message and "BearerTokenError" in message)
+        or "HTTP 429" in message
+        or any(f"HTTP {status}" in message for status in range(500, 600))
+        or " failed:" in message
+    )
+
+
 class ResilientRequester:
     """Bounded retries for transient API failures, with duplicate-safe writes.
 
@@ -616,36 +630,41 @@ class OpenHandsClient:
         last_record: dict[str, Any] = {}
         last_events: list[dict[str, Any]] = []
         while self._monotonic() < deadline:
-            last_record = self.get_conversation(conversation_id)
-            status = str(last_record.get("execution_status", "")).lower()
-            if status in TERMINAL_STATUSES:
-                return (
-                    last_record,
-                    self.fetch_events(
+            try:
+                last_record = self.get_conversation(conversation_id)
+                status = str(last_record.get("execution_status", "")).lower()
+                if status in TERMINAL_STATUSES:
+                    return (
+                        last_record,
+                        self.fetch_events(
+                            conversation_id,
+                            sort_order="TIMESTAMP_DESC",
+                            max_pages=2,
+                        ),
+                        False,
+                    )
+
+                sandbox_status = str(last_record.get("sandbox_status", "")).upper()
+                if sandbox_status in {"PAUSED", "ERROR", "MISSING"}:
+                    last_events = self.fetch_events(
                         conversation_id,
                         sort_order="TIMESTAMP_DESC",
                         max_pages=2,
-                    ),
-                    False,
-                )
-
-            sandbox_status = str(last_record.get("sandbox_status", "")).upper()
-            if sandbox_status in {"PAUSED", "ERROR", "MISSING"}:
-                last_events = self.fetch_events(
-                    conversation_id,
-                    sort_order="TIMESTAMP_DESC",
-                    max_pages=2,
-                )
-                recovered = terminal_status_from_events(last_events)
-                if recovered:
-                    recovered_record = dict(last_record)
-                    recovered_record["execution_status"] = recovered
-                    recovered_record["terminal_status_source"] = "events"
-                    return recovered_record, last_events, True
-                if sandbox_status in {"ERROR", "MISSING"}:
-                    raise OpenHandsAPIError(
-                        f"conversation {conversation_id} sandbox is {sandbox_status}"
                     )
+                    recovered = terminal_status_from_events(last_events)
+                    if recovered:
+                        recovered_record = dict(last_record)
+                        recovered_record["execution_status"] = recovered
+                        recovered_record["terminal_status_source"] = "events"
+                        return recovered_record, last_events, True
+                    if sandbox_status in {"ERROR", "MISSING"}:
+                        raise OpenHandsAPIError(
+                            f"conversation {conversation_id} sandbox is "
+                            f"{sandbox_status}"
+                        )
+            except (OpenHandsAPIError, TimeoutError, ConnectionError) as exc:
+                if not is_transient_api_error(exc):
+                    raise
             self._sleep(poll_seconds)
         raise TimeoutError(f"timed out waiting for OpenHands conversation {conversation_id}")
 
@@ -659,12 +678,18 @@ class OpenHandsClient:
     ) -> tuple[str, list[dict[str, Any]]]:
         events = initial_events or []
         for attempt in range(retries + 1):
-            if not events or attempt:
-                events = self.fetch_events(
-                    conversation_id,
-                    sort_order="TIMESTAMP_DESC",
-                    max_pages=2,
-                )
+            try:
+                if not events or attempt:
+                    events = self.fetch_events(
+                        conversation_id,
+                        sort_order="TIMESTAMP_DESC",
+                        max_pages=2,
+                    )
+            except (OpenHandsAPIError, TimeoutError, ConnectionError) as exc:
+                if not is_transient_api_error(exc) or attempt >= retries:
+                    raise
+                self._sleep(retry_seconds)
+                continue
             text = latest_agent_text(events)
             if text:
                 return text, events

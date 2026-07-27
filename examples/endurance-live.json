@@ -7,6 +7,7 @@
   "branch": "main",
   "model": null,
   "research_protocol": "endurance-v1",
+  "controlled_dwell_seconds": 600,
   "task_paths": [
     "tasks/hard/color-01-crown-12.json",
     "tasks/hard/color-02-mycielski-11.json",

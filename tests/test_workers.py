@@ -252,9 +252,55 @@ class OpenHandsWorkerTests(unittest.TestCase):
         self.assertIn("Endurance research protocol", prompt)
         self.assertIn("at least three solution approaches", prompt)
         self.assertIn("30 seeded orderings or perturbations", prompt)
-        self.assertIn("controlled\n  seven-minute wait", prompt)
-        self.assertIn("not additional\n  research evidence", prompt)
         self.assertIn("complete attempt within twenty minutes", prompt)
+
+    def test_controller_enforces_controlled_dwell_before_cleanup(self) -> None:
+        client = FakeOpenHandsClient()
+        lifecycle = []
+        delays = []
+        times = iter((100.0, 220.0))
+        worker = OpenHandsWorker(
+            client,
+            poll_seconds=1,
+            sleeper=delays.append,
+            monotonic=lambda: next(times),
+        )
+        campaign = CampaignSpec(
+            id="campaign-1",
+            name="Campaign",
+            policy="managed",
+            attempt_budget=1,
+            repository=None,
+            branch=None,
+            model=None,
+            tasks=(),
+            controlled_dwell_seconds=600,
+        )
+        task = TaskSpec(
+            id="task-1",
+            family="graph-coloring",
+            description="test",
+            tags=("graph-coloring",),
+            nodes=("0",),
+            edges=(),
+            target_score=1,
+        )
+
+        worker.execute(
+            campaign=campaign,
+            task=task,
+            run_id="run-1",
+            attempt_id="attempt-1",
+            lessons=[],
+            on_lifecycle=lambda kind, payload: lifecycle.append((kind, payload)),
+        )
+
+        self.assertEqual(delays, [480.0])
+        kinds = [kind for kind, _ in lifecycle]
+        self.assertLess(
+            kinds.index("controlled_dwell_completed"),
+            kinds.index("sandbox_pause_requested"),
+        )
 
 
 if __name__ == "__main__":

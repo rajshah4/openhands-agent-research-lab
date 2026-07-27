@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import time
 from collections import Counter
 from collections.abc import Callable
 from typing import Any, Protocol
@@ -267,13 +268,8 @@ Endurance research protocol:
   then use that observation in the final refinement.
 - Independently re-check every task constraint before returning the final
   candidate. Keep the complete attempt within twenty minutes.
-- After the final candidate passes your own checks, run one controlled
-  seven-minute wait using a terminal command before returning the contract.
-  This dwell period is part of the controller endurance test, not additional
-  research evidence. Do not perform more work or make network calls during it.
 - Use the final summary strings to name the approaches compared, the number of
-  trials completed, the best valid score, the final verification result, and
-  completion of the controlled dwell period.
+  trials completed, the best valid score, and the final verification result.
 """
     return f"""You are one bounded experimental worker in a research campaign.
 
@@ -324,6 +320,8 @@ class OpenHandsWorker:
         pause_timeout_seconds: int = 120,
         runtime_limit: int = 10,
         launch_lock_at: int = 7,
+        sleeper: Callable[[float], None] = time.sleep,
+        monotonic: Callable[[], float] = time.monotonic,
     ):
         self.client = client
         self.start_timeout_seconds = start_timeout_seconds
@@ -333,6 +331,8 @@ class OpenHandsWorker:
         self.pause_timeout_seconds = pause_timeout_seconds
         self.runtime_limit = runtime_limit
         self.launch_lock_at = launch_lock_at
+        self._sleep = sleeper
+        self._monotonic = monotonic
 
     def execute(
         self,
@@ -374,6 +374,7 @@ class OpenHandsWorker:
         on_lifecycle("start_task_created", {"start_task_id": start_task_id})
         return self._complete_started_attempt(
             start_task_id=start_task_id,
+            controlled_dwell_seconds=campaign.controlled_dwell_seconds,
             on_lifecycle=on_lifecycle,
         )
 
@@ -388,7 +389,7 @@ class OpenHandsWorker:
         lifecycle_events: list[dict[str, Any]],
         on_lifecycle: Callable[[str, dict[str, Any]], None],
     ) -> WorkerExecution:
-        del campaign, task, run_id, attempt_id, lessons
+        del task, run_id, attempt_id, lessons
         start_task_id = ""
         for event in lifecycle_events:
             if event.get("kind") == "start_task_created":
@@ -405,6 +406,7 @@ class OpenHandsWorker:
         )
         return self._complete_started_attempt(
             start_task_id=start_task_id,
+            controlled_dwell_seconds=campaign.controlled_dwell_seconds,
             on_lifecycle=on_lifecycle,
         )
 
@@ -412,6 +414,7 @@ class OpenHandsWorker:
         self,
         *,
         start_task_id: str,
+        controlled_dwell_seconds: int = 0,
         on_lifecycle: Callable[[str, dict[str, Any]], None],
     ) -> WorkerExecution:
         try:
@@ -446,6 +449,7 @@ class OpenHandsWorker:
                 "ui_url": self.client.conversation_url(conversation_id),
             },
         )
+        ready_at = self._monotonic()
         try:
             record, events, recovered = self.client.wait_for_terminal(
                 conversation_id,
@@ -492,6 +496,24 @@ class OpenHandsWorker:
                 "event_counts": dict(sorted(event_counts.items())),
                 "event_count": len(final_events),
             }
+            elapsed = self._monotonic() - ready_at
+            dwell_remaining = max(controlled_dwell_seconds - elapsed, 0.0)
+            if dwell_remaining:
+                on_lifecycle(
+                    "controlled_dwell_started",
+                    {
+                        "configured_seconds": controlled_dwell_seconds,
+                        "elapsed_active_seconds": round(elapsed, 3),
+                        "remaining_seconds": round(dwell_remaining, 3),
+                    },
+                )
+                self._sleep(dwell_remaining)
+                on_lifecycle(
+                    "controlled_dwell_completed",
+                    {
+                        "configured_seconds": controlled_dwell_seconds,
+                    },
+                )
             return WorkerExecution(
                 final_text=final_text,
                 worker_kind="openhands",

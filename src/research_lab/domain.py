@@ -57,6 +57,7 @@ class CampaignSpec:
     model: str | None
     tasks: tuple[TaskSpec, ...]
     research_protocol: str | None = None
+    controlled_dwell_seconds: int = 0
 
     @classmethod
     def from_path(cls, path: Path) -> "CampaignSpec":
@@ -70,6 +71,9 @@ class CampaignSpec:
         budget = int(data["attempt_budget"])
         if budget < 1:
             raise ValueError("attempt_budget must be at least 1")
+        controlled_dwell_seconds = int(data.get("controlled_dwell_seconds", 0))
+        if controlled_dwell_seconds < 0:
+            raise ValueError("controlled_dwell_seconds cannot be negative")
         return cls(
             id=str(data["id"]),
             name=str(data["name"]),
@@ -80,12 +84,15 @@ class CampaignSpec:
             model=data.get("model"),
             tasks=tasks,
             research_protocol=data.get("research_protocol"),
+            controlled_dwell_seconds=controlled_dwell_seconds,
         )
 
     def to_dict(self) -> dict[str, Any]:
         data = asdict(self)
         if self.research_protocol is None:
             data.pop("research_protocol")
+        if self.controlled_dwell_seconds == 0:
+            data.pop("controlled_dwell_seconds")
         return data
 
 

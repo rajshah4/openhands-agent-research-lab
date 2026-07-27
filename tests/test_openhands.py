@@ -263,6 +263,42 @@ class OpenHandsHelpersTests(unittest.TestCase):
         self.assertEqual(events, [])
         self.assertEqual(event_reads, 1)
 
+    def test_wait_for_terminal_continues_after_exhausted_transient_read(
+        self,
+    ) -> None:
+        conversation_reads = 0
+
+        def requester(method, url, headers, body=None, timeout=60):
+            nonlocal conversation_reads
+            if "/api/v1/app-conversations?" in url:
+                conversation_reads += 1
+                if conversation_reads == 1:
+                    raise OpenHandsAPIError(
+                        "GET /api/v1/app-conversations -> HTTP 401: "
+                        "BearerTokenError"
+                    )
+                return [
+                    {
+                        "sandbox_status": "RUNNING",
+                        "execution_status": "finished",
+                    }
+                ]
+            if "/events/search" in url:
+                return {"items": [], "next_page_id": None}
+            raise AssertionError(url)
+
+        client = OpenHandsClient(
+            "https://example.test",
+            "not-logged",
+            requester=requester,
+            sleeper=lambda _: None,
+            monotonic=lambda: 0,
+            transient_retries=0,
+        )
+        record, _, _ = client.wait_for_terminal("conversation-1")
+        self.assertEqual(record["execution_status"], "finished")
+        self.assertEqual(conversation_reads, 2)
+
     def test_fetch_events_can_bound_page_scans(self) -> None:
         calls = 0
 
