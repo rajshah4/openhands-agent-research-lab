@@ -1,0 +1,158 @@
+{
+  "candidate": {
+    "selected_sets": [
+      "arc-a",
+      "arc-b",
+      "arc-c",
+      "arc-d"
+    ]
+  },
+  "candidate_hash": "c3d31bed9365121d9ec37c14cb875cdea9f22c88db292a9945cb238eba9768b9",
+  "contract": {
+    "next_gate": "validate",
+    "status": "done",
+    "summary": [
+      "Exact exhaustive: 4 sets optimal (arc-a, arc-b, arc-c, arc-d)",
+      "Greedy heuristic: 4 sets (matched exact)",
+      "Randomized greedy: 12 seeds, best 4, worst 6",
+      "Optimal partition forms perfect 4-way split of 24 checkpoints",
+      "Final verified solution: 4 sets, all constraints satisfied"
+    ],
+    "transport": "exact-json",
+    "transport_compliant": true
+  },
+  "conversation": {
+    "conversation_id": "be0c0a513cfa48378885e8084055e920",
+    "execution_status": "finished",
+    "sandbox_id": "6Dbr2dSTX5D1QMvEpObsPj",
+    "sandbox_status": "RUNNING",
+    "start_task_id": "49c51ef259d348818b4ee5cc114e1d9d",
+    "terminal_status_recovered_from_events": false,
+    "ui_url": "https://app.replicated.rajistics.com/conversations/be0c0a513cfa48378885e8084055e920"
+  },
+  "duplicate_candidate": false,
+  "final_response": {
+    "length": 1070,
+    "sha256": "afa5e38b12dda92918780b0586ee9049d352bf56010c461091456955912c8eb1"
+  },
+  "finished_at": "2026-07-27T09:11:11.078730+00:00",
+  "id": "attempt-0004-e663075a",
+  "improved": true,
+  "metadata": {
+    "conversation_snapshot": {
+      "acp_server": null,
+      "agent_kind": "openhands",
+      "conversation_url": "https://ljhusqdsnhdcaqtw.runtime.replicated.rajistics.com/api/conversations/be0c0a513cfa48378885e8084055e920",
+      "created_at": "2026-07-27T09:01:04.689074Z",
+      "created_by_user_id": "69c4fcfd-fb0e-4372-b9fd-68c860387888",
+      "execution_status": "finished",
+      "git_provider": null,
+      "id": "be0c0a513cfa48378885e8084055e920",
+      "launched_agent_profile": {
+        "agent_profile_id": "c3c5742a-eb28-40a1-8a66-210fa9b98cd7",
+        "revision": 0
+      },
+      "llm_model": "litellm_proxy/us.anthropic.claude-sonnet-4-5-20250929-v1:0",
+      "metrics": {
+        "accumulated_cost": 0.23001594000000003,
+        "accumulated_token_usage": {
+          "cache_read_tokens": 86303,
+          "cache_write_tokens": 31622,
+          "completion_tokens": 4170,
+          "context_window": 200000,
+          "model": "",
+          "per_turn_token": 31728,
+          "prompt_tokens": 118619,
+          "reasoning_tokens": 0,
+          "response_id": ""
+        },
+        "max_budget_per_task": null,
+        "model_name": "default"
+      },
+      "parent_conversation_id": null,
+      "pr_number": [],
+      "public": null,
+      "sandbox_id": "6Dbr2dSTX5D1QMvEpObsPj",
+      "sandbox_status": "RUNNING",
+      "selected_branch": "main",
+      "selected_repository": "rajshah4/openhands-agent-research-lab",
+      "sub_conversation_ids": [],
+      "tags": {
+        "agentprofileid": "c3c5742a-eb28-40a1-8a66-210fa9b98cd7",
+        "agentprofilerevision": "0",
+        "archiveworkspacepath": "/workspace/project/be0c0a513cfa48378885e8084055e920",
+        "repo_name": "rajshah4/openhands-agent-research-lab",
+        "selected_branch": "main"
+      },
+      "title": "Conversation be0c0",
+      "trigger": "openhands_api",
+      "updated_at": "2026-07-27T09:02:18.100263Z"
+    },
+    "event_count": 200,
+    "event_counts": {
+      "ActionEvent": 4,
+      "ConversationStateUpdateEvent": 5,
+      "MessageEvent": 1,
+      "ObservationEvent": 4,
+      "StreamingDeltaEvent": 186
+    },
+    "final_response_source": "git_artifact",
+    "start_task_snapshot": {
+      "agent_server_url": "https://ljhusqdsnhdcaqtw.runtime.replicated.rajistics.com",
+      "app_conversation_id": "be0c0a513cfa48378885e8084055e920",
+      "created_at": "2026-07-27T09:00:55.253060Z",
+      "created_by_user_id": "69c4fcfd-fb0e-4372-b9fd-68c860387888",
+      "detail": null,
+      "id": "49c51ef259d348818b4ee5cc114e1d9d",
+      "request": {
+        "agent_profile_id": null,
+        "agent_type": "default",
+        "conversation_id": null,
+        "git_provider": null,
+        "initial_message": "<redacted-content>",
+        "llm_model": null,
+        "parent_conversation_id": null,
+        "plugins": null,
+        "pr_number": [],
+        "processors": null,
+        "public": null,
+        "sandbox_id": null,
+        "secrets": null,
+        "selected_branch": "main",
+        "selected_repository": "rajshah4/openhands-agent-research-lab",
+        "suggested_task": null,
+        "system_message_suffix": null,
+        "title": "[research-lab] neurogolf-endurance-live-20260727T050720Z-c2919492 / cover-02-bridges / attempt-0004-e663075a",
+        "trigger": "openhands_api"
+      },
+      "sandbox_id": "6Dbr2dSTX5D1QMvEpObsPj",
+      "status": "READY",
+      "updated_at": "2026-07-27T09:01:04.729559Z"
+    }
+  },
+  "outcome": "completed",
+  "promoted_lesson_id": "lesson-78b1a43d23e2e02f",
+  "retrieved_lesson_ids": [
+    "lesson-fcdf92ed8a09f2e5"
+  ],
+  "run_id": "neurogolf-endurance-live-20260727T050720Z-c2919492",
+  "scheduler_decision": {
+    "policy": "managed",
+    "policy_version": "1",
+    "rationale": "prioritized task coverage, balanced attempt ownership, then the weakest validated score, with relevant validated memory",
+    "retrieved_lesson_ids": [
+      "lesson-fcdf92ed8a09f2e5"
+    ],
+    "task_id": "cover-02-bridges"
+  },
+  "schema_version": 1,
+  "sequence": 4,
+  "started_at": "2026-07-27T09:00:51.279798+00:00",
+  "task_id": "cover-02-bridges",
+  "validation": {
+    "errors": [],
+    "score": 4.0,
+    "valid": true
+  },
+  "worker_kind": "openhands"
+}
