@@ -1,0 +1,26 @@
+{
+  "candidate": {
+    "bins": [
+      ["amber", "dune"],
+      ["gale", "jade"],
+      ["elm", "birch"],
+      ["kelp", "heath"],
+      ["coral", "frost"],
+      ["iris", "lumen"]
+    ]
+  },
+  "lesson": {
+    "evidence": "Three approaches (FFD, BFD, multi-ordering search with 20+ trials) all converged to 6 bins matching theoretical minimum. The items form complementary pairs (8+2, 7+3, 6+4) that perfectly fill capacity-10 bins.",
+    "statement": "When item weights form complementary pairs summing to bin capacity, FFD achieves optimal packing immediately.",
+    "tags": ["bin-packing"]
+  },
+  "next_gate": "validate",
+  "status": "done",
+  "summary": [
+    "Tested FFD, BFD, and multi-ordering search (20+ trials)",
+    "All approaches found optimal 6-bin solution",
+    "Items form perfect complementary pairs (8+2, 7+3, 6+4)",
+    "Each bin utilizes full capacity of 10",
+    "Verified all 12 items packed exactly once"
+  ]
+}
