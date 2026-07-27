@@ -1,0 +1,12 @@
+{
+  "attempt_id": "attempt-0007-645374df",
+  "id": "0014-attempt_recorded",
+  "kind": "attempt_recorded",
+  "payload": {
+    "outcome": "failed",
+    "validation_valid": false
+  },
+  "recorded_at": "2026-07-27T13:01:21.621368+00:00",
+  "run_id": "neurogolf-endurance-live-20260727T050720Z-c2919492",
+  "schema_version": 1
+}
