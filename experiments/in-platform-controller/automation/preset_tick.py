@@ -99,17 +99,23 @@ def main() -> int:
             "PYTHONPATH": str(PROJECT_ROOT / "src"),
         }
     )
+    command = [
+        sys.executable,
+        str(TICK_SCRIPT),
+        "--campaign",
+        str(campaign),
+        "--state-root",
+        str(state_root),
+        "--live",
+    ]
+    if os.environ.get("RESEARCH_DEFER_SANDBOX_CLEANUP", "true").lower() in {
+        "1",
+        "true",
+        "yes",
+    }:
+        command.append("--defer-sandbox-cleanup")
     completed = subprocess.run(
-        [
-            sys.executable,
-            str(TICK_SCRIPT),
-            "--campaign",
-            str(campaign),
-            "--state-root",
-            str(state_root),
-            "--live",
-            "--defer-sandbox-cleanup",
-        ],
+        command,
         cwd=PROJECT_ROOT,
         env=environment,
         check=False,

@@ -11,6 +11,7 @@ git checkout -B main origin/main
 RESEARCH_STATE_BRANCH="experiment/endurance-controller-state" \
 RESEARCH_CAMPAIGN="examples/endurance-live.json" \
 RESEARCH_STATE_ROOT=".campaign-state/endurance-controller" \
+RESEARCH_DEFER_SANDBOX_CLEANUP="false" \
 OPENHANDS_API_KEY="$OPENHANDS_API_KEY" \
   python3 experiments/in-platform-controller/automation/preset_tick.py
 ```
