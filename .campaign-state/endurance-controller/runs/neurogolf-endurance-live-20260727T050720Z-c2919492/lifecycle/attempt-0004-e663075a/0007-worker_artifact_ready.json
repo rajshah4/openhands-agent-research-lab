@@ -1,0 +1,13 @@
+{
+  "attempt_id": "attempt-0004-e663075a",
+  "id": "0007-worker_artifact_ready",
+  "kind": "worker_artifact_ready",
+  "payload": {
+    "branch": "experiment/worker-artifact/attempt-0004-e663075a",
+    "length": 1070,
+    "path": ".research-artifacts/neurogolf-endurance-live-20260727T050720Z-c2919492/attempt-0004-e663075a.json"
+  },
+  "recorded_at": "2026-07-27T09:05:26.194146+00:00",
+  "run_id": "neurogolf-endurance-live-20260727T050720Z-c2919492",
+  "schema_version": 1
+}
