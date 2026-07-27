@@ -3,7 +3,7 @@
 - Campaign: Long-running Kaggle-shaped controller qualification
 - Scheduler: managed
 - Attempt budget: 8
-- Attempts recorded: 6
+- Attempts recorded: 7
 - Valid candidates: 6
 - Duplicate candidates: 0
 - Normalized solution quality: 1.000
@@ -17,7 +17,7 @@
 | cover-01-constellations | 1 | 3 |
 | cover-02-bridges | 1 | 4 |
 | pack-01-pairs-12 | 1 | 6 |
-| pack-02-pairs-16 | 1 | 8 |
+| pack-02-pairs-16 | 2 | 8 |
 
 ## Attempt ledger
 
@@ -29,6 +29,7 @@
 | 4 | cover-02-bridges | openhands | completed | yes | 4 | yes | no | [open](https://app.replicated.rajistics.com/conversations/be0c0a513cfa48378885e8084055e920) |
 | 5 | pack-01-pairs-12 | openhands | completed | yes | 6 | yes | no | [open](https://app.replicated.rajistics.com/conversations/e3cdcc9faae44381b3dbc5b6f54a5c1a) |
 | 6 | pack-02-pairs-16 | openhands | completed | yes | 8 | yes | no | [open](https://app.replicated.rajistics.com/conversations/8d1df5e5760145d792c2952ad57e6ff5) |
+| 7 | pack-02-pairs-16 | None | failed | no | — | no | no | — |
 
 This report is derived from immutable attempt records. Worker claims are
 not treated as validation evidence.
