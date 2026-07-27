@@ -252,6 +252,24 @@ item weights in each bin must not exceed the task capacity."""
         "summary": ["Five or fewer concise strings."],
         "next_gate": "validate",
     }
+    research_protocol = ""
+    if campaign.research_protocol == "endurance-v1":
+        research_protocol = """
+Endurance research protocol:
+- Use terminal tools and a temporary directory outside the repository. Do not
+  edit or commit repository files.
+- Implement and compare at least three solution approaches appropriate to this
+  task family: an exact or exhaustive baseline, a standard greedy heuristic,
+  and a seeded randomized or local-search refinement.
+- Run deterministic correctness checks after each approach. Exercise at least
+  30 seeded orderings or perturbations and record the best valid score.
+- Identify one concrete case where the weakest approach makes a worse choice,
+  then use that observation in the final refinement.
+- Independently re-check every task constraint before returning the final
+  candidate. Keep the complete attempt within twenty minutes.
+- Use the final summary strings to name the approaches compared, the number of
+  trials completed, the best valid score, and the final verification result.
+"""
     return f"""You are one bounded experimental worker in a research campaign.
 
 Run ID: {run_id}
@@ -269,6 +287,7 @@ Task:
 Validated lessons selected by the external scheduler:
 {json.dumps(lesson_payload, indent=2, sort_keys=True)}
 
+{research_protocol}
 Constraints:
 - Work only on this task.
 - Do not start other agents or conversations.

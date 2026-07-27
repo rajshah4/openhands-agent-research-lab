@@ -1,0 +1,21 @@
+Run exactly one bounded long-running NeuroGolf controller tick from the cloned
+`rajshah4/openhands-agent-research-lab` repository.
+
+Use the cloned repository path supplied in the repository context. Do not edit
+code, inspect or print secrets, create a pull request, or perform any additional
+research. From the repository root, run exactly:
+
+```bash
+git fetch origin main
+git checkout -B main origin/main
+RESEARCH_STATE_BRANCH="experiment/endurance-controller-state" \
+RESEARCH_CAMPAIGN="examples/endurance-live.json" \
+RESEARCH_STATE_ROOT=".campaign-state/endurance-controller" \
+OPENHANDS_API_KEY="$OPENHANDS_API_KEY" \
+  python3 experiments/in-platform-controller/automation/preset_tick.py
+```
+
+Wait for that command to finish. If it exits successfully, report the final
+JSON status printed by the command and finish. If it fails, report the error
+type and failing stage without printing environment variables or credential
+values, then finish with a failure.

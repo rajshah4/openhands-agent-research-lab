@@ -56,6 +56,7 @@ class CampaignSpec:
     branch: str | None
     model: str | None
     tasks: tuple[TaskSpec, ...]
+    research_protocol: str | None = None
 
     @classmethod
     def from_path(cls, path: Path) -> "CampaignSpec":
@@ -78,10 +79,14 @@ class CampaignSpec:
             branch=data.get("branch"),
             model=data.get("model"),
             tasks=tasks,
+            research_protocol=data.get("research_protocol"),
         )
 
     def to_dict(self) -> dict[str, Any]:
-        return asdict(self)
+        data = asdict(self)
+        if self.research_protocol is None:
+            data.pop("research_protocol")
+        return data
 
 
 @dataclass(frozen=True)

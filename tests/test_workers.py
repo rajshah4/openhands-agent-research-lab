@@ -53,6 +53,20 @@ class FakeOpenHandsClient:
 
 
 class OpenHandsWorkerTests(unittest.TestCase):
+    def test_default_campaign_serialization_remains_backward_compatible(self) -> None:
+        campaign = CampaignSpec(
+            id="campaign-1",
+            name="Campaign",
+            policy="managed",
+            attempt_budget=1,
+            repository=None,
+            branch=None,
+            model=None,
+            tasks=(),
+        )
+
+        self.assertNotIn("research_protocol", campaign.to_dict())
+
     def test_pauses_sandbox_after_final_response(self) -> None:
         client = FakeOpenHandsClient()
         lifecycle = []
@@ -206,6 +220,39 @@ class OpenHandsWorkerTests(unittest.TestCase):
         self.assertIn('"a"', prompt)
         self.assertNotIn('"item-a"', prompt)
         self.assertIn("Never add a", prompt)
+
+    def test_endurance_protocol_requires_multi_stage_tool_work(self) -> None:
+        campaign = CampaignSpec(
+            id="campaign-1",
+            name="Campaign",
+            policy="managed",
+            attempt_budget=1,
+            repository="owner/repo",
+            branch="main",
+            model=None,
+            tasks=(),
+            research_protocol="endurance-v1",
+        )
+        task = TaskSpec(
+            id="pack",
+            family="bin-packing",
+            description="pack",
+            tags=("bin-packing",),
+            payload={"capacity": 10, "items": {"a": 6, "b": 4}},
+        )
+
+        prompt = render_worker_prompt(
+            campaign=campaign,
+            task=task,
+            run_id="run-1",
+            attempt_id="attempt-1",
+            lessons=[],
+        )
+
+        self.assertIn("Endurance research protocol", prompt)
+        self.assertIn("at least three solution approaches", prompt)
+        self.assertIn("30 seeded orderings or perturbations", prompt)
+        self.assertIn("complete attempt within twenty minutes", prompt)
 
 
 if __name__ == "__main__":

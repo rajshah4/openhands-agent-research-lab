@@ -76,3 +76,23 @@ def test_prepare_state_branch_creates_branch_when_remote_is_absent(monkeypatch):
         ("checkout", "-B", "experiment/in-platform-controller-state"),
         True,
     ) in calls
+
+
+def test_prepare_state_branch_accepts_a_separate_endurance_branch(monkeypatch):
+    module = _load_module()
+    calls: list[tuple[tuple[str, ...], bool]] = []
+
+    class Result:
+        returncode = 2
+
+    def fake_git(*arguments: str, check: bool = True):
+        calls.append((arguments, check))
+        return Result()
+
+    monkeypatch.setattr(module, "_git", fake_git)
+    module._prepare_state_branch("experiment/endurance-controller-state")
+
+    assert (
+        ("checkout", "-B", "experiment/endurance-controller-state"),
+        True,
+    ) in calls

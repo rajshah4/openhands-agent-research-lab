@@ -15,7 +15,9 @@ from pathlib import Path
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
-STATE_BRANCH = "experiment/in-platform-controller-state"
+DEFAULT_STATE_BRANCH = "experiment/in-platform-controller-state"
+DEFAULT_CAMPAIGN = "examples/in-platform-controller-pilot.json"
+DEFAULT_STATE_ROOT = ".campaign-state/in-platform-controller"
 TICK_SCRIPT = PROJECT_ROOT / "experiments" / "in-platform-controller" / "run_tick.py"
 
 
@@ -31,7 +33,7 @@ def _git(*arguments: str, check: bool = True) -> subprocess.CompletedProcess[str
     )
 
 
-def _prepare_state_branch() -> None:
+def _prepare_state_branch(state_branch: str = DEFAULT_STATE_BRANCH) -> None:
     _git("config", "user.name", "OpenHands Research Controller")
     _git(
         "config",
@@ -47,15 +49,26 @@ def _prepare_state_branch() -> None:
         "--exit-code",
         "--heads",
         "origin",
-        STATE_BRANCH,
+        state_branch,
         check=False,
     )
     if remote_state.returncode == 0:
-        _git("fetch", "origin", f"{STATE_BRANCH}:refs/remotes/origin/{STATE_BRANCH}")
-        _git("checkout", "-B", STATE_BRANCH, f"origin/{STATE_BRANCH}")
+        _git(
+            "fetch",
+            "origin",
+            f"{state_branch}:refs/remotes/origin/{state_branch}",
+        )
+        _git("checkout", "-B", state_branch, f"origin/{state_branch}")
         _git("merge", "--no-edit", "origin/main")
     else:
-        _git("checkout", "-B", STATE_BRANCH)
+        _git("checkout", "-B", state_branch)
+
+
+def _project_path(value: str, *, label: str) -> Path:
+    path = (PROJECT_ROOT / value).resolve()
+    if PROJECT_ROOT not in path.parents:
+        raise ValueError(f"{label} must resolve inside the repository")
+    return path
 
 
 def main() -> int:
@@ -63,7 +76,18 @@ def main() -> int:
         raise RuntimeError(
             "OPENHANDS_API_KEY was not injected into the automation conversation"
         )
-    _prepare_state_branch()
+    state_branch = os.environ.get("RESEARCH_STATE_BRANCH", DEFAULT_STATE_BRANCH)
+    if not state_branch.startswith("experiment/"):
+        raise ValueError("RESEARCH_STATE_BRANCH must start with experiment/")
+    campaign = _project_path(
+        os.environ.get("RESEARCH_CAMPAIGN", DEFAULT_CAMPAIGN),
+        label="RESEARCH_CAMPAIGN",
+    )
+    state_root = _project_path(
+        os.environ.get("RESEARCH_STATE_ROOT", DEFAULT_STATE_ROOT),
+        label="RESEARCH_STATE_ROOT",
+    )
+    _prepare_state_branch(state_branch)
     environment = dict(os.environ)
     environment.update(
         {
@@ -71,7 +95,7 @@ def main() -> int:
                 "OPENHANDS_BASE_URL",
                 "https://app.replicated.rajistics.com",
             ),
-            "RESEARCH_STATE_BRANCH": STATE_BRANCH,
+            "RESEARCH_STATE_BRANCH": state_branch,
             "PYTHONPATH": str(PROJECT_ROOT / "src"),
         }
     )
@@ -79,6 +103,10 @@ def main() -> int:
         [
             sys.executable,
             str(TICK_SCRIPT),
+            "--campaign",
+            str(campaign),
+            "--state-root",
+            str(state_root),
             "--live",
             "--defer-sandbox-cleanup",
         ],
