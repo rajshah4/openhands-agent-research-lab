@@ -237,6 +237,23 @@
       "attempts": 2,
       "firstSeconds": 33.3,
       "resumedSeconds": 25.6
+    },
+    "externalValidation": {
+      "documentedBatches": 4,
+      "workerAttempts": 20,
+      "initialFullBatches": 2,
+      "initialValidPerBatch": 5,
+      "targetedValid": 2,
+      "targetedAttempts": 2,
+      "finalValid": 6,
+      "finalAttempts": 6
+    },
+    "automationValidation": {
+      "documentedRuns": 9,
+      "pilotRuns": 7,
+      "concurrencyRuns": 2,
+      "cleanPilotTicks": 2,
+      "recurringRuns": 0
     }
   },
   "portfolioScale": {

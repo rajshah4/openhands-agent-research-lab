@@ -857,7 +857,9 @@ dd {
   grid-template-columns: repeat(2, 1fr);
 }
 
-.controller-config-table .agent-table {
+.controller-config-table .agent-table,
+.controller-model-table .agent-table,
+.controller-evidence-table .agent-table {
   min-width: 820px;
 }
 

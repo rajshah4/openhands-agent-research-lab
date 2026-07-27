@@ -211,6 +211,23 @@ type Snapshot = {
       firstSeconds: number;
       resumedSeconds: number;
     };
+    externalValidation: {
+      documentedBatches: number;
+      workerAttempts: number;
+      initialFullBatches: number;
+      initialValidPerBatch: number;
+      targetedValid: number;
+      targetedAttempts: number;
+      finalValid: number;
+      finalAttempts: number;
+    };
+    automationValidation: {
+      documentedRuns: number;
+      pilotRuns: number;
+      concurrencyRuns: number;
+      cleanPilotTicks: number;
+      recurringRuns: number;
+    };
   };
   portfolioScale: {
     tasks: number;
@@ -1456,14 +1473,13 @@ function RobustnessGuide({ snapshot }: { snapshot: Snapshot }) {
       <section className="section narrative">
         <div className="section-heading">
           <div>
-            <p className="eyebrow">Production robustness</p>
-            <h1>How the controller handles failures and incomplete work.</h1>
+            <p className="eyebrow">Managing and controlling OpenHands conversations</p>
           </div>
           <p>
-            The controller treats OpenHands as the execution plane and keeps
-            research state outside it. Every transition is recorded so work
-            can be validated, resumed, rejected, or cleaned up without asking
-            an agent to remember the system state.
+            The Deployment section explains how OpenHands provides conversation
+            and runtime infrastructure. This section covers the management
+            layer around it: assignment, admission, observation, validation,
+            recovery, durable records, and cleanup.
           </p>
         </div>
         <div className="workflow">
@@ -1487,7 +1503,7 @@ function RobustnessGuide({ snapshot }: { snapshot: Snapshot }) {
       <section className="section controller-section">
         <div className="section-heading report-heading">
           <div>
-            <p className="eyebrow">Controller placement and durable state</p>
+            <p className="eyebrow">One management loop</p>
           </div>
           <p>
             OpenHands executed the agent work. The controller selected tasks,
@@ -1542,84 +1558,263 @@ function RobustnessGuide({ snapshot }: { snapshot: Snapshot }) {
       <section className="section implementation-section">
         <div className="section-heading report-heading">
           <div>
-            <p className="eyebrow">Tested controller configurations and operating limits</p>
+            <p className="eyebrow">Four control patterns</p>
           </div>
           <p>
-            These tests answer one question: where can the controller run, and
-            how much concurrent work was independently verified in that
-            configuration? Larger campaigns remain in the queue and enter
-            OpenHands as capacity becomes available.
+            These patterns use the same scheduler, validators, ledger, and
+            OpenHands conversation API. The difference is what starts the
+            management loop and how long it remains active.
           </p>
         </div>
-        <div className="agent-table-wrap controller-config-table">
+        <div className="agent-table-wrap controller-model-table">
           <table className="agent-table">
             <thead>
               <tr>
-                <th>Controller location</th>
-                <th>Agent execution</th>
-                <th>Verified operating point</th>
-                <th>Result</th>
-                <th>Use this for</th>
+                <th>Pattern</th>
+                <th>How it works</th>
+                <th>Use it when</th>
+                <th>Evidence in this project</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td><strong>External service</strong></td>
-                <td>Enterprise grouped conversations</td>
+                <td><strong>Bounded polling batch</strong></td>
                 <td>
-                  {snapshot.controllerLoad.enterpriseExternal.activeWorkers}
-                  {" "}active;{" "}
-                  {snapshot.controllerLoad.enterpriseExternal.queuedWorkers}
-                  {" "}queued in one sandbox
+                  An external process starts a limited set of conversations,
+                  polls them to terminal state, validates the results, updates
+                  the ledger, cleans up, and exits.
                 </td>
                 <td>
-                  {snapshot.controllerLoad.enterpriseExternal.valid}/
-                  {snapshot.controllerLoad.enterpriseExternal.attempts}
-                  {" "}outputs independently validated
+                  A pipeline or operator owns a finite batch and needs an
+                  inspectable end state.
                 </td>
-                <td>Sustained campaigns and higher controller throughput</td>
+                <td>
+                  <strong>Live-tested.</strong> Four documented batches covered
+                  20 worker attempts; the accepted load used four active
+                  conversations and queued two.
+                </td>
               </tr>
               <tr>
-                <td><strong>Enterprise automation</strong></td>
-                <td>Child Enterprise conversations</td>
+                <td><strong>Scheduled automation tick</strong></td>
                 <td>
-                  {snapshot.controllerLoad.enterpriseAutomation.acceptedWorkers}
-                  {" "}active children in one sandbox
+                  An OpenHands automation creates a temporary controller
+                  conversation. One reconciliation runs, checkpoints Git, and
+                  exits with <code>keep_alive: false</code>.
                 </td>
                 <td>
-                  {snapshot.controllerLoad.enterpriseAutomation.acceptedValid}/
-                  {snapshot.controllerLoad.enterpriseAutomation.acceptedAttempts}
-                  {" "}validated. At four children, only{" "}
-                  {snapshot.controllerLoad.enterpriseAutomation.rejectedValid}/
-                  {snapshot.controllerLoad.enterpriseAutomation.rejectedAttempts}
-                  {" "}were independently verifiable.
+                  Work can wait until the next scheduled interval and running
+                  the controller inside OpenHands is operationally useful.
                 </td>
-                <td>Small scheduled batches that should run entirely in OpenHands</td>
+                <td>
+                  <strong>Trigger-tested, not schedule-tested.</strong> Nine
+                  manual automation runs covered setup, recovery, and
+                  concurrency. No unattended recurring campaign ran.
+                </td>
               </tr>
               <tr>
-                <td><strong>Beside Agent Canvas</strong></td>
-                <td>Canvas conversations on a shared backend</td>
+                <td><strong>Persistent reconciler</strong></td>
                 <td>
-                  {snapshot.controllerLoad.canvasResume.controllerProcesses}
-                  {" "}successive controller processes
+                  A long-running service repeatedly checks the queue and active
+                  conversations, then admits new work as capacity opens.
                 </td>
                 <td>
-                  The second process resumed the same run;{" "}
-                  {snapshot.controllerLoad.canvasResume.valid}/
-                  {snapshot.controllerLoad.canvasResume.attempts}
-                  {" "}attempts validated.
+                  A sustained campaign needs faster reaction than a schedule
+                  provides.
                 </td>
-                <td>One trusted team using a shared Canvas service</td>
+                <td>
+                  <strong>Implementation available; endurance unproven.</strong>
+                  The reconciliation and restart paths were tested in bounded
+                  runs, but the service was not kept running for 24 hours.
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Event-triggered tick</strong></td>
+                <td>
+                  A queue, webhook, or completion event invokes the same
+                  idempotent reconciliation instead of waiting for a timer.
+                </td>
+                <td>
+                  Start latency matters, workload is irregular, and the
+                  surrounding platform already has reliable event delivery.
+                </td>
+                <td>
+                  <strong>Design option, not yet tested.</strong> It still needs
+                  duplicate-event, missed-event, and out-of-order-event tests.
+                  Periodic reconciliation remains necessary as a backstop.
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
         <p className="architecture-note">
-          A campaign may contain hundreds of pending agents without running
-          hundreds simultaneously. The durable queue records the work; the
-          operating limit determines how many conversations are admitted at
-          once.
+          All four patterns must reconcile durable state before claiming work.
+          A successful schedule or event trigger only shows that the controller
+          started; validation and recorded terminal state determine whether the
+          agent work completed.
         </p>
+      </section>
+
+      <section className="section implementation-section">
+        <div className="section-heading report-heading">
+          <div>
+            <p className="eyebrow">Test results and current limits</p>
+          </div>
+          <p>
+            These were bounded integration and recovery tests. They support a
+            production pilot, but they are not an endurance test of a complete
+            NeuroGolf campaign.
+          </p>
+        </div>
+        <div className="agent-table-wrap controller-evidence-table">
+          <table className="agent-table">
+            <thead>
+              <tr>
+                <th>Approach</th>
+                <th>Test history</th>
+                <th>What it established</th>
+                <th>What it did not establish</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Bounded polling batch</strong></td>
+                <td>
+                  {snapshot.controllerLoad.externalValidation.documentedBatches}
+                  {" "}documented controller batches covering{" "}
+                  {snapshot.controllerLoad.externalValidation.workerAttempts}
+                  {" "}worker attempts: two initial 6-task batches at 5/6, a{" "}
+                  {snapshot.controllerLoad.externalValidation.targetedValid}/
+                  {snapshot.controllerLoad.externalValidation.targetedAttempts}
+                  {" "}targeted recovery test, and a final{" "}
+                  {snapshot.controllerLoad.externalValidation.finalValid}/
+                  {snapshot.controllerLoad.externalValidation.finalAttempts}
+                  {" "}batch.
+                </td>
+                <td>
+                  Bounded admission, queueing, grouped placement, terminal
+                  response recovery, independent validation, and sandbox
+                  cleanup worked together.
+                </td>
+                <td>
+                  It was not one uninterrupted 20-attempt run, a long-running
+                  service test, or a multi-controller failover test.
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Scheduled automation tick</strong></td>
+                <td>
+                  {snapshot.controllerLoad.automationValidation.documentedRuns}
+                  {" "}documented automation runs:{" "}
+                  {snapshot.controllerLoad.automationValidation.pilotRuns}
+                  {" "}setup, failure, recovery, and campaign-pilot runs plus{" "}
+                  {snapshot.controllerLoad.automationValidation.concurrencyRuns}
+                  {" "}concurrency runs. The final accepted cell validated{" "}
+                  {snapshot.controllerLoad.enterpriseAutomation.acceptedValid}/
+                  {snapshot.controllerLoad.enterpriseAutomation.acceptedAttempts}
+                  {" "}children.
+                </td>
+                <td>
+                  A temporary controller could load Git state, create worker
+                  conversations, recover an interrupted attempt, validate
+                  results, checkpoint state, and release the sandbox.
+                </td>
+                <td>
+                  We ran{" "}
+                  {snapshot.controllerLoad.automationValidation.recurringRuns}
+                  {" "}unattended recurring schedules. We did not test a
+                  15-minute schedule, a 24-hour campaign, or the full 400-task
+                  ONNX workload.
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Persistent reconciler</strong></td>
+                <td>
+                  The reusable supervisor and reconciliation code passed unit
+                  tests. Separate bounded tests exercised restart
+                  reattachment, file locking, validation, and cleanup.
+                </td>
+                <td>
+                  The components needed by a long-running controller behave
+                  correctly when invoked in bounded runs.
+                </td>
+                <td>
+                  No continuous 24-hour run, rolling process restart, memory
+                  growth test, prolonged API degradation, or queue-drain test
+                  has been completed. There is no established endurance limit.
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Event-triggered tick</strong></td>
+                <td>
+                  No live event-delivery test has been run. This pattern would
+                  invoke the same tested reconciliation command.
+                </td>
+                <td>
+                  Nothing beyond reuse of the controller contract.
+                </td>
+                <td>
+                  Duplicate, delayed, missed, and out-of-order events remain
+                  untested. Do not recommend this pattern without a periodic
+                  reconciliation backstop and an event failure-injection run.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p className="architecture-note">
+          The next qualification run should exercise both operational models:
+          repeated scheduled ticks and a continuously running reconciler. Each
+          should run long enough to drain a larger queue while controller,
+          worker, API, and Git failures are injected. Acceptance requires no
+          duplicate claims, no lost work, validated recovery, and zero leaked
+          sandboxes.
+        </p>
+      </section>
+
+      <section className="section implementation-section">
+        <div className="section-heading report-heading">
+          <div>
+            <p className="eyebrow">Reusable implementations</p>
+          </div>
+          <p>
+            The examples share the production controller code rather than
+            embedding orchestration decisions in prompts.
+          </p>
+        </div>
+        <div className="control-list">
+          <article>
+            <h3>Controller tick</h3>
+            <p>
+              One command reconciles saved state, handles one bounded unit of
+              work, checkpoints the result, and exits.
+            </p>
+            <a href="https://github.com/rajshah4/openhands-agent-research-lab/blob/main/experiments/in-platform-controller/run_tick.py">
+              View the reusable tick
+            </a>
+          </article>
+          <article>
+            <h3>OpenHands automation</h3>
+            <p>
+              The automation wrapper prepares the checkout and credentials,
+              invokes the same controller tick, and leaves lifecycle cleanup
+              to OpenHands.
+            </p>
+            <a href="https://github.com/rajshah4/openhands-agent-research-lab/tree/main/experiments/in-platform-controller/automation">
+              View the automation package
+            </a>
+          </article>
+          <article>
+            <h3>Persistent polling</h3>
+            <p>
+              The supervisor repeats bounded ticks at a configured interval.
+              It is intentionally small so production process management can
+              be supplied by Kubernetes or another service manager.
+            </p>
+            <a href="https://github.com/rajshah4/openhands-agent-research-lab/blob/main/experiments/in-platform-controller/persistent_supervisor.py">
+              View the polling supervisor
+            </a>
+          </article>
+        </div>
       </section>
 
       <section className="section implementation-section">
