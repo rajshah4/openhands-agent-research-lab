@@ -1,0 +1,11 @@
+{
+  "attempt_id": "attempt-0001-52464c16",
+  "id": "0034-controlled_dwell_reused",
+  "kind": "controlled_dwell_reused",
+  "payload": {
+    "configured_seconds": 600
+  },
+  "recorded_at": "2026-07-27T05:32:37.498159+00:00",
+  "run_id": "neurogolf-endurance-live-20260727T050720Z-c2919492",
+  "schema_version": 1
+}
