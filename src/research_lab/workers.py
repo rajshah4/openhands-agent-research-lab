@@ -263,13 +263,15 @@ Endurance research protocol:
   task family: an exact or exhaustive baseline, a standard greedy heuristic,
   and a seeded randomized or local-search refinement.
 - Run deterministic correctness checks after each approach. Exercise at least
-  30 seeded orderings or perturbations and record the best valid score.
+  12 seeded orderings or perturbations and record the best valid score.
 - Identify one concrete case where the weakest approach makes a worse choice,
   then use that observation in the final refinement.
 - Independently re-check every task constraint before returning the final
   candidate. Keep the complete attempt within twenty minutes.
 - Use the final summary strings to name the approaches compared, the number of
   trials completed, the best valid score, and the final verification result.
+- Return the compact JSON contract as soon as verification is complete. Do not
+  perform additional tool calls or add a narrative after verification.
 """
     return f"""You are one bounded experimental worker in a research campaign.
 

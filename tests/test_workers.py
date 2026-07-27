@@ -251,7 +251,7 @@ class OpenHandsWorkerTests(unittest.TestCase):
 
         self.assertIn("Endurance research protocol", prompt)
         self.assertIn("at least three solution approaches", prompt)
-        self.assertIn("30 seeded orderings or perturbations", prompt)
+        self.assertIn("12 seeded orderings or perturbations", prompt)
         self.assertIn("complete attempt within twenty minutes", prompt)
 
     def test_controller_enforces_controlled_dwell_before_cleanup(self) -> None:

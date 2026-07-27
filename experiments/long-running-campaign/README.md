@@ -14,8 +14,9 @@ eight-hour campaign instead of a single short batch.
   controller/worker sandbox.
 
 The worker compares an exact baseline, a greedy heuristic, and a seeded search
-across at least 30 deterministic trials. Independent application code still
-validates the final candidate. The controller then keeps the work cell alive
+across at least 12 deterministic trials. Independent application code still
+validates the final candidate. This bound keeps the worker's terminal contract
+inside the Enterprise app's searchable event history. The controller then keeps the work cell alive
 until ten minutes have elapsed since conversation readiness. That controlled
 dwell period tests long-lived controller state, timeouts, and runtime stability;
 it is recorded separately and is not presented as research complexity.
