@@ -1,0 +1,33 @@
+{
+  "candidate": {
+    "assignments": {
+      "v0": 0,
+      "v1": 1,
+      "v2": 0,
+      "v3": 1,
+      "v4": 2,
+      "u0": 0,
+      "u1": 1,
+      "u2": 0,
+      "u3": 1,
+      "u4": 2,
+      "w": 3
+    }
+  },
+  "lesson": {
+    "evidence": "Mycielski(C5) graph with 11 nodes, 20 edges analyzed. Exact backtracking proved χ=4 (3 colors insufficient, 4 sufficient). Greedy succeeded across 12 orderings when w (degree 5, adjacent to all u-nodes) colored last. DSATUR and local search both converged to 4 colors. The shadow construction: 5-cycle v0..v4 needs 3 colors, each ui adjacent to two non-adjacent cycle vertices mirrors cycle constraints, w adjacent to all ui forces 4th color.",
+    "statement": "Mycielski construction of 5-cycle has chromatic number 4; greedy achieves optimum when the universal shadow vertex is colored after its neighbors.",
+    "tags": [
+      "graph-coloring"
+    ]
+  },
+  "next_gate": "validate",
+  "status": "done",
+  "summary": [
+    "Exact backtracking: 4 colors optimal (3 failed, 4 succeeded)",
+    "Greedy: 4 colors across 12 orderings, all valid",
+    "DSATUR and local search: 4 colors, 12/12 trials valid",
+    "Structure: Mycielski(C5) with shadow layer needs 4th color for universal vertex w",
+    "Final verification: all 11 nodes assigned, 20 edge constraints satisfied"
+  ]
+}
