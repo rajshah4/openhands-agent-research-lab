@@ -1,0 +1,19 @@
+{
+  "attempt_id": "attempt-0003-56cc5714",
+  "id": "0001-attempt_selected",
+  "kind": "attempt_selected",
+  "payload": {
+    "scheduler_decision": {
+      "policy": "managed",
+      "policy_version": "1",
+      "rationale": "prioritized task coverage, balanced attempt ownership, then the weakest validated score, with relevant validated memory",
+      "retrieved_lesson_ids": [],
+      "task_id": "cover-01-constellations"
+    },
+    "sequence": 3,
+    "task_id": "cover-01-constellations"
+  },
+  "recorded_at": "2026-07-27T07:00:55.478080+00:00",
+  "run_id": "neurogolf-endurance-live-20260727T050720Z-c2919492",
+  "schema_version": 1
+}
