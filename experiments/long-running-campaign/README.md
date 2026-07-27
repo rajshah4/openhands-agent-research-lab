@@ -12,10 +12,10 @@ eight-hour campaign instead of a single short batch.
 - A unique Git state branch and state directory.
 - `keep_alive: false` so the automation service releases each completed
   controller sandbox.
-- `RESEARCH_DEFER_SANDBOX_CLEANUP=false` so the controller explicitly pauses
-  an isolated worker sandbox after every attempt. In a grouped controller and
-  worker sandbox, leave the default enabled and let the automation service own
-  cleanup of the shared sandbox.
+- The grouped automation and worker share one sandbox, so the default
+  `RESEARCH_DEFER_SANDBOX_CLEANUP=true` leaves cleanup to the automation
+  service. For an isolated worker sandbox, set it to `false` so the controller
+  explicitly pauses the worker after every attempt.
 
 The worker compares an exact baseline, a greedy heuristic, and a seeded search
 across at least 12 deterministic trials. Independent application code still
