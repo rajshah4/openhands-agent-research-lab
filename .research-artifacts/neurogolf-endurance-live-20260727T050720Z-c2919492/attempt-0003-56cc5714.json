@@ -1,0 +1,25 @@
+{
+  "candidate": {
+    "selected_sets": [
+      "atlas",
+      "beacon",
+      "cipher"
+    ]
+  },
+  "lesson": {
+    "evidence": "Exact brute-force found optimal 3-set solution. Atlas, beacon, cipher form a perfect partition (e01-e06, e07-e12, e13-e18). Greedy matched optimum. Randomized trials (12 seeds) produced size 3-5 solutions; seed 1 chose 4 sets when randomness picked drift early.",
+    "statement": "Partition-structured set covers allow optimal exact solutions at small scale; randomized greedy degrades when early picks fragment the partition.",
+    "tags": [
+      "set-cover"
+    ]
+  },
+  "next_gate": "validate",
+  "status": "done",
+  "summary": [
+    "Exact brute-force: 3 sets (atlas, beacon, cipher)",
+    "Greedy heuristic: 3 sets, matches optimal",
+    "Randomized greedy: 12 trials, best 3 sets, worst 5 sets",
+    "Local search refinement: all 12 trials converged to 3 sets",
+    "Final verified: 3 sets cover all 18 elements with no duplicates"
+  ]
+}
