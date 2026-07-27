@@ -1,0 +1,14 @@
+{
+  "attempt_id": "attempt-0006-67074705",
+  "id": "0005-conversation_ready",
+  "kind": "conversation_ready",
+  "payload": {
+    "conversation_id": "8d1df5e5760145d792c2952ad57e6ff5",
+    "sandbox_id": "6kBvy0G2PEM9A1Zc8CcKOz",
+    "start_task_id": "8f7292233ceb44e0aa9889da30915fda",
+    "ui_url": "https://app.replicated.rajistics.com/conversations/8d1df5e5760145d792c2952ad57e6ff5"
+  },
+  "recorded_at": "2026-07-27T11:01:11.223117+00:00",
+  "run_id": "neurogolf-endurance-live-20260727T050720Z-c2919492",
+  "schema_version": 1
+}
