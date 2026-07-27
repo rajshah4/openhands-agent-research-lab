@@ -237,7 +237,7 @@ type Snapshot = {
   }>;
 };
 
-const views = ["Overview", "Deployment", "Robustness", "Evidence", "Scaling"] as const;
+const views = ["Overview", "Deployment", "Robustness", "How we tested", "Scaling"] as const;
 type View = (typeof views)[number];
 
 function pct(value: number) {
@@ -863,46 +863,73 @@ function OverviewGuide({ snapshot }: { snapshot: Snapshot }) {
   );
 }
 
-function EvidenceGuide({ snapshot }: { snapshot: Snapshot }) {
+function TestMethodGuide({ snapshot }: { snapshot: Snapshot }) {
   return (
     <>
       <section className="section narrative">
         <div className="section-heading">
           <div>
-            <p className="eyebrow">Live OpenHands evidence</p>
-            <h1>Small test problems were used to verify the real execution path.</h1>
+            <p className="eyebrow">How we tested</p>
+            <h1>Simple problems were used to test the orchestration system.</h1>
           </div>
           <p>
-            These were not intended to represent NeuroGolf difficulty. They
-            were deliberately easy to check independently, which made them
-            useful for testing conversation creation, model execution, result
-            parsing, validation, memory retrieval, sandbox placement, and
-            cleanup on the Replicated installation.
+            The problems were deliberately easy to verify. That allowed the
+            tests to focus on task assignment, conversation creation, result
+            validation, shared memory, sandbox placement, and cleanup. They
+            were not a test of NeuroGolf reasoning difficulty.
           </p>
         </div>
-        <div className="implementation-grid">
-          <article className="implementation-card">
-            <span className="implementation-status tested">Live execution</span>
-            <h3>{snapshot.proof.validAttempts}/{snapshot.proof.liveAttempts} accepted OpenHands runs</h3>
-            <p>Every accepted answer was checked by code rather than accepted from the agent&apos;s own assessment.</p>
-          </article>
-          <article className="implementation-card">
-            <span className="implementation-status tested">Matched protocol</span>
-            <h3>Six small problems, two organizations, three repetitions</h3>
-            <p>The model, problems, timeouts, and attempt budgets were held constant.</p>
-          </article>
-          <article className="implementation-card">
-            <span className="implementation-status next">Interpretation</span>
-            <h3>An infrastructure result, not a reasoning result</h3>
-            <p>Both organizations solved the problems, so this run does not establish a quality advantage from shared memory.</p>
-          </article>
+        <div className="agent-table-wrap method-table">
+          <table className="agent-table">
+            <thead>
+              <tr>
+                <th>What we tested</th>
+                <th>Method</th>
+                <th>What the result tells us</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>OpenHands execution path</strong></td>
+                <td>
+                  {snapshot.proof.validAttempts}/
+                  {snapshot.proof.liveAttempts} accepted runs; every answer
+                  checked by deterministic code
+                </td>
+                <td>
+                  Conversations could be created, completed, independently
+                  validated, and cleaned up.
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Managed versus independent agents</strong></td>
+                <td>
+                  The same six problems ran under both organizations three
+                  times, using the same model, timeouts, and attempt budgets.
+                </td>
+                <td>
+                  Differences in coverage, time, and cost came from the
+                  orchestration setup rather than different test inputs.
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Limits of the comparison</strong></td>
+                <td>
+                  The problems were small and both organizations could solve
+                  them.
+                </td>
+                <td>
+                  The test measures orchestration behavior. It does not
+                  establish a reasoning-quality or Kaggle-score advantage.
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
         <p className="architecture-note">
-          After the tests, the Replicated instance had{" "}
-          {snapshot.capacity.active} active sandboxes,{" "}
-          {snapshot.capacity.unhealthyPods} unhealthy services, and{" "}
-          {snapshot.capacity.memoryAvailable} of available memory. Finished
-          sandboxes were paused and their identifiers remain in the evidence.
+          The run records below link the method to the individual OpenHands
+          conversations. Finished experiment sandboxes were paused after their
+          results were recorded.
         </p>
       </section>
     </>
@@ -2334,19 +2361,19 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
 
       {view === "Robustness" && <RobustnessGuide snapshot={snapshot} />}
 
-      {view === "Evidence" && <EvidenceGuide snapshot={snapshot} />}
+      {view === "How we tested" && <TestMethodGuide snapshot={snapshot} />}
 
       {view === "Scaling" && <CompetitionPlanner snapshot={snapshot} />}
 
-      {view === "Evidence" && (
+      {view === "How we tested" && (
         <section className="section" id="live-agents">
-          <div className="section-heading agents-heading">
+          <div className="section-heading agents-heading report-heading">
             <div>
-              <p className="eyebrow">OpenHands conversation records</p>
-              <h2>Individual live runs used to verify the execution path.</h2>
+              <p className="eyebrow">Run records</p>
               <p>
-                Each row links to the agent conversation. The score came from
-                the independent checker, not from the agent grading itself.
+                Each row links to an OpenHands conversation used in the test.
+                Results came from the independent checker, not from the agent
+                grading its own work.
               </p>
             </div>
             <div className="filter-row" aria-label="Filter experiments">

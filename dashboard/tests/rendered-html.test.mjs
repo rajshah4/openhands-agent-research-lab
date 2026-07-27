@@ -48,7 +48,7 @@ test("renders the NeuroGolf experiment for a new reader", async () => {
   assert.match(html, />Overview</);
   assert.match(html, />Deployment</);
   assert.match(html, />Robustness</);
-  assert.match(html, />Evidence</);
+  assert.match(html, />How we tested</);
   assert.match(html, />Scaling</);
   assert.match(html, /What the Kaggle competition required/);
   assert.match(html, /400 independent implementation problems/);
@@ -68,6 +68,7 @@ test("renders the NeuroGolf experiment for a new reader", async () => {
   assert.doesNotMatch(html, /Supporting live-systems check|These are real OpenHands runs/);
   assert.doesNotMatch(html, /full competition solver is not/);
   assert.doesNotMatch(html, /codex-preview|Your site is taking shape/);
+  assert.doesNotMatch(html, />Evidence</);
 });
 
 test("includes the Agent Canvas deployment evidence", async () => {
@@ -145,6 +146,13 @@ test("includes the Agent Canvas deployment evidence", async () => {
   assert.match(source, /These estimates scale with the campaign, not sandbox placement/);
   assert.match(source, /CPU and memory still require an ONNX workload benchmark/);
   assert.doesNotMatch(source, /Placement proven|Density option|Worker cluster/);
+  assert.match(source, /Simple problems were used to test the orchestration system/);
+  assert.match(source, /What we tested/);
+  assert.match(source, /Managed versus independent agents/);
+  assert.match(source, /Limits of the comparison/);
+  assert.match(source, /Run records/);
+  assert.doesNotMatch(source, /Live OpenHands evidence/);
+  assert.doesNotMatch(source, /After the tests, the Replicated instance had/);
   assert.match(snapshot, /"clusterProvisionMinutes": 8/);
   assert.match(snapshot, /"wallSeconds": 113/);
   assert.match(snapshot, /"effectiveThroughput": 153\.55/);

@@ -861,6 +861,10 @@ dd {
   min-width: 820px;
 }
 
+.method-table .agent-table {
+  min-width: 760px;
+}
+
 .control-list {
   border-top: 1px solid var(--line);
   display: grid;
