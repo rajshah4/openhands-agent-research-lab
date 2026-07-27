@@ -362,6 +362,65 @@ class OpenHandsWorkerTests(unittest.TestCase):
             kinds.index("sandbox_pause_requested"),
         )
 
+    def test_recovery_reuses_completed_dwell(self) -> None:
+        client = FakeOpenHandsClient()
+        lifecycle = []
+        delays = []
+        worker = OpenHandsWorker(
+            client,
+            poll_seconds=1,
+            sleeper=delays.append,
+            artifact_reader=lambda branch, path: json.dumps(
+                {
+                    "status": "done",
+                    "candidate": {"assignments": {"0": 0}},
+                    "lesson": None,
+                    "summary": ["artifact"],
+                    "next_gate": "validate",
+                }
+            ),
+        )
+        campaign = CampaignSpec(
+            id="campaign-1",
+            name="Campaign",
+            policy="managed",
+            attempt_budget=1,
+            repository="owner/repository",
+            branch="main",
+            model=None,
+            tasks=(),
+            research_protocol="endurance-v1",
+            controlled_dwell_seconds=600,
+        )
+        task = TaskSpec(
+            id="task-1",
+            family="graph-coloring",
+            description="test",
+            tags=("graph-coloring",),
+            nodes=("0",),
+            edges=(),
+            target_score=1,
+        )
+
+        worker.recover(
+            campaign=campaign,
+            task=task,
+            run_id="run-1",
+            attempt_id="attempt-1",
+            lessons=[],
+            lifecycle_events=[
+                {
+                    "kind": "start_task_created",
+                    "payload": {"start_task_id": "start-1"},
+                },
+                {"kind": "sandbox_pause_requested", "payload": {}},
+            ],
+            on_lifecycle=lambda kind, payload: lifecycle.append((kind, payload)),
+        )
+
+        self.assertEqual(delays, [])
+        self.assertIn("controlled_dwell_reused", [kind for kind, _ in lifecycle])
+
 
 if __name__ == "__main__":
     unittest.main()

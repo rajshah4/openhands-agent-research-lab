@@ -477,9 +477,25 @@ class OpenHandsWorker:
                 run_id,
                 attempt_id,
             )
+        prior_dwell_finished = any(
+            event.get("kind")
+            in {"controlled_dwell_completed", "sandbox_pause_requested"}
+            for event in lifecycle_events
+        )
+        if prior_dwell_finished and campaign.controlled_dwell_seconds:
+            on_lifecycle(
+                "controlled_dwell_reused",
+                {
+                    "configured_seconds": campaign.controlled_dwell_seconds,
+                },
+            )
         return self._complete_started_attempt(
             start_task_id=start_task_id,
-            controlled_dwell_seconds=campaign.controlled_dwell_seconds,
+            controlled_dwell_seconds=(
+                0
+                if prior_dwell_finished
+                else campaign.controlled_dwell_seconds
+            ),
             artifact_branch=artifact_branch,
             artifact_path=artifact_path,
             on_lifecycle=on_lifecycle,
