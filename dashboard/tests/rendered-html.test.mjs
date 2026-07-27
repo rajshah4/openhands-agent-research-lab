@@ -171,7 +171,7 @@ test("includes the Agent Canvas deployment evidence", async () => {
   assert.match(source, /What we tested/);
   assert.match(source, /Managed versus independent agents/);
   assert.match(source, /Limits of the comparison/);
-  assert.match(source, /Run records/);
+  assert.doesNotMatch(source, /Run records/);
   assert.doesNotMatch(source, /Live OpenHands evidence/);
   assert.doesNotMatch(source, /After the tests, the Replicated instance had/);
   assert.match(snapshot, /"clusterProvisionMinutes": 8/);

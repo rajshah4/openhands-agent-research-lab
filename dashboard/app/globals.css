@@ -96,8 +96,7 @@ main {
   margin-top: 2px;
 }
 
-.view-switcher,
-.filter-row {
+.view-switcher {
   background: rgba(255, 255, 255, 0.55);
   border: 1px solid var(--line);
   border-radius: 999px;
@@ -105,8 +104,7 @@ main {
   padding: 3px;
 }
 
-.view-switcher button,
-.filter-row button {
+.view-switcher button {
   background: transparent;
   border: 0;
   border-radius: 999px;
@@ -115,8 +113,7 @@ main {
   padding: 8px 14px;
 }
 
-.view-switcher button.active,
-.filter-row button.active {
+.view-switcher button.active {
   background: var(--ink);
   color: white;
 }
@@ -1348,14 +1345,6 @@ dd {
   padding-bottom: 4px;
 }
 
-.agents-heading {
-  align-items: center;
-}
-
-.filter-row {
-  justify-self: end;
-}
-
 .agent-table-wrap {
   border: 1px solid var(--line);
   border-radius: 12px;
@@ -1420,15 +1409,6 @@ dd {
 .arm-chip.validation {
   background: var(--green-soft);
   color: var(--green);
-}
-
-.paused-dot {
-  background: var(--green);
-  border-radius: 50%;
-  display: inline-block;
-  height: 6px;
-  margin-right: 7px;
-  width: 6px;
 }
 
 .memory-section {
@@ -1823,16 +1803,6 @@ footer > div:last-child {
   .finding-card,
   .memory-rule {
     grid-column: auto;
-  }
-
-  .agents-heading {
-    align-items: start;
-  }
-
-  .filter-row {
-    justify-self: start;
-    overflow-x: auto;
-    width: 100%;
   }
 
   .incident-list article {

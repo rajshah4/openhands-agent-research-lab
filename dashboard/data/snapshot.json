@@ -292,22 +292,6 @@
     "managedQuality": 1.0,
     "exactAttemptsPerTask": 12
   },
-  "agents": [
-    {"id":"16ec807fe6134556ae023d84ad1b3f9d","arm":"Naive","task":"color-bipartite-8","score":2,"target":2,"status":"valid","sandbox":"PAUSED","transport":"fenced-json-fallback","lessons":0,"conversationUrl":"https://app.replicated.rajistics.com/conversations/16ec807fe6134556ae023d84ad1b3f9d"},
-    {"id":"9498ee78bd6d4ba1b595d63e1bcf49b5","arm":"Naive","task":"color-cycle-7","score":3,"target":3,"status":"valid","sandbox":"PAUSED","transport":"trailing-json-fallback","lessons":0,"conversationUrl":"https://app.replicated.rajistics.com/conversations/9498ee78bd6d4ba1b595d63e1bcf49b5"},
-    {"id":"db6459cde61f473d8ca6624e275ae4d3","arm":"Naive","task":"cover-campus","score":2,"target":2,"status":"valid","sandbox":"PAUSED","transport":"exact-json","lessons":0,"conversationUrl":"https://app.replicated.rajistics.com/conversations/db6459cde61f473d8ca6624e275ae4d3"},
-    {"id":"5da499e6edd64db08ce386cdf52398d8","arm":"Naive","task":"cover-grid","score":2,"target":2,"status":"valid","sandbox":"PAUSED","transport":"fenced-json-fallback","lessons":0,"conversationUrl":"https://app.replicated.rajistics.com/conversations/5da499e6edd64db08ce386cdf52398d8"},
-    {"id":"cd93339964d84cedb6e310cd1aa37db0","arm":"Naive","task":"pack-alpha","score":2,"target":2,"status":"valid","sandbox":"PAUSED","transport":"fenced-json-fallback","lessons":0,"conversationUrl":"https://app.replicated.rajistics.com/conversations/cd93339964d84cedb6e310cd1aa37db0"},
-    {"id":"0d8dee513b964884820724207cc16e09","arm":"Naive","task":"pack-beta","score":2,"target":2,"status":"valid","sandbox":"PAUSED","transport":"fenced-json-fallback","lessons":0,"conversationUrl":"https://app.replicated.rajistics.com/conversations/0d8dee513b964884820724207cc16e09"},
-    {"id":"9cc3a1a714754e37ac3cb0ee47bd8ac8","arm":"Managed","task":"color-bipartite-8","score":2,"target":2,"status":"valid","sandbox":"PAUSED","transport":"fenced-json-fallback","lessons":0,"conversationUrl":"https://app.replicated.rajistics.com/conversations/9cc3a1a714754e37ac3cb0ee47bd8ac8"},
-    {"id":"083e44938a6c41029f09fdb72507a849","arm":"Managed","task":"color-cycle-7","score":3,"target":3,"status":"valid","sandbox":"PAUSED","transport":"exact-json","lessons":1,"conversationUrl":"https://app.replicated.rajistics.com/conversations/083e44938a6c41029f09fdb72507a849"},
-    {"id":"adc1bcba7dac45c59c98c91e7a404fcf","arm":"Managed","task":"cover-campus","score":2,"target":2,"status":"valid","sandbox":"PAUSED","transport":"trailing-json-fallback","lessons":0,"conversationUrl":"https://app.replicated.rajistics.com/conversations/adc1bcba7dac45c59c98c91e7a404fcf"},
-    {"id":"0bdb141ede814e7c9ec7186685b7601b","arm":"Managed","task":"cover-grid","score":2,"target":2,"status":"valid","sandbox":"PAUSED","transport":"fenced-json-fallback","lessons":1,"conversationUrl":"https://app.replicated.rajistics.com/conversations/0bdb141ede814e7c9ec7186685b7601b"},
-    {"id":"2b819f1d58cf4484b78fba201798acb8","arm":"Managed","task":"pack-alpha","score":null,"target":2,"status":"invalid","sandbox":"PAUSED","transport":"trailing-json-fallback","lessons":0,"conversationUrl":"https://app.replicated.rajistics.com/conversations/2b819f1d58cf4484b78fba201798acb8"},
-    {"id":"91330f2ec077482b83ff1ba87932972d","arm":"Managed","task":"pack-beta","score":null,"target":2,"status":"invalid","sandbox":"PAUSED","transport":"fenced-json-fallback","lessons":0,"conversationUrl":"https://app.replicated.rajistics.com/conversations/91330f2ec077482b83ff1ba87932972d"},
-    {"id":"832cdfc8ec1a4eeaa2749499ce38a43b","arm":"Regression","task":"pack-alpha","score":2,"target":2,"status":"valid","sandbox":"PAUSED","transport":"trailing-json-fallback","lessons":0,"conversationUrl":"https://app.replicated.rajistics.com/conversations/832cdfc8ec1a4eeaa2749499ce38a43b"},
-    {"id":"2350802c7cd5451e99dd6e2df5d2c212","arm":"Regression","task":"pack-beta","score":2,"target":2,"status":"valid","sandbox":"PAUSED","transport":"fenced-json-fallback","lessons":1,"conversationUrl":"https://app.replicated.rajistics.com/conversations/2350802c7cd5451e99dd6e2df5d2c212"}
-  ],
   "lessons": [
     {
       "id": "lesson-130ed8196f507687",

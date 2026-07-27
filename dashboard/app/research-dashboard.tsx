@@ -1,19 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
-
-type AgentRecord = {
-  id: string;
-  arm: string;
-  task: string;
-  score: number | null;
-  target: number;
-  status: string;
-  sandbox: string;
-  transport: string;
-  lessons: number;
-  conversationUrl: string;
-};
+import { useState } from "react";
 
 type Snapshot = {
   generatedAt: string;
@@ -265,7 +252,6 @@ type Snapshot = {
     managedQuality: number;
     exactAttemptsPerTask: number;
   };
-  agents: AgentRecord[];
   lessons: Array<{
     id: string;
     statement: string;
@@ -286,27 +272,6 @@ type View = (typeof views)[number];
 
 function pct(value: number) {
   return `${Math.round(value * 100)}%`;
-}
-
-function shortId(value: string) {
-  return value.length > 12 ? `${value.slice(0, 8)}…` : value;
-}
-
-function armLabel(value: string) {
-  return {
-    all: "All runs",
-    naive: "No memory",
-    managed: "Shared lessons",
-    regression: "Fix check",
-  }[value.toLowerCase()] ?? value;
-}
-
-function transportLabel(value: string) {
-  return {
-    "exact-json": "Exact JSON",
-    "fenced-json-fallback": "JSON in a code block",
-    "trailing-json-fallback": "JSON after an explanation",
-  }[value] ?? value.replaceAll("-", " ");
 }
 
 function formatNumber(value: number) {
@@ -2007,15 +1972,6 @@ function RobustnessGuide({ snapshot }: { snapshot: Snapshot }) {
 
 export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
   const [view, setView] = useState<View>("Overview");
-  const [arm, setArm] = useState("all");
-
-  const visibleAgents = useMemo(
-    () =>
-      snapshot.agents.filter(
-        (agent) => arm === "all" || agent.arm.toLowerCase() === arm,
-      ),
-    [snapshot.agents, arm],
-  );
 
   return (
     <main>
@@ -2694,75 +2650,6 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
       {view === "How we tested" && <TestMethodGuide snapshot={snapshot} />}
 
       {view === "Scaling" && <CompetitionPlanner snapshot={snapshot} />}
-
-      {view === "How we tested" && (
-        <section className="section" id="live-agents">
-          <div className="section-heading agents-heading report-heading">
-            <div>
-              <p className="eyebrow">Run records</p>
-              <p>
-                Each row links to an OpenHands conversation used in the test.
-                Results came from the independent checker, not from the agent
-                grading its own work.
-              </p>
-            </div>
-            <div className="filter-row" aria-label="Filter experiments">
-              {["all", "naive", "managed", "regression"].map((item) => (
-                <button
-                  className={arm === item ? "active" : ""}
-                  key={item}
-                  onClick={() => setArm(item)}
-                  type="button"
-                >
-                  {armLabel(item)}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="agent-table-wrap">
-            <table className="agent-table">
-              <thead>
-                <tr>
-                  <th>Agent run</th>
-                  <th>Test setup</th>
-                  <th>Problem</th>
-                  <th>Result</th>
-                  <th>Lessons provided</th>
-                  <th>Reply format</th>
-                  <th>Workspace</th>
-                </tr>
-              </thead>
-              <tbody>
-                {visibleAgents.map((agent) => (
-                  <tr key={agent.id}>
-                    <td>
-                      <a href={agent.conversationUrl}>
-                        {shortId(agent.id)} <span aria-hidden="true">↗</span>
-                      </a>
-                    </td>
-                    <td>
-                      <span className={`arm-chip ${agent.arm.toLowerCase()}`}>
-                        {armLabel(agent.arm)}
-                      </span>
-                    </td>
-                    <td>{agent.task}</td>
-                    <td>
-                      <strong>{agent.score ?? "invalid"}</strong>
-                      <small> / target {agent.target}</small>
-                    </td>
-                    <td>{agent.lessons ? `${agent.lessons} retrieved` : "none"}</td>
-                    <td>{transportLabel(agent.transport)}</td>
-                    <td>
-                      <span className="paused-dot" />
-                      {agent.sandbox.toLowerCase()}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-      )}
 
       {view === "Robustness" && (
         <section className="section memory-section">
