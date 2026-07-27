@@ -1,0 +1,22 @@
+{
+  "attempt_id": "attempt-0008-e1972512",
+  "id": "0002-capacity_checked",
+  "kind": "capacity_checked",
+  "payload": {
+    "active": 1,
+    "available_before_limit": 9,
+    "launch_allowed": true,
+    "launch_lock_at": 7,
+    "observed_sandboxes": 242,
+    "runtime_limit": 10,
+    "scope": "authenticated-user-visible-sandboxes",
+    "status_counts": {
+      "MISSING": 7,
+      "PAUSED": 234,
+      "RUNNING": 1
+    }
+  },
+  "recorded_at": "2026-07-27T14:00:56.473992+00:00",
+  "run_id": "neurogolf-endurance-live-20260727T050720Z-c2919492",
+  "schema_version": 1
+}
