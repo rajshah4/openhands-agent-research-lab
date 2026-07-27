@@ -27,7 +27,11 @@ test("renders the NeuroGolf experiment for a new reader", async () => {
   const illustration = await stat(
     new URL("../public/sandbox-placement.png", import.meta.url),
   );
+  const deploymentOptions = await stat(
+    new URL("../public/deployment-options.png", import.meta.url),
+  );
   assert.ok(illustration.size > 0);
+  assert.ok(deploymentOptions.size > 0);
 
   const response = await render();
   assert.equal(response.status, 200);
@@ -76,8 +80,10 @@ test("includes the Agent Canvas deployment evidence", async () => {
     "utf8",
   );
 
-  assert.match(source, /We measured setup time, shared-agent load, model cost, and estimated cluster cost/);
-  assert.match(source, /These are resource-based estimates, not a cloud invoice/);
+  assert.match(source, /Agent Canvas: a shared agent service for one trusted team/);
+  assert.match(source, /Unlike Enterprise conversations, Canvas does not create a separate\s+sandbox boundary for each agent/);
+  assert.match(source, /Lower runtime overhead for trusted work/);
+  assert.match(source, /The application owns the shared boundary/);
   assert.match(source, /Those waiting jobs\s+did not have sandboxes yet/);
   assert.match(source, /Removing the queue increased contention and did not produce a wall-time win/);
   assert.doesNotMatch(source, /simultaneous sandbox(?:es)? · .* queued/);
@@ -85,11 +91,22 @@ test("includes the Agent Canvas deployment evidence", async () => {
   assert.match(source, /Enterprise isolated/);
   assert.match(source, /Enterprise grouped/);
   assert.match(source, /Agent Canvas/);
-  assert.match(source, /SDK subagents/);
-  assert.match(source, /Native TaskToolSet delegation passed in Agent Canvas/);
-  assert.match(source, /Native TaskToolSet worked in Agent Canvas; the Replicated profile still omitted it/);
+  assert.match(source, /Parent with subagents/);
+  assert.match(source, /src="\/deployment-options\.png"/);
+  assert.match(source, /operational tradeoffs among the four structures/);
+  assert.ok(
+    source.indexOf("operational tradeoffs among the four structures") <
+      source.indexOf("Agent Canvas: a shared agent service"),
+  );
+  assert.ok(
+    source.indexOf("<table className=\"agent-table\">") <
+      source.indexOf("Agent Canvas: a shared agent service"),
+  );
+  assert.match(source, /Enterprise: comparing isolated and grouped conversations/);
+  assert.match(source, /Replicated was the deployment method, not a\s+separate orchestration pattern/);
+  assert.match(source, /Parent and subagents: using TaskToolSet to coordinate specialist children/);
   assert.match(source, /A native code-explorer child performed the delegated work/);
-  assert.match(source, /Same four research tasks, three execution structures/);
+  assert.match(source, /same four research tasks in three execution structures/);
   assert.match(source, /33\.4% faster than sequential delegation/);
   assert.match(source, /Four first-class Canvas conversations/);
   assert.match(source, /Recommended hybrid/);
@@ -100,8 +117,13 @@ test("includes the Agent Canvas deployment evidence", async () => {
   assert.match(source, /Need Enterprise\?/);
   assert.match(source, /Failure and retry scope/);
   assert.match(source, /Manageability/);
-  assert.match(source, /validate the task\s+tool separately on OpenHands Cloud/i);
-  assert.match(source, /Choosing an execution pattern/);
+  assert.match(source, /Enterprise implementation note/);
+  assert.match(source, /Decision guide: use trust and operational requirements to choose the boundary/);
+  assert.doesNotMatch(source, /Six-agent load phase/);
+  assert.doesNotMatch(source, /Peak shared pod/);
+  assert.doesNotMatch(source, /Replicated measurements/);
+  assert.doesNotMatch(source, /OHE side note/);
+  assert.doesNotMatch(source, /Native TaskToolSet worked in Agent Canvas; the Replicated profile still omitted it/);
   assert.match(source, /OpenHands ran the workers\. One controller kept the campaign organized/);
   assert.match(source, /One controller can use files and Git/);
   assert.match(source, /Several controllers need database leases/);

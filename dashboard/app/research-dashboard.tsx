@@ -944,8 +944,8 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
       record: "Canvas agent records",
       runtime: "Shared backend and workspace",
       isolation: "Shared trust boundary",
-      use: "Tightly coupled trusted work and lightweight demonstrations",
-      tradeoff: "Less runtime isolation than Enterprise conversations",
+      use: "One trusted team that wants lower runtime overhead and can own the surrounding controls",
+      tradeoff: "The application owns capacity, access, and shared-workspace safety",
       concurrency: "Logical agents share one backend; size the backend for the workload",
       cost: `$${snapshot.canvasPilot.matchedDeployment.totalModelCost.toFixed(3)} total for 18 matched attempts`,
       enterprise: "No",
@@ -959,13 +959,13 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
       runtime: "One parent sandbox",
       isolation: "Shared parent context",
       use: "Two to four independent specialists inside one trusted work cell",
-      tradeoff: "Passed in Agent Canvas; the tested Enterprise profile still omitted the task tool",
+      tradeoff: "Children share the parent lifecycle, workspace, and audit record",
       concurrency: "Four read-only delegates ran concurrently; shared writes can race",
       cost: `$${snapshot.agentCanvasTaskTool.deeperComparison.parallel.modelCost.toFixed(3)} for four matched Canvas tasks`,
       enterprise: "No",
       recovery: "Parent or controller identifies and reissues the failed child",
       management: "One compact record; weakest child-level audit and handoff",
-      status: "Canvas validated · OHE gap",
+      status: "Canvas validated",
     },
   ];
 
@@ -989,7 +989,7 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
             ["01", "Enterprise isolated", "Each agent has its own OpenHands conversation and sandbox.", "isolated", "Measured"],
             ["02", "Enterprise grouped", "Agents keep separate conversations while trusted work shares a sandbox.", "grouped", "Measured"],
             ["03", "Agent Canvas", "Several agents share one lighter agent backend, workspace, and trust boundary.", "canvas", "Measured"],
-            ["04", "SDK subagents", "One parent delegates through TaskToolSet inside its conversation and sandbox.", "subagents", "Passed in Canvas · blocked in OHE"],
+            ["04", "Parent with subagents", "One parent delegates through TaskToolSet inside its conversation and sandbox.", "subagents", "Validated in Canvas"],
           ].map(([number, title, copy, visual, status]) => (
             <article className="pattern-card" key={number}>
               <div className={`pattern-miniature ${visual}`} aria-hidden="true">
@@ -1008,73 +1008,111 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
             </article>
           ))}
         </div>
+        <figure className="deployment-illustration">
+          <img
+            src="/deployment-options.png"
+            alt="Four OpenHands execution structures: separate Enterprise sandboxes, grouped Enterprise conversations in one sandbox, Agent Canvas records in one shared backend and workspace, and parent-managed subagents in one sandbox."
+          />
+          <figcaption>
+            The four structures differ in runtime isolation and record
+            ownership. The controller, validators, and experiment ledger can
+            remain the same.
+          </figcaption>
+        </figure>
         <p className="architecture-note">
-          <strong>What we measured:</strong> live tests covered Enterprise
-          isolated conversations, Enterprise grouped conversations, and Agent
-          Canvas. Native TaskToolSet delegation passed in Agent Canvas. The
-          matched Replicated test exposed a separate profile integration gap
-          before a native child could run.
+          The same campaign controller, task registry, validators, and
+          experiment ledger can be used with all four structures. The
+          execution choice changes isolation, runtime count, agent history,
+          failure scope, and how much operational control the application must
+          provide.
         </p>
-      </section>
-
-      <section className="section">
-        <div className="section-heading">
+        <div className="section-heading comparison-table-heading report-heading">
           <div>
-            <p className="eyebrow">Results by execution pattern</p>
-            <h2>What each structure changed in the live tests.</h2>
+            <p className="eyebrow">Comparison at a glance: operational tradeoffs among the four structures</p>
           </div>
           <p>
-            These are not one four-way benchmark. Enterprise isolated and
-            grouped conversations used matched batches; Agent Canvas used a
-            separate matched deployment comparison; the subagent results are
-            feature-integration tests in Canvas and OHE.
+            Use this table for the initial decision. The sections below provide
+            the implementation details and measured evidence for each
+            approach.
           </p>
         </div>
-        <div className="result-overview-grid">
-          <article>
-            <span>Enterprise isolated</span>
-            <strong>{snapshot.replicatedPatterns.isolatedFour.valid}/{snapshot.replicatedPatterns.isolatedFour.attempts} valid</strong>
-            <p>{snapshot.replicatedPatterns.isolatedFour.meanWallSeconds.toFixed(1)} seconds mean wall time; four simultaneous sandboxes and two waiting jobs.</p>
-          </article>
-          <article>
-            <span>Enterprise grouped</span>
-            <strong>1 shared sandbox</strong>
-            <p>{snapshot.replicatedPatterns.groupedFour.valid}/{snapshot.replicatedPatterns.groupedFour.attempts} valid with four active agents; six active agents did not finish faster.</p>
-          </article>
-          <article>
-            <span>Agent Canvas</span>
-            <strong>{snapshot.canvasPilot.matchedDeployment.meanBatchWallSeconds.toFixed(1)} seconds</strong>
-            <p>Mean six-task batch time in one shared pod; {snapshot.canvasPilot.matchedDeployment.valid}/{snapshot.canvasPilot.matchedDeployment.attempts} independently valid.</p>
-          </article>
-          <article>
-            <span>SDK subagents</span>
-            <strong>{snapshot.agentCanvasTaskTool.deeperComparison.parallel.wallSeconds.toFixed(1)} seconds</strong>
-            <p>Four parallel Canvas delegates completed 4/4 strict output contracts; OHE still omitted the enabled task tool.</p>
-          </article>
+        <div className="agent-table-wrap">
+          <table className="agent-table">
+            <thead>
+              <tr>
+                <th>Pattern</th>
+                <th>Need Enterprise?</th>
+                <th>Agent record</th>
+                <th>Runtime boundary</th>
+                <th>Failure and retry scope</th>
+                <th>Manageability</th>
+                <th>Best fit</th>
+                <th>Main tradeoff</th>
+                <th>Evidence</th>
+              </tr>
+            </thead>
+            <tbody>
+              {patterns.map((pattern) => (
+                <tr key={pattern.name}>
+                  <td><strong>{pattern.name}</strong></td>
+                  <td>{pattern.enterprise}</td>
+                  <td>{pattern.record}</td>
+                  <td>{pattern.runtime}</td>
+                  <td>{pattern.recovery}</td>
+                  <td>{pattern.management}</td>
+                  <td>{pattern.use}</td>
+                  <td>{pattern.tradeoff}</td>
+                  <td><span className="arm-chip managed">{pattern.status}</span></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </section>
 
       <section className="section implementation-section">
-        <div className="section-heading">
+        <div className="section-heading report-heading">
           <div>
-            <p className="eyebrow">Agent Canvas on Kubernetes</p>
-            <h2>We measured setup time, shared-agent load, model cost, and estimated cluster cost.</h2>
+            <p className="eyebrow">Agent Canvas: a shared agent service for one trusted team</p>
           </div>
           <p>
-            This was one trusted-team Agent Canvas backend on GKE Autopilot:
-            one StatefulSet pod and one 20 GiB persistent volume. It is a
-            lighter trust model than Enterprise, not a tenant-isolated
-            replacement for it.
+            Unlike Enterprise conversations, Canvas does not create a separate
+            sandbox boundary for each agent. Agents keep separate records but
+            share the backend, workspace, credentials, and infrastructure
+            failure boundary.
           </p>
         </div>
-        <div className="compact-metrics">
-          <div><span>Cluster provisioning</span><strong>{snapshot.canvasPilot.clusterProvisionMinutes} min</strong></div>
-          <div><span>Six-agent load phase</span><strong>{snapshot.canvasPilot.sharedLoadSix.wallSeconds} sec</strong></div>
-          <div><span>Peak shared pod</span><strong>{snapshot.canvasPilot.sharedLoadSix.peakCpuMillis}m · {snapshot.canvasPilot.sharedLoadSix.peakMemoryMib} MiB</strong></div>
-          <div><span>Estimated list price</span><strong>${snapshot.canvasPilot.estimatedDailyInfrastructure.publicListPrice.toFixed(2)}/day</strong></div>
+        <div className="implementation-grid">
+          <article className="implementation-card">
+            <span className="implementation-status tested">Organization</span>
+            <h3>Independent agent records on one shared service</h3>
+            <p>
+              The controller can assign and retry individual Canvas
+              conversations while the agents use the same Agent Server and
+              persistent workspace.
+            </p>
+          </article>
+          <article className="implementation-card">
+            <span className="implementation-status tested">Advantage</span>
+            <h3>Lower runtime overhead for trusted work</h3>
+            <p>
+              A team can coordinate many logical agents without operating one
+              sandbox for every conversation. Enterprise is not required for
+              this execution model.
+            </p>
+          </article>
+          <article className="implementation-card">
+            <span className="implementation-status pilot">Tradeoff</span>
+            <h3>The application owns the shared boundary</h3>
+            <p>
+              Capacity limits, access control, workspace safety, credentials,
+              and recovery from a backend failure remain the
+              application&apos;s responsibility.
+            </p>
+          </article>
         </div>
         <details className="compact-details">
-          <summary>How Agent Canvas was deployed and measured</summary>
+          <summary>Implementation and measured evidence</summary>
           <div className="compact-details-grid">
             <div>
               <h3>Setup</h3>
@@ -1086,64 +1124,53 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
               </p>
             </div>
             <div>
-              <h3>Startup</h3>
+              <h3>Why Kubernetes</h3>
               <p>
-                Cold workload startup took{" "}
-                {Math.floor(snapshot.canvasPilot.coldStartSeconds.first / 60)}:
-                {String(snapshot.canvasPilot.coldStartSeconds.first % 60).padStart(2, "0")}
-                {" "}on the first cluster and{" "}
-                {Math.floor(snapshot.canvasPilot.coldStartSeconds.recreated / 60)}:
-                {String(snapshot.canvasPilot.coldStartSeconds.recreated % 60).padStart(2, "0")}
-                {" "}after recreation.
+                Kubernetes supplied restart, storage, and service lifecycle for
+                the shared Canvas backend. It did not add per-agent isolation;
+                all agents remained inside the same trusted service boundary.
               </p>
             </div>
             <div>
-              <h3>Load result</h3>
+              <h3>Load check</h3>
               <p>
                 {snapshot.canvasPilot.sharedLoadSix.valid}/
                 {snapshot.canvasPilot.sharedLoadSix.attempts} attempts
                 validated with {snapshot.canvasPilot.sharedLoadSix.restarts}
-                {" "}pod restarts. Model cost was $
-                {snapshot.canvasPilot.sharedLoadSix.modelCost.toFixed(4)} for
-                that phase.
+                {" "}backend restarts. This established that several logical
+                agents could share one service for the tested workload.
               </p>
             </div>
             <div>
-              <h3>Matched result</h3>
+              <h3>Matched comparison</h3>
               <p>
-                Canvas averaged{" "}
-                {snapshot.canvasPilot.matchedDeployment.meanBatchWallSeconds.toFixed(1)}
-                {" "}seconds and{" "}
-                {snapshot.canvasPilot.matchedDeployment.effectiveThroughput.toFixed(2)}
-                {" "}tasks/hour. Matched Replicated batches averaged{" "}
-                {snapshot.canvasPilot.matchedDeployment.replicatedMeanBatchWallSeconds.toFixed(1)}
-                {" "}seconds and{" "}
-                {snapshot.canvasPilot.matchedDeployment.replicatedEffectiveThroughput.toFixed(2)}
-                {" "}tasks/hour; reported model cost was effectively tied.
+                All {snapshot.canvasPilot.matchedDeployment.valid} matched
+                attempts validated. Canvas and Enterprise had effectively tied
+                reported model cost; the important difference was the runtime
+                and trust boundary, not answer quality.
               </p>
             </div>
           </div>
           <p>
-            With the applicable GKE cluster credit, estimated infrastructure
-            was approximately $
-            {snapshot.canvasPilot.estimatedDailyInfrastructure.afterApplicableFreeTierLow.toFixed(2)}
-            –$
-            {snapshot.canvasPilot.estimatedDailyInfrastructure.afterApplicableFreeTierHigh.toFixed(2)}
-            /day. These are resource-based estimates, not a cloud invoice.
+            Choose Canvas when one trusted team values a shared service and is
+            prepared to own the surrounding operational controls. Choose
+            Enterprise when agents require stronger isolation, separate
+            credentials, platform-managed sandbox lifecycle, or tenant
+            boundaries.
           </p>
         </details>
       </section>
 
       <section className="section implementation-section">
-        <div className="section-heading">
+        <div className="section-heading report-heading">
           <div>
-            <p className="eyebrow">Replicated measurements</p>
-            <h2>Measured results for isolated and grouped OpenHands conversations.</h2>
+            <p className="eyebrow">Enterprise: comparing isolated and grouped conversations</p>
           </div>
           <p>
             The same model and six-task batch ran three times in each setup.
-            This measured placement overhead and container pressure, not task
-            difficulty.
+            All three approaches produced 18/18 valid results. The useful
+            differences were sandbox count, queueing, failure scope, and the
+            type of work each approach can safely run.
           </p>
         </div>
         <p className="architecture-note">
@@ -1156,49 +1183,46 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
         <div className="implementation-grid">
           <article className="implementation-card">
             <span className="implementation-status tested">Isolated</span>
-            <h3>4 running jobs; 2 waiting</h3>
+            <h3>One sandbox per conversation</h3>
             <p>
-              {snapshot.replicatedPatterns.isolatedFour.valid}/
-              {snapshot.replicatedPatterns.isolatedFour.attempts} valid,{" "}
-              {snapshot.replicatedPatterns.isolatedFour.meanWallSeconds.toFixed(1)}
-              {" "}seconds mean wall time.
+              Four agents ran in four sandboxes while two jobs waited for an
+              agent slot. This creates the clearest security and failure
+              boundary.
             </p>
             <dl>
               <div><dt>Placement</dt><dd>{snapshot.replicatedPatterns.isolatedFour.activeAgents} active agents · {snapshot.replicatedPatterns.isolatedFour.simultaneousSandboxes} simultaneous sandboxes</dd></div>
               <div><dt>Backpressure</dt><dd>{snapshot.replicatedPatterns.isolatedFour.queuedAgents} jobs waiting for an agent slot; each starts in its own sandbox when admitted</dd></div>
-              <div><dt>Total model cost</dt><dd>${snapshot.replicatedPatterns.isolatedFour.totalCost.toFixed(3)} across 18 attempts</dd></div>
+              <div><dt>Measured batch time</dt><dd>{snapshot.replicatedPatterns.isolatedFour.meanWallSeconds.toFixed(1)} seconds on average</dd></div>
               <div><dt>Choose for</dt><dd>Strong isolation and untrusted work.</dd></div>
             </dl>
           </article>
           <article className="implementation-card">
             <span className="implementation-status pilot">Bounded cell</span>
-            <h3>4 running jobs; 2 waiting</h3>
+            <h3>Several conversations share one sandbox</h3>
             <p>
-              {snapshot.replicatedPatterns.groupedFour.valid}/
-              {snapshot.replicatedPatterns.groupedFour.attempts} valid,{" "}
-              {snapshot.replicatedPatterns.groupedFour.meanWallSeconds.toFixed(1)}
-              {" "}seconds mean wall time.
+              Four trusted agents kept separate conversation histories while
+              sharing one runtime. Two additional jobs remained in the
+              controller queue.
             </p>
             <dl>
               <div><dt>Placement</dt><dd>{snapshot.replicatedPatterns.groupedFour.activeAgents} active agents share {snapshot.replicatedPatterns.groupedFour.simultaneousSandboxes} sandbox</dd></div>
               <div><dt>Backpressure</dt><dd>{snapshot.replicatedPatterns.groupedFour.queuedAgents} jobs waiting for an agent slot in the same bounded cell</dd></div>
-              <div><dt>Total model cost</dt><dd>${snapshot.replicatedPatterns.groupedFour.totalCost.toFixed(3)} across 18 attempts</dd></div>
+              <div><dt>Measured batch time</dt><dd>{snapshot.replicatedPatterns.groupedFour.meanWallSeconds.toFixed(1)} seconds on average</dd></div>
               <div><dt>Choose for</dt><dd>Trusted production work with separate conversation histories.</dd></div>
             </dl>
           </article>
           <article className="implementation-card">
             <span className="implementation-status next">Higher density</span>
-            <h3>All 6 jobs running; none waiting</h3>
+            <h3>Six conversations share one sandbox</h3>
             <p>
-              {snapshot.replicatedPatterns.groupedSix.valid}/
-              {snapshot.replicatedPatterns.groupedSix.attempts} valid,{" "}
-              {snapshot.replicatedPatterns.groupedSix.meanWallSeconds.toFixed(1)}
-              {" "}seconds mean wall time.
+              The full batch started together. Removing the queue increased
+              shared-runtime contention and did not improve average completion
+              time.
             </p>
             <dl>
               <div><dt>Placement</dt><dd>{snapshot.replicatedPatterns.groupedSix.activeAgents} active agents share {snapshot.replicatedPatterns.groupedSix.simultaneousSandboxes} sandbox</dd></div>
               <div><dt>Backpressure</dt><dd>{snapshot.replicatedPatterns.groupedSix.queuedAgents} jobs waiting; the full batch starts together</dd></div>
-              <div><dt>Total model cost</dt><dd>${snapshot.replicatedPatterns.groupedSix.totalCost.toFixed(3)} across 18 attempts</dd></div>
+              <div><dt>Measured batch time</dt><dd>{snapshot.replicatedPatterns.groupedSix.meanWallSeconds.toFixed(1)} seconds on average</dd></div>
               <div><dt>Finding</dt><dd>Removing the queue increased contention and did not produce a wall-time win.</dd></div>
             </dl>
           </article>
@@ -1214,32 +1238,26 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
           substantially between otherwise matched batches, so these totals are
           observed spend—not evidence that placement caused the difference.
           The two-job queue is intentional admission control, not unused
-          sandbox capacity. Infrastructure cost was not measured.
+          sandbox capacity. These tests ran on OpenHands Enterprise installed
+          through Replicated; Replicated was the deployment method, not a
+          separate orchestration pattern.
         </p>
       </section>
 
       <section className="section subagent-section">
-        <div className="section-heading">
+        <div className="section-heading report-heading">
           <div>
-            <p className="eyebrow">SDK subagent delegation</p>
-            <h2>Native TaskToolSet worked in Agent Canvas; the Replicated profile still omitted it.</h2>
+            <p className="eyebrow">Parent and subagents: using TaskToolSet to coordinate specialist children</p>
           </div>
           <p>
-            This SDK pattern keeps one parent conversation and runs a persisted
-            child beneath it. That is different from an external controller
-            creating another first-class Canvas or Enterprise conversation.
+            This structure keeps one parent conversation and one shared
+            lifecycle. It is useful when specialists can share a workspace and
+            do not need independent histories, permissions, or service levels.
           </p>
         </div>
-        <div className="compact-metrics">
-          <div><span>Canvas native result</span><strong>{snapshot.agentCanvasTaskTool.passed ? "Passed" : "Failed"}</strong></div>
-          <div><span>Parent + child wall time</span><strong>{snapshot.agentCanvasTaskTool.wallSeconds.toFixed(1)} sec</strong></div>
-          <div><span>Child task time</span><strong>{snapshot.agentCanvasTaskTool.taskSeconds.toFixed(1)} sec</strong></div>
-          <div><span>Total model cost</span><strong>${snapshot.agentCanvasTaskTool.totalModelCost.toFixed(4)}</strong></div>
-        </div>
-        <div className="section-heading">
+        <div className="section-heading report-heading">
           <div>
-            <p className="eyebrow">Matched four-task comparison</p>
-            <h2>Same four research tasks, three execution structures.</h2>
+            <p className="eyebrow">Matched comparison: the same four research tasks in three execution structures</p>
           </div>
           <p>
             Each run inspected the same four source files and had to return the
@@ -1290,16 +1308,6 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
             </p>
           </article>
           <article>
-            <span className="implementation-status next">OHE side note</span>
-            <h3>The saved Enterprise setting still did not reach the launched profile</h3>
-            <p>
-              The OHE user record reported subagents enabled, but its system
-              prompt did not advertise TaskToolSet and its event stream
-              contained {snapshot.subagentPilot.taskActions} task actions.
-              That remains a separate profile-wiring issue.
-            </p>
-          </article>
-          <article>
             <span className="implementation-status pilot">Execution boundary</span>
             <h3>Parallel children still share the parent process and workspace</h3>
             <p>
@@ -1329,17 +1337,23 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
           use two to four native subagents inside each trusted cell for
           independent read-only exploration, testing, or synthesis. Use
           isolated sandboxes for untrusted code, conflicting writes, separate
-          credentials, or failures that must remain local. Validate the task
-          tool separately on OpenHands Cloud, then file the OHE propagation
-          issue with both environments clearly distinguished.
+          credentials, or failures that must remain local.
         </p>
+        <details className="compact-details">
+          <summary>Enterprise implementation note</summary>
+          <p>
+            In the tested Enterprise installation, the saved subagent setting
+            did not appear in the launched agent profile. This is tracked as a
+            profile integration issue; it does not change the TaskToolSet
+            results measured in Agent Canvas.
+          </p>
+        </details>
       </section>
 
       <section className="section">
-        <div className="section-heading">
+        <div className="section-heading report-heading">
           <div>
-            <p className="eyebrow">Choosing an execution pattern</p>
-            <h2>Use trust and operational requirements to choose the boundary.</h2>
+            <p className="eyebrow">Decision guide: use trust and operational requirements to choose the boundary</p>
           </div>
           <p>
             All four patterns can use the same external task registry,
@@ -1393,38 +1407,6 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
               <p>{copy}</p>
             </article>
           ))}
-        </div>
-        <div className="agent-table-wrap">
-          <table className="agent-table">
-            <thead>
-              <tr>
-                <th>Pattern</th>
-                <th>Need Enterprise?</th>
-                <th>Agent record</th>
-                <th>Runtime boundary</th>
-                <th>Failure and retry scope</th>
-                <th>Manageability</th>
-                <th>Best fit</th>
-                <th>Main tradeoff</th>
-                <th>Evidence</th>
-              </tr>
-            </thead>
-            <tbody>
-              {patterns.map((pattern) => (
-                <tr key={pattern.name}>
-                  <td><strong>{pattern.name}</strong></td>
-                  <td>{pattern.enterprise}</td>
-                  <td>{pattern.record}</td>
-                  <td>{pattern.runtime}</td>
-                  <td>{pattern.recovery}</td>
-                  <td>{pattern.management}</td>
-                  <td>{pattern.use}</td>
-                  <td>{pattern.tradeoff}</td>
-                  <td><span className="arm-chip managed">{pattern.status}</span></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
         </div>
       </section>
     </>

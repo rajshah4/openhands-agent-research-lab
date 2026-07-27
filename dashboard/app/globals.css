@@ -383,6 +383,22 @@ dd {
   margin: 0;
 }
 
+.comparison-table-heading {
+  margin-top: 72px;
+}
+
+.report-heading {
+  margin-bottom: 36px;
+}
+
+.report-heading .eyebrow {
+  font-size: clamp(18px, 2vw, 26px);
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+  margin-bottom: 0;
+  text-transform: none;
+}
+
 .workflow {
   border: 1px solid var(--line);
   border-radius: 12px;
