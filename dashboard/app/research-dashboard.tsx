@@ -1597,18 +1597,25 @@ function RobustnessGuide({ snapshot }: { snapshot: Snapshot }) {
               <tr>
                 <td><strong>Scheduled automation tick</strong></td>
                 <td>
-                  An OpenHands automation creates a temporary controller
-                  conversation. One reconciliation runs, checkpoints Git, and
-                  exits with <code>keep_alive: false</code>.
+                  On each trigger, an OpenHands automation creates a temporary
+                  controller conversation and loads the campaign state from
+                  Git. It reconciles existing conversations, starts up to two
+                  active children, saves the updated state to Git, and exits
+                  with <code>keep_alive: false</code>. Later triggers continue
+                  the same campaign from that saved state.
                 </td>
                 <td>
-                  Work can wait until the next scheduled interval and running
-                  the controller inside OpenHands is operationally useful.
+                  A campaign may contain hundreds of queued tasks, but only a
+                  small bounded group needs to run during each controller tick.
+                  Work can wait until the next scheduled interval.
                 </td>
                 <td>
                   <strong>Trigger-tested, not schedule-tested.</strong> Nine
                   manual automation runs covered setup, recovery, and
-                  concurrency. No unattended recurring campaign ran.
+                  concurrency. Two active child conversations passed in one
+                  shared sandbox; the four-child test produced only 3/4
+                  independently verifiable results. No unattended recurring
+                  campaign ran.
                 </td>
               </tr>
               <tr>
@@ -1714,9 +1721,11 @@ function RobustnessGuide({ snapshot }: { snapshot: Snapshot }) {
                   {" "}children.
                 </td>
                 <td>
-                  A temporary controller could load Git state, create worker
-                  conversations, recover an interrupted attempt, validate
-                  results, checkpoint state, and release the sandbox.
+                  Git preserved the campaign queue, task claims, run and
+                  attempt IDs, OpenHands conversation and start-task IDs,
+                  validation results, and checkpoints between temporary
+                  controller conversations. That allowed separate automation
+                  runs to manage one continuing campaign.
                 </td>
                 <td>
                   We ran{" "}

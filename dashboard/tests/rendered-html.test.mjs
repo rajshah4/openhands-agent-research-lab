@@ -133,6 +133,11 @@ test("includes the Agent Canvas deployment evidence", async () => {
   assert.match(source, /Four control patterns/);
   assert.match(source, /Bounded polling batch/);
   assert.match(source, /Scheduled automation tick/);
+  assert.match(source, /loads the campaign state from\s+Git/);
+  assert.match(source, /starts up to two\s+active children/);
+  assert.match(source, /Later triggers continue\s+the same campaign from that saved state/);
+  assert.match(source, /A campaign may contain hundreds of queued tasks/);
+  assert.match(source, /Git preserved the campaign queue, task claims/);
   assert.match(source, /Persistent reconciler/);
   assert.match(source, /Event-triggered tick/);
   assert.match(source, /Design option, not yet tested/);
