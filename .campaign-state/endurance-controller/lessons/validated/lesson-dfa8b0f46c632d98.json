@@ -1,0 +1,12 @@
+{
+  "created_at": "2026-07-27T05:33:01.617920+00:00",
+  "evidence": "Crown graph K_{6,6}-M recognized as bipartite via BFS. Exact approach (2 colors) matched greedy best (2 colors) across 12 orderings. One greedy trial used 3 colors, showing ordering sensitivity. Local search from random 3-color initialization converged to 2 colors in 5 of 12 seeds. The missing p_i-q_i edges create independent sets enabling optimal 2-coloring.",
+  "id": "lesson-dfa8b0f46c632d98",
+  "source_attempt_id": "attempt-0001-52464c16",
+  "source_run_id": "neurogolf-endurance-live-20260727T050720Z-c2919492",
+  "source_task_id": "color-01-crown-12",
+  "statement": "Crown graphs (complete bipartite minus perfect matching) have chromatic number 2; BFS bipartite detection guarantees optimality while greedy depends on node ordering.",
+  "tags": [
+    "graph-coloring"
+  ]
+}
