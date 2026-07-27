@@ -1,0 +1,14 @@
+{
+  "attempt_id": "attempt-0001-52464c16",
+  "id": "0030-final_response_ready",
+  "kind": "final_response_ready",
+  "payload": {
+    "conversation_id": "3c59585ca21e49458f1eed767dff5b8c",
+    "event_count": 200,
+    "present": true,
+    "source": "git_artifact"
+  },
+  "recorded_at": "2026-07-27T05:26:55.455519+00:00",
+  "run_id": "neurogolf-endurance-live-20260727T050720Z-c2919492",
+  "schema_version": 1
+}
