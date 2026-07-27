@@ -857,6 +857,38 @@ dd {
   grid-template-columns: repeat(2, 1fr);
 }
 
+.controller-config-table .agent-table {
+  min-width: 820px;
+}
+
+.control-list {
+  border-top: 1px solid var(--line);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.control-list article {
+  border-bottom: 1px solid var(--line);
+  padding: 22px 24px 22px 0;
+}
+
+.control-list article:nth-child(even) {
+  border-left: 1px solid var(--line);
+  padding-left: 24px;
+}
+
+.control-list h3 {
+  font-size: 18px;
+  margin: 0 0 8px;
+}
+
+.control-list p {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.65;
+  margin: 0;
+}
+
 .deployment-illustration {
   background: var(--panel);
   border: 1px solid var(--line);
@@ -1635,6 +1667,7 @@ footer > div:last-child {
   .memory-grid,
   .implementation-grid,
   .controller-results,
+  .control-list,
   .planner-requirements {
     grid-template-columns: 1fr 1fr;
   }
@@ -1724,6 +1757,7 @@ footer > div:last-child {
   .controller-map,
   .controller-boundary,
   .controller-results,
+  .control-list,
   .comparison-grid,
   .memory-grid,
   .implementation-grid,
@@ -1732,6 +1766,11 @@ footer > div:last-child {
   .planner-comparison,
   .planner-requirements {
     grid-template-columns: 1fr;
+  }
+
+  .control-list article:nth-child(even) {
+    border-left: 0;
+    padding-left: 0;
   }
 
   .controller-arrow {

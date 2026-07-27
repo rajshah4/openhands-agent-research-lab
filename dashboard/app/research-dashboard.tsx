@@ -1458,16 +1458,14 @@ function RobustnessGuide({ snapshot }: { snapshot: Snapshot }) {
       </section>
 
       <section className="section controller-section">
-        <div className="section-heading">
+        <div className="section-heading report-heading">
           <div>
-            <p className="eyebrow">Where the controller runs</p>
-            <h2>OpenHands ran the workers. One controller kept the campaign organized.</h2>
+            <p className="eyebrow">Controller placement and durable state</p>
           </div>
           <p>
-            The controller selected work, enforced the active-agent limit,
-            checked outputs, recorded evidence, resumed interrupted work, and
-            paused finished sandboxes. We tested it outside Enterprise, inside
-            an Enterprise automation, and beside Agent Canvas.
+            OpenHands executed the agent work. The controller selected tasks,
+            limited concurrent work, validated outputs, recorded evidence,
+            resumed interrupted attempts, and paused completed sandboxes.
           </p>
         </div>
 
@@ -1515,96 +1513,101 @@ function RobustnessGuide({ snapshot }: { snapshot: Snapshot }) {
       </section>
 
       <section className="section implementation-section">
-        <div className="section-heading">
+        <div className="section-heading report-heading">
           <div>
-            <p className="eyebrow">Controller load tests</p>
-            <h2>What passed, and where we reduced concurrency.</h2>
+            <p className="eyebrow">Tested controller configurations and operating limits</p>
           </div>
           <p>
-            A campaign can contain hundreds of agents without running hundreds
-            at once. The controller keeps the backlog durable and admits a
-            tested number of workers into each cell.
+            These tests answer one question: where can the controller run, and
+            how much concurrent work was independently verified in that
+            configuration? Larger campaigns remain in the queue and enter
+            OpenHands as capacity becomes available.
           </p>
         </div>
-        <div className="controller-results">
-          <article>
-            <span className="implementation-status tested">Enterprise · external service</span>
-            <h3>{snapshot.controllerLoad.enterpriseExternal.valid}/{snapshot.controllerLoad.enterpriseExternal.attempts} independently valid</h3>
-            <p>
-              {snapshot.controllerLoad.enterpriseExternal.activeWorkers} active
-              conversations and {snapshot.controllerLoad.enterpriseExternal.queuedWorkers}
-              {" "}queued in one grouped sandbox. The batch took{" "}
-              {snapshot.controllerLoad.enterpriseExternal.wallSeconds.toFixed(1)}
-              {" "}seconds at{" "}
-              {snapshot.controllerLoad.enterpriseExternal.throughput.toFixed(2)}
-              {" "}tasks/hour, with{" "}
-              {snapshot.controllerLoad.enterpriseExternal.retries} API retries.
-            </p>
-          </article>
-          <article>
-            <span className="implementation-status pilot">Enterprise · in-platform automation</span>
-            <h3>{snapshot.controllerLoad.enterpriseAutomation.acceptedValid}/{snapshot.controllerLoad.enterpriseAutomation.acceptedAttempts} passed at {snapshot.controllerLoad.enterpriseAutomation.acceptedWorkers} workers</h3>
-            <p>
-              The accepted cell used{" "}
-              {snapshot.controllerLoad.enterpriseAutomation.acceptedSandboxes}
-              {" "}sandbox and took{" "}
-              {snapshot.controllerLoad.enterpriseAutomation.acceptedWallSeconds.toFixed(1)}
-              {" "}seconds. A {snapshot.controllerLoad.enterpriseAutomation.rejectedWorkers}-worker
-              test finished at the automation layer, but only{" "}
-              {snapshot.controllerLoad.enterpriseAutomation.rejectedValid}/
-              {snapshot.controllerLoad.enterpriseAutomation.rejectedAttempts}
-              {" "}child outputs were independently verifiable, so we rejected
-              it as the default.
-            </p>
-          </article>
-          <article>
-            <span className="implementation-status tested">Agent Canvas · adjacent controller</span>
-            <h3>{snapshot.controllerLoad.canvasResume.valid}/{snapshot.controllerLoad.canvasResume.attempts} valid across {snapshot.controllerLoad.canvasResume.controllerProcesses} controller processes</h3>
-            <p>
-              A second process resumed the same run instead of creating a new
-              campaign. The two attempts took{" "}
-              {snapshot.controllerLoad.canvasResume.firstSeconds.toFixed(1)}
-              {" "}and{" "}
-              {snapshot.controllerLoad.canvasResume.resumedSeconds.toFixed(1)}
-              {" "}seconds.
-            </p>
-          </article>
-          <article>
-            <span className="implementation-status tested">Native subagents · inside a cell</span>
-            <h3>4/4 strict contracts in Canvas</h3>
-            <p>
-              Native delegation is useful for two to four trusted specialists
-              sharing one parent workspace. It does not replace the durable
-              campaign controller because child tasks do not independently own
-              the queue, leases, or long-term experiment record.
-            </p>
-          </article>
+        <div className="agent-table-wrap controller-config-table">
+          <table className="agent-table">
+            <thead>
+              <tr>
+                <th>Controller location</th>
+                <th>Agent execution</th>
+                <th>Verified operating point</th>
+                <th>Result</th>
+                <th>Use this for</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>External service</strong></td>
+                <td>Enterprise grouped conversations</td>
+                <td>
+                  {snapshot.controllerLoad.enterpriseExternal.activeWorkers}
+                  {" "}active;{" "}
+                  {snapshot.controllerLoad.enterpriseExternal.queuedWorkers}
+                  {" "}queued in one sandbox
+                </td>
+                <td>
+                  {snapshot.controllerLoad.enterpriseExternal.valid}/
+                  {snapshot.controllerLoad.enterpriseExternal.attempts}
+                  {" "}outputs independently validated
+                </td>
+                <td>Sustained campaigns and higher controller throughput</td>
+              </tr>
+              <tr>
+                <td><strong>Enterprise automation</strong></td>
+                <td>Child Enterprise conversations</td>
+                <td>
+                  {snapshot.controllerLoad.enterpriseAutomation.acceptedWorkers}
+                  {" "}active children in one sandbox
+                </td>
+                <td>
+                  {snapshot.controllerLoad.enterpriseAutomation.acceptedValid}/
+                  {snapshot.controllerLoad.enterpriseAutomation.acceptedAttempts}
+                  {" "}validated. At four children, only{" "}
+                  {snapshot.controllerLoad.enterpriseAutomation.rejectedValid}/
+                  {snapshot.controllerLoad.enterpriseAutomation.rejectedAttempts}
+                  {" "}were independently verifiable.
+                </td>
+                <td>Small scheduled batches that should run entirely in OpenHands</td>
+              </tr>
+              <tr>
+                <td><strong>Beside Agent Canvas</strong></td>
+                <td>Canvas conversations on a shared backend</td>
+                <td>
+                  {snapshot.controllerLoad.canvasResume.controllerProcesses}
+                  {" "}successive controller processes
+                </td>
+                <td>
+                  The second process resumed the same run;{" "}
+                  {snapshot.controllerLoad.canvasResume.valid}/
+                  {snapshot.controllerLoad.canvasResume.attempts}
+                  {" "}attempts validated.
+                </td>
+                <td>One trusted team using a shared Canvas service</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
         <p className="architecture-note">
-          <strong>Recommended production shape:</strong> run the durable
-          controller as a small Enterprise service for sustained campaigns, or
-          as a two-child in-platform automation for bounded scheduled work.
-          Agent Canvas can use the same controller beside one trusted shared
-          backend. In every case, queue excess work and validate results outside
-          the agent.
+          A campaign may contain hundreds of pending agents without running
+          hundreds simultaneously. The durable queue records the work; the
+          operating limit determines how many conversations are admitted at
+          once.
         </p>
       </section>
 
       <section className="section implementation-section">
-        <div className="section-heading">
+        <div className="section-heading report-heading">
           <div>
-            <p className="eyebrow">Controls around every agent</p>
-            <h2>Controls applied before, during, and after each agent run.</h2>
+            <p className="eyebrow">Controls used</p>
           </div>
           <p>
-            These controls apply whether workers use isolated Enterprise
-            sandboxes, bounded shared cells, Agent Canvas, or subagents.
+            These safeguards are part of the controller and apply to every
+            execution pattern.
           </p>
         </div>
-        <div className="implementation-grid deployment-grid">
+        <div className="control-list">
           {controls.map(([title, copy]) => (
-            <article className="implementation-card" key={title}>
-              <span className="implementation-status tested">Control</span>
+            <article key={title}>
               <h3>{title}</h3>
               <p>{copy}</p>
             </article>
@@ -1613,10 +1616,9 @@ function RobustnessGuide({ snapshot }: { snapshot: Snapshot }) {
       </section>
 
       <section className="section comparison">
-        <div className="section-heading">
+        <div className="section-heading report-heading">
           <div>
-            <p className="eyebrow">Controller restart test</p>
-            <h2>Recovery after the controller stopped during an active OpenHands run.</h2>
+            <p className="eyebrow">Restart recovery after the controller stopped during an active run</p>
           </div>
           <p>
             Restart found the unfinished attempt, attached to the same live
@@ -1626,8 +1628,8 @@ function RobustnessGuide({ snapshot }: { snapshot: Snapshot }) {
         </div>
         <div className="comparison-grid">
           <article className="finding-card">
-            <span className="finding-label">No duplicate work</span>
-            <strong>One start task. One conversation. One completed attempt.</strong>
+            <span className="finding-label">Recovery result</span>
+            <strong>The controller resumed the original start task without creating another conversation.</strong>
             <p>The original run and attempt identities were preserved across the controller restart.</p>
           </article>
           <article className="finding-card">
@@ -1636,8 +1638,8 @@ function RobustnessGuide({ snapshot }: { snapshot: Snapshot }) {
             <p>{formatNumber(snapshot.robustness.records)} parseable records occupied {snapshot.robustness.storeMb} MB.</p>
           </article>
           <article className="finding-card">
-            <span className="finding-label">Honest boundary</span>
-            <strong>Restartable single controller, not a distributed queue.</strong>
+            <span className="finding-label">Database boundary</span>
+            <strong>Files support one controller; concurrent controllers need leases.</strong>
             <p>Several controllers or tenants require application-owned database leases and idempotent claims.</p>
           </article>
         </div>
