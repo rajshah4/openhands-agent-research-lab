@@ -1,0 +1,21 @@
+{
+  "attempt_id": "attempt-0002-63e26c84",
+  "id": "0001-attempt_selected",
+  "kind": "attempt_selected",
+  "payload": {
+    "scheduler_decision": {
+      "policy": "managed",
+      "policy_version": "1",
+      "rationale": "prioritized task coverage, balanced attempt ownership, then the weakest validated score, with relevant validated memory",
+      "retrieved_lesson_ids": [
+        "lesson-dfa8b0f46c632d98"
+      ],
+      "task_id": "color-02-mycielski-11"
+    },
+    "sequence": 2,
+    "task_id": "color-02-mycielski-11"
+  },
+  "recorded_at": "2026-07-27T06:00:59.324798+00:00",
+  "run_id": "neurogolf-endurance-live-20260727T050720Z-c2919492",
+  "schema_version": 1
+}
