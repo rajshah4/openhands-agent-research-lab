@@ -1,0 +1,34 @@
+{
+  "candidate": {
+    "assignments": {
+      "p1": 0,
+      "p2": 0,
+      "p3": 0,
+      "p4": 0,
+      "p5": 0,
+      "p6": 0,
+      "q1": 1,
+      "q2": 1,
+      "q3": 1,
+      "q4": 1,
+      "q5": 1,
+      "q6": 1
+    }
+  },
+  "lesson": {
+    "evidence": "Crown graph K_{6,6}-M recognized as bipartite via BFS. Exact approach (2 colors) matched greedy best (2 colors) across 12 orderings. One greedy trial used 3 colors, showing ordering sensitivity. Local search from random 3-color initialization converged to 2 colors in 5 of 12 seeds. The missing p_i-q_i edges create independent sets enabling optimal 2-coloring.",
+    "statement": "Crown graphs (complete bipartite minus perfect matching) have chromatic number 2; BFS bipartite detection guarantees optimality while greedy depends on node ordering.",
+    "tags": [
+      "graph-coloring"
+    ]
+  },
+  "next_gate": "validate",
+  "status": "done",
+  "summary": [
+    "Exact bipartite BFS: 2 colors (optimal)",
+    "Greedy: 2 colors best, 3 colors worst (12 trials)",
+    "Local search: 2 colors best from 3-color starts (12 seeds)",
+    "Crown graph structure detected, 2-coloring verified",
+    "All constraints satisfied: 12 nodes, 30 edges, no violations"
+  ]
+}
