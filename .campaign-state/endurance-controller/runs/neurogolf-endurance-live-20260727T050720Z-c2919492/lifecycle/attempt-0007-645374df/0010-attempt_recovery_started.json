@@ -1,0 +1,12 @@
+{
+  "attempt_id": "attempt-0007-645374df",
+  "id": "0010-attempt_recovery_started",
+  "kind": "attempt_recovery_started",
+  "payload": {
+    "prior_lifecycle_events": 9,
+    "sequence": 7
+  },
+  "recorded_at": "2026-07-27T13:00:56.416518+00:00",
+  "run_id": "neurogolf-endurance-live-20260727T050720Z-c2919492",
+  "schema_version": 1
+}
