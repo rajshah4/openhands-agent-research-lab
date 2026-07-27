@@ -1,0 +1,163 @@
+{
+  "candidate": {
+    "assignments": {
+      "p1": 0,
+      "p2": 0,
+      "p3": 0,
+      "p4": 0,
+      "p5": 0,
+      "p6": 0,
+      "q1": 1,
+      "q2": 1,
+      "q3": 1,
+      "q4": 1,
+      "q5": 1,
+      "q6": 1
+    }
+  },
+  "candidate_hash": "31ac9ebdba829cd1263a34c500ef0d291a48dffe0de2214f781eedac3c9392f0",
+  "contract": {
+    "next_gate": "validate",
+    "status": "done",
+    "summary": [
+      "Exact bipartite BFS: 2 colors (optimal)",
+      "Greedy: 2 colors best, 3 colors worst (12 trials)",
+      "Local search: 2 colors best from 3-color starts (12 seeds)",
+      "Crown graph structure detected, 2-coloring verified",
+      "All constraints satisfied: 12 nodes, 30 edges, no violations"
+    ],
+    "transport": "exact-json",
+    "transport_compliant": true
+  },
+  "conversation": {
+    "conversation_id": "3c59585ca21e49458f1eed767dff5b8c",
+    "execution_status": "finished",
+    "sandbox_id": "2lEcO8VVhxrncnHfTHWBna",
+    "sandbox_status": "MISSING",
+    "start_task_id": "88f24bfe7fd348229344e5aeee49e582",
+    "terminal_status_recovered_from_events": true,
+    "ui_url": "https://app.replicated.rajistics.com/conversations/3c59585ca21e49458f1eed767dff5b8c"
+  },
+  "duplicate_candidate": false,
+  "final_response": {
+    "length": 1223,
+    "sha256": "d38fc56d93e31e8d9012828f61771ccd3c4f77ad2bd44864b5b20906b96c3d81"
+  },
+  "finished_at": "2026-07-27T05:33:02.738492+00:00",
+  "id": "attempt-0001-52464c16",
+  "improved": true,
+  "metadata": {
+    "conversation_snapshot": {
+      "acp_server": null,
+      "agent_kind": "openhands",
+      "conversation_url": null,
+      "created_at": "2026-07-27T05:07:34.886557Z",
+      "created_by_user_id": "69c4fcfd-fb0e-4372-b9fd-68c860387888",
+      "execution_status": "finished",
+      "git_provider": null,
+      "id": "3c59585ca21e49458f1eed767dff5b8c",
+      "launched_agent_profile": {
+        "agent_profile_id": "c3c5742a-eb28-40a1-8a66-210fa9b98cd7",
+        "revision": 0
+      },
+      "llm_model": "litellm_proxy/us.anthropic.claude-sonnet-4-5-20250929-v1:0",
+      "metrics": {
+        "accumulated_cost": 0.31494474,
+        "accumulated_token_usage": {
+          "cache_read_tokens": 181128,
+          "cache_write_tokens": 33716,
+          "completion_tokens": 6885,
+          "context_window": 200000,
+          "model": "",
+          "per_turn_token": 33826,
+          "prompt_tokens": 215599,
+          "reasoning_tokens": 0,
+          "response_id": ""
+        },
+        "max_budget_per_task": null,
+        "model_name": "default"
+      },
+      "parent_conversation_id": null,
+      "pr_number": [],
+      "public": null,
+      "sandbox_id": "2lEcO8VVhxrncnHfTHWBna",
+      "sandbox_status": "MISSING",
+      "selected_branch": "main",
+      "selected_repository": "rajshah4/openhands-agent-research-lab",
+      "sub_conversation_ids": [],
+      "tags": {
+        "agentprofileid": "c3c5742a-eb28-40a1-8a66-210fa9b98cd7",
+        "agentprofilerevision": "0",
+        "archiveworkspacepath": "/workspace/project/3c59585ca21e49458f1eed767dff5b8c",
+        "repo_name": "rajshah4/openhands-agent-research-lab",
+        "selected_branch": "main"
+      },
+      "terminal_status_source": "events",
+      "title": "Conversation 3c595",
+      "trigger": "openhands_api",
+      "updated_at": "2026-07-27T05:12:51.291322Z"
+    },
+    "event_count": 200,
+    "event_counts": {
+      "ActionEvent": 3,
+      "ConversationStateUpdateEvent": 7,
+      "MessageEvent": 1,
+      "ObservationEvent": 4,
+      "StreamingDeltaEvent": 185
+    },
+    "final_response_source": "git_artifact",
+    "start_task_snapshot": {
+      "agent_server_url": "https://iatgqrfnazvaoncj.runtime.replicated.rajistics.com",
+      "app_conversation_id": "3c59585ca21e49458f1eed767dff5b8c",
+      "created_at": "2026-07-27T05:07:25.660609Z",
+      "created_by_user_id": "69c4fcfd-fb0e-4372-b9fd-68c860387888",
+      "detail": null,
+      "id": "88f24bfe7fd348229344e5aeee49e582",
+      "request": {
+        "agent_profile_id": null,
+        "agent_type": "default",
+        "conversation_id": null,
+        "git_provider": null,
+        "initial_message": "<redacted-content>",
+        "llm_model": null,
+        "parent_conversation_id": null,
+        "plugins": null,
+        "pr_number": [],
+        "processors": null,
+        "public": null,
+        "sandbox_id": null,
+        "secrets": null,
+        "selected_branch": "main",
+        "selected_repository": "rajshah4/openhands-agent-research-lab",
+        "suggested_task": null,
+        "system_message_suffix": null,
+        "title": "[research-lab] neurogolf-endurance-live-20260727T050720Z-c2919492 / color-01-crown-12 / attempt-0001-52464c16",
+        "trigger": "openhands_api"
+      },
+      "sandbox_id": "2lEcO8VVhxrncnHfTHWBna",
+      "status": "READY",
+      "updated_at": "2026-07-27T05:07:34.898580Z"
+    }
+  },
+  "outcome": "completed",
+  "promoted_lesson_id": "lesson-dfa8b0f46c632d98",
+  "retrieved_lesson_ids": [],
+  "run_id": "neurogolf-endurance-live-20260727T050720Z-c2919492",
+  "scheduler_decision": {
+    "policy": "managed",
+    "policy_version": "1",
+    "rationale": "prioritized task coverage, balanced attempt ownership, then the weakest validated score, with relevant validated memory",
+    "retrieved_lesson_ids": [],
+    "task_id": "color-01-crown-12"
+  },
+  "schema_version": 1,
+  "sequence": 1,
+  "started_at": "2026-07-27T05:07:22.115406+00:00",
+  "task_id": "color-01-crown-12",
+  "validation": {
+    "errors": [],
+    "score": 2.0,
+    "valid": true
+  },
+  "worker_kind": "openhands"
+}
