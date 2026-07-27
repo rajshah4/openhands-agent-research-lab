@@ -1,0 +1,13 @@
+{
+  "attempt_id": "attempt-0007-645374df",
+  "id": "0009-controlled_dwell_started",
+  "kind": "controlled_dwell_started",
+  "payload": {
+    "configured_seconds": 600,
+    "elapsed_active_seconds": 187.398,
+    "remaining_seconds": 412.602
+  },
+  "recorded_at": "2026-07-27T12:04:20.965910+00:00",
+  "run_id": "neurogolf-endurance-live-20260727T050720Z-c2919492",
+  "schema_version": 1
+}
