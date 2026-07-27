@@ -1,0 +1,26 @@
+{
+  "candidate": {
+    "selected_sets": [
+      "arc-a",
+      "arc-b",
+      "arc-c",
+      "arc-d"
+    ]
+  },
+  "lesson": {
+    "evidence": "Exhaustive search up to size 6 found optimal 4-set partition (arc-a through arc-d covering all 24 checkpoints). Standard greedy matched optimum. Randomized greedy across 12 seeds produced solutions ranging from size 4 to 6; seeds 1, 2, 4, 5, 11 chose splice sets early, fragmenting the partition and requiring 6 sets total.",
+    "statement": "When interleaved sets fragment optimal partitions, greedy randomization degrades by picking splice or partial-overlap sets before recognizing full partition structure.",
+    "tags": [
+      "set-cover"
+    ]
+  },
+  "next_gate": "validate",
+  "status": "done",
+  "summary": [
+    "Exact exhaustive: 4 sets optimal (arc-a, arc-b, arc-c, arc-d)",
+    "Greedy heuristic: 4 sets (matched exact)",
+    "Randomized greedy: 12 seeds, best 4, worst 6",
+    "Optimal partition forms perfect 4-way split of 24 checkpoints",
+    "Final verified solution: 4 sets, all constraints satisfied"
+  ]
+}
