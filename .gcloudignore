@@ -1,0 +1,15 @@
+*
+!README.md
+!pyproject.toml
+!src/**
+!examples/**
+!experiments/
+!experiments/agent-canvas-kubernetes/
+!experiments/agent-canvas-kubernetes/controller/
+!experiments/agent-canvas-kubernetes/controller/Dockerfile
+!experiments/agent-canvas-kubernetes/controller/cloudbuild.yaml
+!experiments/agent-canvas-kubernetes/controller/controller_tick.py
+!experiments/agent-canvas-kubernetes/controller/configure_canvas_llm.py
+src/**/__pycache__/**
+src/*.egg-info/**
+*.pyc
