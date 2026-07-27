@@ -188,6 +188,11 @@ The [controller load report](experiments/controller-load/results-2026-07-26.md)
 records the 4,800-attempt ledger test, the Enterprise failure and recovery
 sequence, the final 6/6 four-active external-controller load, the accepted
 two-child in-platform automation cell, and the two-tick Canvas resume test.
+The [long-running Enterprise campaign](experiments/long-running-campaign/results-2026-07-27.md)
+records eight hourly controller attempts over nine hours: seven valid results,
+six promoted lessons, cross-conversation lesson retrieval, one duplicate
+candidate, and one recovery failure after a completed Git artifact outlived its
+sandbox.
 The [Kaggle parity review](docs/kaggle-neurogolf-parity-review.md) separates
 what is now proven from the ONNX workload, adversarial validation, artifact
 quarantine, and submission gate still required. The
