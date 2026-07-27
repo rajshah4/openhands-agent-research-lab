@@ -1,0 +1,12 @@
+{
+  "created_at": "2026-07-27T10:11:07.459993+00:00",
+  "evidence": "Three approaches (FFD, BFD, multi-ordering search with 20+ trials) all converged to 6 bins matching theoretical minimum. The items form complementary pairs (8+2, 7+3, 6+4) that perfectly fill capacity-10 bins.",
+  "id": "lesson-e66c6a16c751e399",
+  "source_attempt_id": "attempt-0005-04020c63",
+  "source_run_id": "neurogolf-endurance-live-20260727T050720Z-c2919492",
+  "source_task_id": "pack-01-pairs-12",
+  "statement": "When item weights form complementary pairs summing to bin capacity, FFD achieves optimal packing immediately.",
+  "tags": [
+    "bin-packing"
+  ]
+}
