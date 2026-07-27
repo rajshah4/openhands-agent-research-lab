@@ -46,12 +46,16 @@ test("renders the NeuroGolf experiment for a new reader", async () => {
   assert.match(html, /NeuroGolf 2026 was a Kaggle competition/);
   assert.match(html, /The rules did not require agents/);
   assert.match(html, />Overview</);
-  assert.match(html, />Deployment</);
-  assert.match(html, />Robustness</);
-  assert.match(html, />How we tested</);
+  assert.match(html, />Controller</);
+  assert.match(html, />Execution</);
+  assert.match(html, />Memory</);
+  assert.match(html, />Results</);
   assert.match(html, />Scaling</);
+  assert.doesNotMatch(html, />Deployment|>Robustness|>How we tested/);
   assert.match(html, /What the Kaggle competition required/);
   assert.match(html, /400 independent implementation problems/);
+  assert.match(html, /The three parts of a multi-agent system/);
+  assert.match(html, /Controller, execution, and memory solve different problems/);
   assert.match(html, /Why teams used multiple agents/);
   assert.match(html, /The 400 tasks could be worked on in parallel/);
   assert.match(html, /12 attempts for each of 400 tasks/);
@@ -73,7 +77,7 @@ test("renders the NeuroGolf experiment for a new reader", async () => {
   assert.doesNotMatch(html, />Evidence</);
 });
 
-test("includes the Agent Canvas deployment evidence", async () => {
+test("organizes the evidence around controller, execution, and memory", async () => {
   const source = await readFile(
     new URL("../app/research-dashboard.tsx", import.meta.url),
     "utf8",
@@ -127,7 +131,7 @@ test("includes the Agent Canvas deployment evidence", async () => {
   assert.doesNotMatch(source, /Replicated measurements/);
   assert.doesNotMatch(source, /OHE side note/);
   assert.doesNotMatch(source, /Native TaskToolSet worked in Agent Canvas; the Replicated profile still omitted it/);
-  assert.match(source, /Managing and controlling OpenHands conversations/);
+  assert.match(source, /The controller turns individual agent runs into one managed campaign/);
   assert.match(source, /One management loop/);
   assert.match(source, /One controller can use files and Git/);
   assert.match(source, /Several controllers need database leases/);
@@ -166,7 +170,7 @@ test("includes the Agent Canvas deployment evidence", async () => {
   assert.match(source, /These estimates scale with the campaign, not sandbox placement/);
   assert.match(source, /CPU and memory still require an ONNX workload benchmark/);
   assert.doesNotMatch(source, /Placement proven|Density option|Worker cluster/);
-  assert.match(source, /We tested the orchestration separately from the competition solver/);
+  assert.match(source, /We tested controller, execution, and memory separately and together/);
   assert.match(source, /nine-hour campaign/);
   assert.match(source, /What we tested/);
   assert.match(source, /Managed versus independent agents/);
@@ -174,6 +178,11 @@ test("includes the Agent Canvas deployment evidence", async () => {
   assert.doesNotMatch(source, /Run records/);
   assert.doesNotMatch(source, /Live OpenHands evidence/);
   assert.doesNotMatch(source, /After the tests, the Replicated instance had/);
+  assert.match(source, /Durable state lets separate agent runs behave like one research campaign/);
+  assert.match(source, /Files and Git for one controller/);
+  assert.match(source, /Application database for concurrent controllers/);
+  assert.match(source, /Candidate hashes and approach history/);
+  assert.match(source, /Promotion rule/);
   assert.match(snapshot, /"clusterProvisionMinutes": 8/);
   assert.match(snapshot, /"wallSeconds": 113/);
   assert.match(snapshot, /"effectiveThroughput": 153\.55/);

@@ -267,7 +267,7 @@ type Snapshot = {
   }>;
 };
 
-const views = ["Overview", "Deployment", "Robustness", "How we tested", "Scaling"] as const;
+const views = ["Overview", "Controller", "Execution", "Memory", "Results", "Scaling"] as const;
 type View = (typeof views)[number];
 
 function pct(value: number) {
@@ -648,6 +648,39 @@ function OverviewGuide({ snapshot }: { snapshot: Snapshot }) {
       <section className="section narrative">
         <div className="section-heading">
           <div>
+            <p className="eyebrow">The three parts of a multi-agent system</p>
+            <h2>Controller, execution, and memory solve different problems.</h2>
+          </div>
+          <p>
+            The controller decides what happens next. The execution layer runs
+            the agents. Memory preserves enough state for later work to improve,
+            recover, and avoid repeating earlier experiments.
+          </p>
+        </div>
+        <div className="workflow">
+          {[
+            ["01", "Controller", "Select, assign, limit, observe, validate, retry, and stop work."],
+            ["02", "Execution", "Run agents with the conversation, sandbox, and isolation boundary the work requires."],
+            ["03", "Memory", "Retain task state, attempts, candidates, failures, artifacts, and validated lessons."],
+          ].map(([number, title, copy]) => (
+            <article className="workflow-step" key={number}>
+              <span>{number}</span>
+              <h3>{title}</h3>
+              <p>{copy}</p>
+            </article>
+          ))}
+        </div>
+        <p className="architecture-note">
+          OpenHands supplies several execution structures. The controller and
+          durable campaign memory are application responsibilities, even when
+          the controller itself runs as an OpenHands automation or beside Agent
+          Canvas.
+        </p>
+      </section>
+
+      <section className="section narrative">
+        <div className="section-heading">
+          <div>
             <p className="eyebrow">Why teams used multiple agents</p>
             <h2>The 400 tasks could be worked on in parallel, but the work still needed central coordination.</h2>
           </div>
@@ -885,14 +918,14 @@ function OverviewGuide({ snapshot }: { snapshot: Snapshot }) {
   );
 }
 
-function TestMethodGuide({ snapshot }: { snapshot: Snapshot }) {
+function ResultsGuide({ snapshot }: { snapshot: Snapshot }) {
   return (
     <>
       <section className="section narrative">
         <div className="section-heading">
           <div>
-            <p className="eyebrow">How we tested</p>
-            <h1>We tested the orchestration separately from the competition solver.</h1>
+            <p className="eyebrow">Results</p>
+            <h1>We tested controller, execution, and memory separately and together.</h1>
           </div>
           <p>
             Small deterministic problems made orchestration failures easy to
@@ -976,16 +1009,17 @@ function TestMethodGuide({ snapshot }: { snapshot: Snapshot }) {
           </table>
         </div>
         <p className="architecture-note">
-          The run records below link the method to the individual OpenHands
-          conversations. Finished experiment sandboxes were paused after their
-          results were recorded.
+          The tests establish the orchestration boundaries and recovery
+          behavior. They do not claim that the controlled workers reproduce the
+          reasoning difficulty or leaderboard performance of the ONNX
+          competition.
         </p>
       </section>
     </>
   );
 }
 
-function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
+function ExecutionGuide({ snapshot }: { snapshot: Snapshot }) {
   const patterns = [
     {
       name: "Enterprise isolated",
@@ -1050,7 +1084,7 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
       <section className="section narrative">
         <div className="section-heading">
           <div>
-            <p className="eyebrow">OpenHands multi-agent deployment options</p>
+            <p className="eyebrow">Execution</p>
             <h1>Four ways to organize agent execution.</h1>
           </div>
           <p>
@@ -1489,7 +1523,7 @@ function DeploymentDecisionGuide({ snapshot }: { snapshot: Snapshot }) {
   );
 }
 
-function RobustnessGuide({ snapshot }: { snapshot: Snapshot }) {
+function ControllerGuide({ snapshot }: { snapshot: Snapshot }) {
   const controls = [
     ["Single owner", "A file lock rejects a second controller instead of allowing two schedulers to race."],
     ["Stable identity", "Run, attempt, task, conversation, start-task, and sandbox IDs survive retries and restarts."],
@@ -1505,13 +1539,13 @@ function RobustnessGuide({ snapshot }: { snapshot: Snapshot }) {
       <section className="section narrative">
         <div className="section-heading">
           <div>
-            <p className="eyebrow">Managing and controlling OpenHands conversations</p>
+            <p className="eyebrow">Controller</p>
+            <h1>The controller turns individual agent runs into one managed campaign.</h1>
           </div>
           <p>
-            The Deployment section explains how OpenHands provides conversation
-            and runtime infrastructure. This section covers the management
-            layer around it: assignment, admission, observation, validation,
-            recovery, durable records, and cleanup.
+            The execution layer provides conversations and runtimes. The
+            controller decides which work starts, how much may run, how results
+            are validated, what gets retried, and when capacity is released.
           </p>
         </div>
         <div className="workflow">
@@ -1600,15 +1634,14 @@ function RobustnessGuide({ snapshot }: { snapshot: Snapshot }) {
             </p>
           </article>
           <article className="finding-card">
-            <span className="finding-label">Shared learning</span>
+            <span className="finding-label">Scheduled control</span>
             <strong>
-              {snapshot.enduranceCampaign.lessonsPromoted} validated lessons
-              were promoted.
+              {snapshot.enduranceCampaign.attempts} separate controller ticks
+              continued one campaign.
             </strong>
             <p>
-              Later agents received{" "}
-              {snapshot.enduranceCampaign.lessonRetrievals} lesson references.
-              One final result still duplicated a known candidate.
+              Each tick loaded durable state, reconciled existing work, handled
+              a bounded unit, saved the result, and exited.
             </p>
           </article>
           <article className="finding-card">
@@ -1962,6 +1995,142 @@ function RobustnessGuide({ snapshot }: { snapshot: Snapshot }) {
             <p>
               Files support one active owner. Several active controllers still
               require application-owned database leases.
+            </p>
+          </article>
+        </div>
+      </section>
+    </>
+  );
+}
+
+function MemoryGuide({ snapshot }: { snapshot: Snapshot }) {
+  return (
+    <>
+      <section className="section narrative">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">Memory</p>
+            <h1>Durable state lets separate agent runs behave like one research campaign.</h1>
+          </div>
+          <p>
+            Conversation history is useful to one agent. Campaign memory serves
+            the whole organization: it records what was assigned, what was
+            tried, what passed, what failed, and what later agents may reuse.
+          </p>
+        </div>
+        <div className="workflow">
+          {[
+            ["01", "Registry", "Keep one durable record for every task and its current status."],
+            ["02", "Ledger", "Record every attempt, owner, budget, conversation, result, and validation state."],
+            ["03", "Candidates", "Retain candidate hashes and approach history so work is not repeated."],
+            ["04", "Lessons", "Promote only valid, improving, and traceable findings."],
+            ["05", "Checkpoint", "Save enough state for the next controller tick to resume the campaign."],
+          ].map(([number, title, copy]) => (
+            <article className="workflow-step" key={number}>
+              <span>{number}</span>
+              <h3>{title}</h3>
+              <p>{copy}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="section implementation-section">
+        <div className="section-heading report-heading">
+          <div>
+            <p className="eyebrow">Storage boundary</p>
+          </div>
+          <p>
+            The storage choice depends mainly on how many controllers can write
+            at the same time, not on how many agents are waiting in the queue.
+          </p>
+        </div>
+        <div className="controller-boundary">
+          <article>
+            <span className="implementation-status tested">Tested</span>
+            <h3>Files and Git for one controller</h3>
+            <p>
+              A file ledger stored the queue, claims, attempts, validation
+              results, candidates, and lessons. Git checkpoints allowed
+              temporary automation conversations and Kubernetes controller
+              jobs to continue the same campaign.
+            </p>
+          </article>
+          <article>
+            <span className="implementation-status next">Scale-out boundary</span>
+            <h3>Application database for concurrent controllers</h3>
+            <p>
+              Several writers require transactional leases, idempotent claims,
+              and heartbeats. That state belongs in an application-owned
+              database rather than OpenHands&apos; internal PostgreSQL tables.
+            </p>
+          </article>
+        </div>
+        <div className="comparison-grid">
+          <article className="finding-card">
+            <span className="finding-label">Ledger test</span>
+            <strong>{formatNumber(snapshot.robustness.attempts)} attempts remained parseable.</strong>
+            <p>
+              {formatNumber(snapshot.robustness.records)} records occupied{" "}
+              {snapshot.robustness.storeMb} MB and were processed in{" "}
+              {snapshot.robustness.elapsedSeconds.toFixed(2)} seconds.
+            </p>
+          </article>
+          <article className="finding-card">
+            <span className="finding-label">Learning test</span>
+            <strong>{snapshot.enduranceCampaign.lessonsPromoted} lessons were promoted after validation.</strong>
+            <p>
+              Later workers received{" "}
+              {snapshot.enduranceCampaign.lessonRetrievals} lesson references
+              across the endurance campaign.
+            </p>
+          </article>
+          <article className="finding-card">
+            <span className="finding-label">Known limit</span>
+            <strong>Lessons alone did not prevent a duplicate candidate.</strong>
+            <p>
+              Candidate hashes and approach history must also be supplied to
+              the scheduler so it can choose a new direction or stop.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section className="section memory-section">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">Validated lessons</p>
+            <h2>An agent shared a lesson only after its answer passed the test.</h2>
+          </div>
+          <p>
+            Each lesson retained its source problem, checker result, and later
+            consumers. A plausible sentence by itself was never enough.
+          </p>
+        </div>
+        <div className="memory-grid">
+          {snapshot.lessons.map((lesson) => (
+            <article className="lesson-card" key={lesson.id}>
+              <div className="lesson-id">{lesson.id}</div>
+              <blockquote>“{lesson.statement}”</blockquote>
+              <div className="provenance">
+                <div>
+                  <span>Earned by</span>
+                  <strong>{lesson.source}</strong>
+                </div>
+                <div>
+                  <span>Used by</span>
+                  <strong>{lesson.usedBy.join(", ")}</strong>
+                </div>
+              </div>
+              <p>{lesson.evidence}</p>
+            </article>
+          ))}
+          <article className="memory-rule">
+            <span>Promotion rule</span>
+            <strong>valid ∧ improving ∧ traceable</strong>
+            <p>
+              Failed findings remain in experiment history, but they are not
+              presented to later agents as validated techniques.
             </p>
           </article>
         </div>
@@ -2643,59 +2812,17 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
         </>
       )}
 
-      {view === "Deployment" && <DeploymentDecisionGuide snapshot={snapshot} />}
+      {view === "Controller" && <ControllerGuide snapshot={snapshot} />}
 
-      {view === "Robustness" && <RobustnessGuide snapshot={snapshot} />}
+      {view === "Execution" && <ExecutionGuide snapshot={snapshot} />}
 
-      {view === "How we tested" && <TestMethodGuide snapshot={snapshot} />}
+      {view === "Memory" && <MemoryGuide snapshot={snapshot} />}
+
+      {view === "Results" && <ResultsGuide snapshot={snapshot} />}
 
       {view === "Scaling" && <CompetitionPlanner snapshot={snapshot} />}
 
-      {view === "Robustness" && (
-        <section className="section memory-section">
-          <div className="section-heading">
-            <div>
-              <p className="eyebrow">What agents passed forward</p>
-              <h2>An agent shared a lesson only after its answer passed the test.</h2>
-            </div>
-            <p>
-              I kept the source problem, the checker result, and the later
-              agents that received each lesson. A plausible sentence by itself
-              was never enough.
-            </p>
-          </div>
-          <div className="memory-grid">
-            {snapshot.lessons.map((lesson) => (
-              <article className="lesson-card" key={lesson.id}>
-                <div className="lesson-id">{lesson.id}</div>
-                <blockquote>“{lesson.statement}”</blockquote>
-                <div className="provenance">
-                  <div>
-                    <span>Earned by</span>
-                    <strong>{lesson.source}</strong>
-                  </div>
-                  <div>
-                    <span>Used by</span>
-                    <strong>{lesson.usedBy.join(", ")}</strong>
-                  </div>
-                </div>
-                <p>{lesson.evidence}</p>
-              </article>
-            ))}
-            <article className="memory-rule">
-              <span>When a lesson gets shared</span>
-              <strong>valid ∧ improving ∧ traceable</strong>
-              <p>
-                The answer must work, improve the best score, and point back to
-                the run that produced it. Failed lessons stay in the record but
-                never reach another agent.
-              </p>
-            </article>
-          </div>
-        </section>
-      )}
-
-      {view === "Robustness" && (
+      {view === "Results" && (
         <section className="section">
           <div className="section-heading">
             <div>
@@ -2726,6 +2853,7 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
         </section>
       )}
 
+      {view === "Results" && (
       <section className="section next-gate">
         <div>
           <p className="eyebrow">Remaining work</p>
@@ -2759,6 +2887,7 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
           </li>
         </ol>
       </section>
+      )}
 
       <footer>
         <div>
