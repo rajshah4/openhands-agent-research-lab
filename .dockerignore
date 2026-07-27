@@ -1,0 +1,8 @@
+.git
+.venv
+.lab*
+__pycache__
+*.pyc
+evidence
+site
+work
