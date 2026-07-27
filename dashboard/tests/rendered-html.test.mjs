@@ -42,7 +42,7 @@ test("renders the NeuroGolf experiment for a new reader", async () => {
     html,
     /<title>NeuroGolf with OpenHands \| Reproducing a Kaggle multi-agent workflow<\/title>/i,
   );
-  assert.match(html, /NeuroGolf required solving and optimizing 400 separate ARC tasks/i);
+  assert.match(html, /Multi-agent orchestration for the NeuroGolf workload/i);
   assert.match(html, /NeuroGolf 2026 was a Kaggle competition/);
   assert.match(html, /The rules did not require agents/);
   assert.match(html, />Overview</);
@@ -58,14 +58,16 @@ test("renders the NeuroGolf experiment for a new reader", async () => {
   assert.match(html, /Controller, execution, and memory solve different problems/);
   assert.match(html, /Why teams used multiple agents/);
   assert.match(html, /The 400 tasks could be worked on in parallel/);
-  assert.match(html, /12 attempts for each of 400 tasks/);
+  assert.match(html, /several ways to coordinate, execute, and retain state across agent work/);
+  assert.match(html, /Four controller approaches/);
+  assert.match(html, /Four execution structures/);
   assert.match(html, /The same control path can run NeuroGolf workers/);
   assert.match(html, /This test focused on multi-agent orchestration/);
-  assert.match(html, /OpenHands can orchestrate this campaign as the worker execution layer/);
+  assert.match(html, /OpenHands can provide the agent execution\s+layer for this workflow/);
   assert.match(html, /OpenHands ran the agents; our application ran the research organization/);
   assert.match(html, /most of the organizational intelligence was application code outside OpenHands/);
   assert.match(html, /Competition teams built persistent research pipelines around general coding agents/);
-  assert.match(html, /A campaign pipeline, not a one-time swarm/);
+  assert.match(html, /A persistent research pipeline/);
   assert.match(html, /Winning-team pipeline/);
   assert.match(html, /A custom resumable Codex scheduler/);
   assert.match(html, /External task ownership prevented agent drift/);
@@ -183,6 +185,16 @@ test("organizes the evidence around controller, execution, and memory", async ()
   assert.match(source, /Application database for concurrent controllers/);
   assert.match(source, /Candidate hashes and approach history/);
   assert.match(source, /Promotion rule/);
+  assert.match(source, /Controller approaches evaluated/);
+  assert.match(source, /Reliability and recovery tests/);
+  assert.match(source, /What must be stored between agent runs/);
+  assert.match(source, /How agents reused findings from earlier work/);
+  assert.match(source, /Experiments completed and what they established/);
+  assert.match(source, /Implications for teams using OpenHands/);
+  assert.match(source, /Limitations and remaining tests/);
+  assert.match(source, /ControllerTechnicalReport/);
+  assert.match(source, /MemoryTechnicalReport/);
+  assert.match(source, /ResultsTechnicalReport/);
   assert.match(snapshot, /"clusterProvisionMinutes": 8/);
   assert.match(snapshot, /"wallSeconds": 113/);
   assert.match(snapshot, /"effectiveThroughput": 153\.55/);

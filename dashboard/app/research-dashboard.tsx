@@ -601,7 +601,7 @@ function CompetitionPlanner({ snapshot }: { snapshot: Snapshot }) {
   );
 }
 
-function OverviewGuide({ snapshot }: { snapshot: Snapshot }) {
+function OverviewGuide() {
   return (
     <>
       <section className="section narrative" id="overview">
@@ -671,9 +671,9 @@ function OverviewGuide({ snapshot }: { snapshot: Snapshot }) {
           ))}
         </div>
         <p className="architecture-note">
-          OpenHands supplies several execution structures. The controller and
-          durable campaign memory are application responsibilities, even when
-          the controller itself runs as an OpenHands automation or beside Agent
+          OpenHands supplies several execution structures. Controller logic and
+          persistent workflow state remain application responsibilities, even
+          when the controller runs as an OpenHands automation or beside Agent
           Canvas.
         </p>
       </section>
@@ -713,30 +713,31 @@ function OverviewGuide({ snapshot }: { snapshot: Snapshot }) {
         <div className="section-heading">
           <div>
             <p className="eyebrow">What this project reproduced</p>
-            <h2>We exercised the coordination system with 12 attempts for each of 400 tasks.</h2>
+            <h2>We evaluated several ways to coordinate, execute, and retain state across agent work.</h2>
           </div>
           <p>
-            The scale run used controlled deterministic workers so that missing
-            work, duplicate ownership, incorrect retrieval, and measurement
-            errors could be detected reliably.
+            Live OpenHands tests compared execution and controller approaches.
+            A separate deterministic simulation tested scheduler coverage at
+            the 400-task scale without presenting that simulation as model-agent
+            or ONNX performance.
           </p>
         </div>
         <div className="implementation-grid">
           <article className="implementation-card">
-            <span className="implementation-status tested">Task assignment</span>
-            <h3>All 400 tasks received work</h3>
+            <span className="implementation-status tested">Controller evaluation</span>
+            <h3>Four controller approaches</h3>
             <p>
-              The scheduler recorded exactly{" "}
-              {snapshot.portfolioScale.exactAttemptsPerTask} attempts for every
-              task instead of concentrating work on only a subset.
+              We tested bounded external control, scheduled Enterprise
+              automation, a persistent polling implementation, and an
+              in-cluster Agent Canvas controller.
             </p>
           </article>
           <article className="implementation-card">
-            <span className="implementation-status tested">Experiment history</span>
-            <h3>{formatNumber(snapshot.portfolioScale.totalAttempts)} attempts were retained</h3>
+            <span className="implementation-status tested">Execution evaluation</span>
+            <h3>Four execution structures</h3>
             <p>
-              Each attempt kept its task, sequence, result, validation state,
-              and the lessons it was allowed to use.
+              We compared isolated and grouped Enterprise conversations, Agent
+              Canvas, and parent/subagent delegation using matched workloads.
             </p>
           </article>
           <article className="implementation-card">
@@ -759,7 +760,7 @@ function OverviewGuide({ snapshot }: { snapshot: Snapshot }) {
           </div>
           <p>
             The results give us enough evidence to proceed with OpenHands as
-            the execution layer for a full campaign. OpenHands would manage
+            the execution layer for a full NeuroGolf run. OpenHands would manage
             agent conversations and sandboxes; the application would continue
             to own scheduling, experiment history, validation, and promotion.
           </p>
@@ -771,7 +772,7 @@ function OverviewGuide({ snapshot }: { snapshot: Snapshot }) {
           </article>
           <article className="finding-card">
             <span className="finding-label">Production state</span>
-            <strong>Add database leases and artifact storage when more than one controller runs the campaign.</strong>
+            <strong>Add database leases and artifact storage when more than one controller updates the workflow.</strong>
           </article>
           <article className="finding-card">
             <span className="finding-label">Release process</span>
@@ -779,8 +780,8 @@ function OverviewGuide({ snapshot }: { snapshot: Snapshot }) {
           </article>
         </div>
         <div className="architecture-note">
-          <strong>Our conclusion:</strong> OpenHands can orchestrate this
-          campaign as the worker execution layer. The remaining work is domain
+          <strong>Conclusion:</strong> OpenHands can provide the agent execution
+          layer for this workflow. The remaining work is domain
           and production integration, not a different orchestration
           architecture. A 100-agent deployment should still pass
           multi-controller and API load tests before it is treated as proven at
@@ -797,7 +798,7 @@ function OverviewGuide({ snapshot }: { snapshot: Snapshot }) {
           <p>
             The experiments were not an all-in-one OpenHands feature. I used
             controller code outside the agent runtime to decide what should
-            run, verify the result, and preserve campaign state. OpenHands
+            run, verify the result, and preserve workflow state. OpenHands
             supplied the execution and lifecycle layer.
           </p>
         </div>
@@ -856,7 +857,7 @@ function OverviewGuide({ snapshot }: { snapshot: Snapshot }) {
         <div className="implementation-grid">
           <article className="implementation-card">
             <span className="implementation-status tested">Winning-team reference</span>
-            <h3>A campaign pipeline, not a one-time swarm</h3>
+            <h3>A persistent research pipeline</h3>
             <p>
               The published pipeline treated task state, candidate history,
               validation, and promotion as durable parts of the competition
@@ -2139,6 +2140,478 @@ function MemoryGuide({ snapshot }: { snapshot: Snapshot }) {
   );
 }
 
+function ControllerTechnicalReport({ snapshot }: { snapshot: Snapshot }) {
+  return (
+    <>
+      <section className="section narrative">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">Controller</p>
+            <h1>How the workflow assigns, monitors, validates, and recovers agent work</h1>
+          </div>
+          <p>
+            OpenHands runs each agent. The controller coordinates those runs:
+            it selects work, limits concurrency, records stable identifiers,
+            checks results independently, resumes interrupted work, and releases
+            runtime capacity.
+          </p>
+        </div>
+        <div className="workflow">
+          {[
+            ["01", "Assign work", "Record the task, owner, budget, and attempt identifier."],
+            ["02", "Start and monitor", "Persist the OpenHands identifiers and monitor the conversation and sandbox."],
+            ["03", "Validate", "Check the candidate outside the agent before accepting it."],
+            ["04", "Record", "Save the result, evidence, cost, and any validated finding."],
+            ["05", "Recover or finish", "Resume interrupted work or pause the completed sandbox."],
+          ].map(([number, title, copy]) => (
+            <article className="workflow-step" key={number}>
+              <span>{number}</span>
+              <h3>{title}</h3>
+              <p>{copy}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="section implementation-section">
+        <div className="section-heading report-heading">
+          <div>
+            <h2>Controller approaches evaluated</h2>
+          </div>
+          <p>
+            The same controller logic was run from different locations and
+            with different trigger models. The table separates completed tests
+            from implementations that still need longer qualification.
+          </p>
+        </div>
+        <div className="agent-table-wrap controller-evidence-table">
+          <table className="agent-table">
+            <thead>
+              <tr>
+                <th>Approach</th>
+                <th>Test setup</th>
+                <th>Measured result</th>
+                <th>Implication</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>External bounded controller</strong></td>
+                <td>
+                  Four documented batches covering{" "}
+                  {snapshot.controllerLoad.externalValidation.workerAttempts}
+                  {" "}worker attempts. Four conversations ran while two waited.
+                </td>
+                <td>
+                  Admission control, polling, independent validation, targeted
+                  recovery, and sandbox cleanup completed together. The final
+                  recovery batch passed{" "}
+                  {snapshot.controllerLoad.externalValidation.finalValid}/
+                  {snapshot.controllerLoad.externalValidation.finalAttempts}.
+                </td>
+                <td>
+                  Appropriate for finite jobs managed by a pipeline or operator.
+                  The external process must remain available until the batch is
+                  reconciled.
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Scheduled Enterprise automation</strong></td>
+                <td>
+                  {snapshot.enduranceCampaign.attempts} hourly controller runs
+                  continued one workflow from Git over{" "}
+                  {snapshot.enduranceCampaign.elapsedHours.toFixed(1)} hours.
+                </td>
+                <td>
+                  {snapshot.enduranceCampaign.valid}/
+                  {snapshot.enduranceCampaign.attempts} attempts were valid and
+                  all {snapshot.enduranceCampaign.taskCount} tasks received
+                  work. Recorded model cost was $
+                  {snapshot.enduranceCampaign.modelCost.toFixed(2)}.
+                </td>
+                <td>
+                  A controller does not need to remain running continuously.
+                  Durable state must be complete enough for each scheduled run
+                  to reconcile previous work before starting more.
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Persistent polling service</strong></td>
+                <td>
+                  The supervisor and reconciliation code passed unit tests and
+                  bounded restart, validation, and cleanup tests.
+                </td>
+                <td>
+                  The component behavior was verified, but the service was not
+                  kept running continuously for 24 hours.
+                </td>
+                <td>
+                  Use when new work must begin as soon as capacity becomes
+                  available. Longer runtime, API degradation, and queue-drain
+                  tests are still required.
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Agent Canvas controller in Kubernetes</strong></td>
+                <td>
+                  {snapshot.canvasController.campaignTicks} Kubernetes
+                  controller jobs processed one shared workflow. Tests included
+                  forced termination and an overlapping controller.
+                </td>
+                <td>
+                  {snapshot.canvasController.valid}/
+                  {snapshot.canvasController.taskCount} tasks completed. The
+                  replacement controller resumed the existing conversation, and
+                  the overlap lock rejected a second owner.
+                </td>
+                <td>
+                  The controller can run beside Agent Canvas without relying on
+                  a developer workstation. Files support one active writer;
+                  multiple active controller replicas require database leases.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="section implementation-section">
+        <div className="section-heading report-heading">
+          <div>
+            <h2>Reliability and recovery tests</h2>
+          </div>
+          <p>
+            These tests cover controller failures that can otherwise create
+            duplicate work, lose completed results, or leave runtime capacity
+            unavailable.
+          </p>
+        </div>
+        <div className="agent-table-wrap">
+          <table className="agent-table">
+            <thead>
+              <tr>
+                <th>Condition</th>
+                <th>Result</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Controller stopped after starting an agent</td>
+                <td>Recovery resumed the existing start task or conversation instead of launching duplicate work.</td>
+                <td><strong>Passed</strong></td>
+              </tr>
+              <tr>
+                <td>Two Canvas controllers started at the same time</td>
+                <td>The file lock rejected the second controller before it launched work.</td>
+                <td><strong>Passed</strong></td>
+              </tr>
+              <tr>
+                <td>Final result arrived after the first completion signal</td>
+                <td>The controller waited for the complete final message before validating the attempt.</td>
+                <td><strong>Handled</strong></td>
+              </tr>
+              <tr>
+                <td>Completed sandboxes continued using capacity</td>
+                <td>Cleanup now pauses completed sandboxes and verifies that capacity is returned.</td>
+                <td><strong>Handled</strong></td>
+              </tr>
+              <tr>
+                <td>Terminal Git artifact remained after its sandbox disappeared</td>
+                <td>Recovery currently checks the missing sandbox before validating the durable artifact.</td>
+                <td><strong>Open</strong></td>
+              </tr>
+              <tr>
+                <td>Several controller replicas claim work concurrently</td>
+                <td>Requires application-owned transactional leases; this configuration was not tested.</td>
+                <td><strong>Not tested</strong></td>
+              </tr>
+              <tr>
+                <td>Duplicate, delayed, missed, or out-of-order events</td>
+                <td>The event-triggered controller design exists, but delivery failures were not tested.</td>
+                <td><strong>Not tested</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="section implementation-section">
+        <div className="section-heading report-heading">
+          <div>
+            <h2>Reusable controller examples</h2>
+          </div>
+          <p>
+            Each example invokes the same reconciliation logic. The difference
+            is whether it runs once, on a schedule, continuously, or inside the
+            Agent Canvas Kubernetes cluster.
+          </p>
+        </div>
+        <div className="control-list">
+          <article>
+            <h3>Bounded controller run</h3>
+            <p>Reconciles saved state, processes one bounded unit of work, saves the result, and exits.</p>
+            <a href="https://github.com/rajshah4/openhands-agent-research-lab/blob/main/experiments/in-platform-controller/run_tick.py">View code</a>
+          </article>
+          <article>
+            <h3>Enterprise automation</h3>
+            <p>Starts the bounded controller on a schedule and continues the workflow from Git.</p>
+            <a href="https://github.com/rajshah4/openhands-agent-research-lab/tree/main/experiments/in-platform-controller/automation">View code</a>
+          </article>
+          <article>
+            <h3>Persistent polling service</h3>
+            <p>Repeats bounded reconciliation at a configured interval.</p>
+            <a href="https://github.com/rajshah4/openhands-agent-research-lab/blob/main/experiments/in-platform-controller/persistent_supervisor.py">View code</a>
+          </article>
+          <article>
+            <h3>Agent Canvas Kubernetes controller</h3>
+            <p>Runs the bounded controller beside Agent Canvas using a persistent volume for state.</p>
+            <a href="https://github.com/rajshah4/openhands-agent-research-lab/tree/main/experiments/agent-canvas-kubernetes/controller">View code</a>
+          </article>
+        </div>
+      </section>
+    </>
+  );
+}
+
+function MemoryTechnicalReport({ snapshot }: { snapshot: Snapshot }) {
+  return (
+    <>
+      <section className="section narrative">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">Persistent state and shared learning</p>
+            <h1>What must be stored between agent runs</h1>
+          </div>
+          <p>
+            Individual conversation history is not enough to coordinate many
+            agents. The workflow also needs task status, experiment history,
+            candidate history, validation results, and findings that later
+            agents are allowed to reuse.
+          </p>
+        </div>
+        <div className="agent-table-wrap">
+          <table className="agent-table">
+            <thead>
+              <tr>
+                <th>Stored information</th>
+                <th>Why it is needed</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Task registry</strong></td><td>Tracks ownership, status, coverage, budget, and the best validated result for every task.</td></tr>
+              <tr><td><strong>Experiment ledger</strong></td><td>Records each attempt, conversation, result, validation outcome, cost, and failure.</td></tr>
+              <tr><td><strong>Candidate and approach history</strong></td><td>Prevents later agents from repeating candidates or approaches that were already evaluated.</td></tr>
+              <tr><td><strong>Validated findings</strong></td><td>Allows later agents to reuse techniques only after independent validation.</td></tr>
+              <tr><td><strong>Controller checkpoint</strong></td><td>Allows a later scheduled run or replacement process to resume the workflow safely.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="section implementation-section">
+        <div className="section-heading report-heading">
+          <div>
+            <h2>Storage options</h2>
+          </div>
+          <p>
+            The main decision is how many controllers may update the state at
+            the same time.
+          </p>
+        </div>
+        <div className="agent-table-wrap">
+          <table className="agent-table">
+            <thead>
+              <tr>
+                <th>Configuration</th>
+                <th>Recommended storage</th>
+                <th>Evidence and tradeoff</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>One active controller</strong></td>
+                <td>Files for state, Git for durable checkpoints and history</td>
+                <td>
+                  Tested with Enterprise automations and the Agent Canvas
+                  Kubernetes controller. Simple to inspect and reproduce, but
+                  intentionally limited to one writer by a file lock.
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Several active controllers or tenants</strong></td>
+                <td>Application-owned transactional database and artifact store</td>
+                <td>
+                  Needed for leases, idempotent claims, heartbeats, and
+                  concurrent updates. This configuration was designed but not
+                  tested. OpenHands internal PostgreSQL tables should not be
+                  used as the workflow database.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="section implementation-section">
+        <div className="section-heading report-heading">
+          <div>
+            <h2>How agents reused findings from earlier work</h2>
+          </div>
+          <p>
+            A finding was shared only after the associated candidate passed
+            independent validation and improved the stored result.
+          </p>
+        </div>
+        <div className="agent-table-wrap">
+          <table className="agent-table">
+            <thead>
+              <tr>
+                <th>Measurement</th>
+                <th>Result</th>
+                <th>Interpretation</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Findings promoted after validation</td>
+                <td><strong>{snapshot.enduranceCampaign.lessonsPromoted}</strong></td>
+                <td>Validated information persisted beyond the conversation that produced it.</td>
+              </tr>
+              <tr>
+                <td>Finding references supplied to later agents</td>
+                <td><strong>{snapshot.enduranceCampaign.lessonRetrievals}</strong></td>
+                <td>Later agents received relevant prior findings as part of their task context.</td>
+              </tr>
+              <tr>
+                <td>Duplicate candidate after receiving prior findings</td>
+                <td><strong>{snapshot.enduranceCampaign.duplicates}</strong></td>
+                <td>Findings alone are insufficient; the scheduler also needs candidate hashes and approach history.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p className="architecture-note">
+          The test established that validated findings can be stored and
+          retrieved across separate agent runs. It did not establish that this
+          small benchmark improves reasoning quality on the real ONNX workload.
+        </p>
+      </section>
+    </>
+  );
+}
+
+function ResultsTechnicalReport({ snapshot }: { snapshot: Snapshot }) {
+  return (
+    <>
+      <section className="section narrative">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">Results</p>
+            <h1>Experiments completed and what they established</h1>
+          </div>
+          <p>
+            The evaluation used small deterministic tasks to isolate
+            orchestration behavior, longer agent tasks to test scheduled
+            control and shared learning, and a 400-task simulation to test
+            scheduler coverage.
+          </p>
+        </div>
+        <div className="agent-table-wrap method-table">
+          <table className="agent-table">
+            <thead>
+              <tr>
+                <th>Experiment</th>
+                <th>What we did</th>
+                <th>Result</th>
+                <th>What it means</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Managed scheduling versus independent selection</strong></td>
+                <td>The same six tasks were run three times with the same model and budget. One setup assigned coverage centrally; the other allowed agents to select independently.</td>
+                <td>Managed scheduling produced 6× task coverage, 22.9% lower mean wall time, and 23.8% lower mean model cost.</td>
+                <td>Central task ownership reduced repeated work and ensured that all tasks received attention.</td>
+              </tr>
+              <tr>
+                <td><strong>Execution structure comparison</strong></td>
+                <td>The same workload was run with Enterprise isolated conversations, Enterprise grouped conversations, Agent Canvas, and parent/subagent delegation.</td>
+                <td>All structures completed valid work. They differed primarily in isolation, conversation records, sandbox use, recovery scope, and operational responsibility.</td>
+                <td>Execution structure should be chosen from trust and operational requirements, not from agent count alone.</td>
+              </tr>
+              <tr>
+                <td><strong>Enterprise scheduled-controller stress test</strong></td>
+                <td>{snapshot.enduranceCampaign.attempts} hourly automation runs continued one Git-backed workflow over {snapshot.enduranceCampaign.elapsedHours.toFixed(1)} hours.</td>
+                <td>{snapshot.enduranceCampaign.valid}/{snapshot.enduranceCampaign.attempts} attempts were valid; all {snapshot.enduranceCampaign.taskCount} tasks received work; {snapshot.enduranceCampaign.lessonsPromoted} findings were promoted.</td>
+                <td>Temporary controller conversations can manage a longer workflow when state is durable and every run reconciles earlier work first.</td>
+              </tr>
+              <tr>
+                <td><strong>Agent Canvas controller recovery test</strong></td>
+                <td>{snapshot.canvasController.campaignTicks} in-cluster controller jobs were followed by forced termination and an overlapping-controller test.</td>
+                <td>{snapshot.canvasController.valid}/{snapshot.canvasController.taskCount} tasks completed. Recovery reused the existing conversation, and the second controller was rejected.</td>
+                <td>The controller can run inside the deployment instead of on a developer machine while retaining restart and single-owner protection.</td>
+              </tr>
+              <tr>
+                <td><strong>400-task scheduler simulation</strong></td>
+                <td>Controlled workers generated {formatNumber(snapshot.portfolioScale.totalAttempts)} attempt records across two scheduling configurations.</td>
+                <td>Every task received exactly {snapshot.portfolioScale.exactAttemptsPerTask} attempts with unique ownership and sequence records.</td>
+                <td>The scheduler and ledger covered the shape of the competition workload. This was not a run of {formatNumber(snapshot.portfolioScale.totalAttempts)} model agents or an ONNX-quality test.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="section implementation-section">
+        <div className="section-heading report-heading">
+          <div>
+            <h2>Implications for teams using OpenHands</h2>
+          </div>
+        </div>
+        <div className="agent-table-wrap">
+          <table className="agent-table">
+            <thead>
+              <tr>
+                <th>Decision</th>
+                <th>Recommendation supported by the tests</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>How to assign work</strong></td><td>Keep task selection and ownership in a controller rather than allowing independent agents to choose from a shared backlog.</td></tr>
+              <tr><td><strong>How many sandboxes to create</strong></td><td>Use isolated sandboxes for untrusted work. Use bounded shared sandboxes for one trusted team when reducing container count matters.</td></tr>
+              <tr><td><strong>Where to run the controller</strong></td><td>Use an external bounded process for finite jobs, scheduled automation for work that can advance periodically, or an in-cluster service when faster continuous reaction is required.</td></tr>
+              <tr><td><strong>Where to store workflow state</strong></td><td>Files and Git are sufficient for one controller. Use an application database when several controllers or tenants update the same workflow concurrently.</td></tr>
+              <tr><td><strong>How to share learning</strong></td><td>Store validation-backed findings together with candidate and approach history. Findings alone did not prevent duplicate experimentation.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="section implementation-section">
+        <div className="section-heading report-heading">
+          <div>
+            <h2>Limitations and remaining tests</h2>
+          </div>
+          <p>
+            These limitations separate measured behavior from the work still
+            required before claiming a full NeuroGolf implementation or
+            production qualification at larger concurrency.
+          </p>
+        </div>
+        <div className="control-list">
+          <article><h3>Competition workload</h3><p>Add licensed ONNX builders, execution, adversarial validation, quarantine, and a 400-task release audit.</p></article>
+          <article><h3>Controller recovery</h3><p>Validate a durable terminal artifact before requiring the original sandbox to exist.</p></article>
+          <article><h3>Duplicate experiments</h3><p>Supply candidate hashes and approach history to the scheduler.</p></article>
+          <article><h3>Concurrent controllers</h3><p>Test transactional leases, failover, and recovery with several controller replicas.</p></article>
+          <article><h3>Long-running service</h3><p>Run the persistent controller continuously through API degradation, process restarts, and queue drain.</p></article>
+          <article><h3>Event delivery</h3><p>Inject duplicate, delayed, missed, and out-of-order events with periodic reconciliation as a backstop.</p></article>
+        </div>
+      </section>
+    </>
+  );
+}
+
 export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
   const [view, setView] = useState<View>("Overview");
 
@@ -2170,17 +2643,19 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
         </div>
       </header>
 
+      {view === "Overview" && (
+      <>
       <section className="hero" id="top">
         <div className="hero-copy">
-          <p className="eyebrow">A Kaggle competition workload reproduced with OpenHands</p>
-          <h1>NeuroGolf required solving and optimizing 400 separate ARC tasks.</h1>
+          <p className="eyebrow">Technical evaluation</p>
+          <h1>Multi-agent orchestration for the NeuroGolf workload</h1>
           <p className="lede">
             NeuroGolf 2026 was a Kaggle competition in which each task needed a
             correct ONNX program. The rules did not require agents, but the 400
-            independent problems made parallel agent work useful. This project
-            reproduces the system needed to assign that work, check results,
-            retain experiment history, share validated lessons, and manage the
-            OpenHands runtimes.
+            independent problems made parallel agent work useful. We evaluated
+            how OpenHands can execute that work, how a controller coordinates
+            it, and how persistent state allows later agents to reuse validated
+            findings.
           </p>
           <div className="hero-actions">
             <a href="#overview" className="primary-action">
@@ -2203,8 +2678,7 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
 
         <aside className="capacity-card" aria-label="NeuroGolf competition summary">
           <div className="card-heading">
-            <span>NeuroGolf workload</span>
-            <span className="status-badge healthy">Kaggle 2026</span>
+            <span>Workload evaluated</span>
           </div>
           <div className="capacity-number">
             <strong>400</strong>
@@ -2236,33 +2710,35 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
         </aside>
       </section>
 
-      <section className="proof-strip" aria-label="Proof summary">
+      <section className="proof-strip" aria-label="Evaluation summary">
         <div>
-          <span>Competition tasks</span>
-          <strong>{snapshot.portfolioScale.tasks}</strong>
-          <small>separate ARC problems</small>
+          <span>System components</span>
+          <strong>3</strong>
+          <small>controller, execution, and persistent state</small>
           <div className="mini-meter">
             <span style={{ width: pct(1) }} />
           </div>
         </div>
         <div>
-          <span>Attempts recorded</span>
-          <strong>{formatNumber(snapshot.portfolioScale.totalAttempts)}</strong>
-          <small>across two matched organizations</small>
+          <span>Execution structures</span>
+          <strong>4</strong>
+          <small>compared with live OpenHands agents</small>
         </div>
         <div>
-          <span>Tasks receiving work</span>
-          <strong>400/400</strong>
-          <small>in the orchestration test</small>
+          <span>Controller approaches</span>
+          <strong>4</strong>
+          <small>implemented or evaluated</small>
         </div>
         <div>
-          <span>Attempts per task</span>
-          <strong>{snapshot.portfolioScale.exactAttemptsPerTask}</strong>
-          <small>for every one of the 400 tasks</small>
+          <span>Scaling simulation</span>
+          <strong>{snapshot.portfolioScale.tasks}</strong>
+          <small>task owners with controlled coverage</small>
         </div>
       </section>
+      </>
+      )}
 
-      {view === "Overview" && <OverviewGuide snapshot={snapshot} />}
+      {view === "Overview" && <OverviewGuide />}
 
       {false && (
         <>
@@ -2812,17 +3288,17 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
         </>
       )}
 
-      {view === "Controller" && <ControllerGuide snapshot={snapshot} />}
+      {view === "Controller" && <ControllerTechnicalReport snapshot={snapshot} />}
 
       {view === "Execution" && <ExecutionGuide snapshot={snapshot} />}
 
-      {view === "Memory" && <MemoryGuide snapshot={snapshot} />}
+      {view === "Memory" && <MemoryTechnicalReport snapshot={snapshot} />}
 
-      {view === "Results" && <ResultsGuide snapshot={snapshot} />}
+      {view === "Results" && <ResultsTechnicalReport snapshot={snapshot} />}
 
       {view === "Scaling" && <CompetitionPlanner snapshot={snapshot} />}
 
-      {view === "Results" && (
+      {false && (
         <section className="section">
           <div className="section-heading">
             <div>
@@ -2853,7 +3329,7 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
         </section>
       )}
 
-      {view === "Results" && (
+      {false && (
       <section className="section next-gate">
         <div>
           <p className="eyebrow">Remaining work</p>
