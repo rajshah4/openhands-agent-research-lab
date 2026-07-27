@@ -252,6 +252,8 @@ class OpenHandsWorkerTests(unittest.TestCase):
         self.assertIn("Endurance research protocol", prompt)
         self.assertIn("at least three solution approaches", prompt)
         self.assertIn("30 seeded orderings or perturbations", prompt)
+        self.assertIn("controlled\n  seven-minute wait", prompt)
+        self.assertIn("not additional\n  research evidence", prompt)
         self.assertIn("complete attempt within twenty minutes", prompt)
 
 

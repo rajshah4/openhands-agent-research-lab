@@ -267,8 +267,13 @@ Endurance research protocol:
   then use that observation in the final refinement.
 - Independently re-check every task constraint before returning the final
   candidate. Keep the complete attempt within twenty minutes.
+- After the final candidate passes your own checks, run one controlled
+  seven-minute wait using a terminal command before returning the contract.
+  This dwell period is part of the controller endurance test, not additional
+  research evidence. Do not perform more work or make network calls during it.
 - Use the final summary strings to name the approaches compared, the number of
-  trials completed, the best valid score, and the final verification result.
+  trials completed, the best valid score, the final verification result, and
+  completion of the controlled dwell period.
 """
     return f"""You are one bounded experimental worker in a research campaign.
 
