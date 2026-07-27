@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-26T05:20:00Z",
+  "generatedAt": "2026-07-27T14:48:50Z",
   "environment": {
     "name": "Rajistics Replicated",
     "version": "0.24.0",
@@ -15,7 +15,7 @@
     "launchAllowed": true
   },
   "proof": {
-    "tests": 49,
+    "tests": 69,
     "liveAttempts": 37,
     "validAttempts": 37,
     "invalidLessons": 0,
@@ -249,12 +249,39 @@
       "finalAttempts": 6
     },
     "automationValidation": {
-      "documentedRuns": 9,
+      "documentedRuns": 17,
       "pilotRuns": 7,
       "concurrencyRuns": 2,
       "cleanPilotTicks": 2,
-      "recurringRuns": 0
+      "recurringRuns": 8
     }
+  },
+  "enduranceCampaign": {
+    "attempts": 8,
+    "valid": 7,
+    "tasksCovered": 6,
+    "taskCount": 6,
+    "elapsedHours": 9.0644,
+    "modelCost": 2.12030643,
+    "promptTokens": 1320153,
+    "completionTokens": 41941,
+    "lessonsPromoted": 6,
+    "lessonRetrievals": 7,
+    "duplicates": 1,
+    "recoveryFailures": 1,
+    "automationEnabled": false
+  },
+  "canvasController": {
+    "campaignTicks": 6,
+    "valid": 6,
+    "taskCount": 6,
+    "elapsedSeconds": 509.953,
+    "modelCost": 0.1748943,
+    "promptTokens": 140228,
+    "completionTokens": 15423,
+    "crashRecoveryPassed": true,
+    "overlapLockPassed": true,
+    "restarts": 0
   },
   "portfolioScale": {
     "tasks": 400,
@@ -328,6 +355,18 @@
       "finding": "Two agents used item-a from my prompt example instead of the real item named a.",
       "resolution": "Prompts now use the actual problem IDs. A focused rerun passed 2/2, followed by 36/36 valid runs.",
       "state": "Resolved"
+    },
+    {
+      "title": "A finished artifact outlived its sandbox",
+      "finding": "An agent finished and wrote its result to Git, but the next controller tick checked for the missing sandbox before validating that durable artifact.",
+      "resolution": "Validate a terminal Git artifact before requiring the original sandbox during recovery.",
+      "state": "Open"
+    },
+    {
+      "title": "Shared lessons did not prevent a duplicate",
+      "finding": "The final agent received two validated lessons but returned a candidate that the campaign had already recorded.",
+      "resolution": "Give the scheduler prior candidate hashes and approach history, then require a new direction or stop the task.",
+      "state": "Open"
     }
   ]
 }

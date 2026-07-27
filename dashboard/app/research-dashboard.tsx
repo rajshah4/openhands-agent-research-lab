@@ -229,6 +229,33 @@ type Snapshot = {
       recurringRuns: number;
     };
   };
+  enduranceCampaign: {
+    attempts: number;
+    valid: number;
+    tasksCovered: number;
+    taskCount: number;
+    elapsedHours: number;
+    modelCost: number;
+    promptTokens: number;
+    completionTokens: number;
+    lessonsPromoted: number;
+    lessonRetrievals: number;
+    duplicates: number;
+    recoveryFailures: number;
+    automationEnabled: boolean;
+  };
+  canvasController: {
+    campaignTicks: number;
+    valid: number;
+    taskCount: number;
+    elapsedSeconds: number;
+    modelCost: number;
+    promptTokens: number;
+    completionTokens: number;
+    crashRecoveryPassed: boolean;
+    overlapLockPassed: boolean;
+    restarts: number;
+  };
   portfolioScale: {
     tasks: number;
     attemptsPerArm: number;
@@ -818,7 +845,7 @@ function OverviewGuide({ snapshot }: { snapshot: Snapshot }) {
         <div className="section-heading">
           <div>
             <p className="eyebrow">Comparison with public NeuroGolf solutions</p>
-            <h2>Top teams built similar control loops themselves around general coding agents.</h2>
+            <h2>Competition teams built persistent research pipelines around general coding agents.</h2>
           </div>
           <p>
             The reviewed writeups describe custom schedulers, task files,
@@ -829,6 +856,16 @@ function OverviewGuide({ snapshot }: { snapshot: Snapshot }) {
           </p>
         </div>
         <div className="implementation-grid">
+          <article className="implementation-card">
+            <span className="implementation-status tested">Winning-team reference</span>
+            <h3>A campaign pipeline, not a one-time swarm</h3>
+            <p>
+              The published pipeline treated task state, candidate history,
+              validation, and promotion as durable parts of the competition
+              system. Repeated agent work improved a retained portfolio instead
+              of starting from an empty prompt each time.
+            </p>
+          </article>
           <article className="implementation-card">
             <span className="implementation-status tested">Third place</span>
             <h3>Custom files and Codex/ChatGPT handoffs</h3>
@@ -865,6 +902,9 @@ function OverviewGuide({ snapshot }: { snapshot: Snapshot }) {
           separated the strongest teams.
         </p>
         <div className="planner-sources">
+          <a href="https://www.kaggle.com/competitions/neurogolf-2026/discussion/726799">
+            Winning-team pipeline ↗
+          </a>
           <a href="https://www.kaggle.com/competitions/neurogolf-2026/writeups/3rd-place-solution-writeup">
             Third-place writeup ↗
           </a>
@@ -887,13 +927,13 @@ function TestMethodGuide({ snapshot }: { snapshot: Snapshot }) {
         <div className="section-heading">
           <div>
             <p className="eyebrow">How we tested</p>
-            <h1>Simple problems were used to test the orchestration system.</h1>
+            <h1>We tested the orchestration separately from the competition solver.</h1>
           </div>
           <p>
-            The problems were deliberately easy to verify. That allowed the
-            tests to focus on task assignment, conversation creation, result
-            validation, shared memory, sandbox placement, and cleanup. They
-            were not a test of NeuroGolf reasoning difficulty.
+            Small deterministic problems made orchestration failures easy to
+            detect. A separate nine-hour campaign tested scheduled control,
+            multi-step tool use, Git handoff, shared lessons, and recovery.
+            Neither test substitutes for the real ONNX workload.
           </p>
         </div>
         <div className="agent-table-wrap method-table">
@@ -938,6 +978,33 @@ function TestMethodGuide({ snapshot }: { snapshot: Snapshot }) {
                 <td>
                   The test measures orchestration behavior. It does not
                   establish a reasoning-quality or Kaggle-score advantage.
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Enterprise endurance campaign</strong></td>
+                <td>
+                  {snapshot.enduranceCampaign.attempts} hourly attempts over{" "}
+                  {snapshot.enduranceCampaign.elapsedHours.toFixed(1)} hours.
+                  Each worker compared three approaches, ran at least 12
+                  trials, and wrote a Git artifact.
+                </td>
+                <td>
+                  Scheduled OpenHands automations resumed one campaign from
+                  Git, passed validated lessons between conversations, and
+                  retained both a failed recovery and a duplicate experiment.
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Agent Canvas controller</strong></td>
+                <td>
+                  {snapshot.canvasController.campaignTicks} separate Kubernetes
+                  controller ticks, followed by forced termination and an
+                  overlapping-controller test.
+                </td>
+                <td>
+                  A controller running beside Agent Canvas recovered an existing
+                  conversation after restart, while the file lock rejected a
+                  second controller before it launched duplicate work.
                 </td>
               </tr>
             </tbody>
@@ -1553,6 +1620,44 @@ function RobustnessGuide({ snapshot }: { snapshot: Snapshot }) {
             </p>
           </article>
         </div>
+
+        <div className="comparison-grid">
+          <article className="finding-card">
+            <span className="finding-label">Enterprise endurance</span>
+            <strong>
+              {snapshot.enduranceCampaign.attempts} hourly attempts over{" "}
+              {snapshot.enduranceCampaign.elapsedHours.toFixed(1)} hours.
+            </strong>
+            <p>
+              {snapshot.enduranceCampaign.valid} valid results covered all{" "}
+              {snapshot.enduranceCampaign.taskCount} tasks at a recorded model
+              cost of ${snapshot.enduranceCampaign.modelCost.toFixed(2)}.
+            </p>
+          </article>
+          <article className="finding-card">
+            <span className="finding-label">Shared learning</span>
+            <strong>
+              {snapshot.enduranceCampaign.lessonsPromoted} validated lessons
+              were promoted.
+            </strong>
+            <p>
+              Later agents received{" "}
+              {snapshot.enduranceCampaign.lessonRetrievals} lesson references.
+              One final result still duplicated a known candidate.
+            </p>
+          </article>
+          <article className="finding-card">
+            <span className="finding-label">In-cluster controller</span>
+            <strong>
+              {snapshot.canvasController.campaignTicks} Canvas ticks completed
+              with zero service restarts.
+            </strong>
+            <p>
+              Forced controller recovery and overlapping-controller rejection
+              both passed.
+            </p>
+          </article>
+        </div>
       </section>
 
       <section className="section implementation-section">
@@ -1595,14 +1700,12 @@ function RobustnessGuide({ snapshot }: { snapshot: Snapshot }) {
                 </td>
               </tr>
               <tr>
-                <td><strong>Scheduled automation tick</strong></td>
+                <td><strong>Scheduled controller tick</strong></td>
                 <td>
-                  On each trigger, an OpenHands automation creates a temporary
-                  controller conversation and loads the campaign state from
-                  Git. It reconciles existing conversations, starts up to two
-                  active children, saves the updated state to Git, and exits
-                  with <code>keep_alive: false</code>. Later triggers continue
-                  the same campaign from that saved state.
+                  On each trigger, an OpenHands automation or Kubernetes
+                  CronJob loads durable campaign state, reconciles existing
+                  conversations, runs one bounded unit of work, saves the
+                  result, and exits. Later triggers continue the same campaign.
                 </td>
                 <td>
                   A campaign may contain hundreds of queued tasks, but only a
@@ -1610,12 +1713,11 @@ function RobustnessGuide({ snapshot }: { snapshot: Snapshot }) {
                   Work can wait until the next scheduled interval.
                 </td>
                 <td>
-                  <strong>Trigger-tested, not schedule-tested.</strong> Nine
-                  manual automation runs covered setup, recovery, and
-                  concurrency. Two active child conversations passed in one
-                  shared sandbox; the four-child test produced only 3/4
-                  independently verifiable results. No unattended recurring
-                  campaign ran.
+                  <strong>Live-tested on both deployments.</strong> Enterprise
+                  completed eight hourly campaign ticks over nine hours. The
+                  in-cluster Agent Canvas controller completed six campaign
+                  ticks, recovered after forced termination, and rejected an
+                  overlapping controller.
                 </td>
               </tr>
               <tr>
@@ -1667,9 +1769,9 @@ function RobustnessGuide({ snapshot }: { snapshot: Snapshot }) {
             <p className="eyebrow">Test results and current limits</p>
           </div>
           <p>
-            These were bounded integration and recovery tests. They support a
-            production pilot, but they are not an endurance test of a complete
-            NeuroGolf campaign.
+            The completed tests cover bounded batches, an unattended hourly
+            campaign, and an in-cluster scheduled controller. They still use
+            simplified optimization tasks rather than the full ONNX workload.
           </p>
         </div>
         <div className="agent-table-wrap controller-evidence-table">
@@ -1708,31 +1810,38 @@ function RobustnessGuide({ snapshot }: { snapshot: Snapshot }) {
                 </td>
               </tr>
               <tr>
-                <td><strong>Scheduled automation tick</strong></td>
+                <td><strong>Scheduled controller tick</strong></td>
                 <td>
                   {snapshot.controllerLoad.automationValidation.documentedRuns}
-                  {" "}documented automation runs:{" "}
+                  {" "}documented Enterprise automation runs:{" "}
                   {snapshot.controllerLoad.automationValidation.pilotRuns}
                   {" "}setup, failure, recovery, and campaign-pilot runs plus{" "}
                   {snapshot.controllerLoad.automationValidation.concurrencyRuns}
-                  {" "}concurrency runs. The final accepted cell validated{" "}
-                  {snapshot.controllerLoad.enterpriseAutomation.acceptedValid}/
-                  {snapshot.controllerLoad.enterpriseAutomation.acceptedAttempts}
-                  {" "}children.
+                  {" "}concurrency runs and{" "}
+                  {snapshot.controllerLoad.automationValidation.recurringRuns}
+                  {" "}hourly campaign ticks. Agent Canvas added{" "}
+                  {snapshot.canvasController.campaignTicks}
+                  {" "}in-cluster campaign ticks.
                 </td>
                 <td>
                   Git preserved the campaign queue, task claims, run and
                   attempt IDs, OpenHands conversation and start-task IDs,
                   validation results, and checkpoints between temporary
-                  controller conversations. That allowed separate automation
-                  runs to manage one continuing campaign.
+                  controller conversations. Enterprise completed{" "}
+                  {snapshot.enduranceCampaign.valid}/
+                  {snapshot.enduranceCampaign.attempts}
+                  {" "}valid attempts and promoted{" "}
+                  {snapshot.enduranceCampaign.lessonsPromoted}
+                  {" "}lessons over{" "}
+                  {snapshot.enduranceCampaign.elapsedHours.toFixed(1)}
+                  {" "}hours. The Canvas controller recovered without creating
+                  another conversation.
                 </td>
                 <td>
-                  We ran{" "}
-                  {snapshot.controllerLoad.automationValidation.recurringRuns}
-                  {" "}unattended recurring schedules. We did not test a
-                  15-minute schedule, a 24-hour campaign, or the full 400-task
-                  ONNX workload.
+                  One Enterprise result artifact outlived its sandbox, but
+                  recovery checked the missing sandbox before validating that
+                  artifact. The final attempt also repeated a known candidate.
+                  The full 400-task ONNX workload was not run.
                 </td>
               </tr>
               <tr>
@@ -1771,12 +1880,11 @@ function RobustnessGuide({ snapshot }: { snapshot: Snapshot }) {
           </table>
         </div>
         <p className="architecture-note">
-          The next qualification run should exercise both operational models:
-          repeated scheduled ticks and a continuously running reconciler. Each
-          should run long enough to drain a larger queue while controller,
-          worker, API, and Git failures are injected. Acceptance requires no
-          duplicate claims, no lost work, validated recovery, and zero leaked
-          sandboxes.
+          The large qualification runs are complete. Before customer use, fix
+          artifact-first recovery when a sandbox is missing and pass prior
+          candidate hashes and approach history to the scheduler. A persistent
+          24-hour service and event-delivery failures remain separate future
+          tests.
         </p>
       </section>
 
@@ -1823,6 +1931,17 @@ function RobustnessGuide({ snapshot }: { snapshot: Snapshot }) {
               View the polling supervisor
             </a>
           </article>
+          <article>
+            <h3>Agent Canvas CronJob</h3>
+            <p>
+              A suspended-by-default Kubernetes CronJob runs the same bounded
+              controller beside Agent Canvas and stores its ledger on a
+              dedicated persistent volume.
+            </p>
+            <a href="https://github.com/rajshah4/openhands-agent-research-lab/tree/main/experiments/agent-canvas-kubernetes/controller">
+              View the in-cluster controller
+            </a>
+          </article>
         </div>
       </section>
 
@@ -1852,16 +1971,20 @@ function RobustnessGuide({ snapshot }: { snapshot: Snapshot }) {
             <p className="eyebrow">Restart recovery after the controller stopped during an active run</p>
           </div>
           <p>
-            Restart found the unfinished attempt, attached to the same live
-            conversation, validated the answer, recorded one completion, and
-            returned the cluster to zero active sandboxes.
+            Enterprise recovery reattached to the original start task. The
+            Agent Canvas test then force-deleted its controller after the child
+            ID was durable; the replacement attached to that same conversation
+            and did not launch another one.
           </p>
         </div>
         <div className="comparison-grid">
           <article className="finding-card">
             <span className="finding-label">Recovery result</span>
-            <strong>The controller resumed the original start task without creating another conversation.</strong>
-            <p>The original run and attempt identities were preserved across the controller restart.</p>
+            <strong>Both controller placements resumed existing work.</strong>
+            <p>
+              Enterprise preserved its start task. Agent Canvas recorded an
+              explicit recovery marker after zero-grace controller termination.
+            </p>
           </article>
           <article className="finding-card">
             <span className="finding-label">Large ledger</span>
@@ -1869,9 +1992,12 @@ function RobustnessGuide({ snapshot }: { snapshot: Snapshot }) {
             <p>{formatNumber(snapshot.robustness.records)} parseable records occupied {snapshot.robustness.storeMb} MB.</p>
           </article>
           <article className="finding-card">
-            <span className="finding-label">Database boundary</span>
-            <strong>Files support one controller; concurrent controllers need leases.</strong>
-            <p>Several controllers or tenants require application-owned database leases and idempotent claims.</p>
+            <span className="finding-label">Overlap result</span>
+            <strong>The second Canvas controller was rejected before launching work.</strong>
+            <p>
+              Files support one active owner. Several active controllers still
+              require application-owned database leases.
+            </p>
           </article>
         </div>
       </section>
@@ -2686,12 +2812,13 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
         <section className="section">
           <div className="section-heading">
             <div>
-              <p className="eyebrow">Bugs I found while building it</p>
-              <h2>The first version broke in four useful ways.</h2>
+              <p className="eyebrow">Implementation issues</p>
+              <h2>The tests exposed six issues in the controller workflow.</h2>
             </div>
             <p>
-              I kept the failed runs. They exposed problems that a polished
-              architecture diagram would have missed.
+              Four are resolved in the current implementation. Two remain open
+              after the endurance campaign and are described with their
+              required fixes.
             </p>
           </div>
           <div className="incident-list">
@@ -2720,21 +2847,26 @@ export function ResearchDashboard({ snapshot }: { snapshot: Snapshot }) {
         <ol>
           <li>
             <span>✓</span>
-            Keep this version as the working reference: 37/37 valid live runs,
-            restart recovery, and 400/400 task-owner coverage.
+            Keep the orchestration, capacity, restart, and endurance results as
+            the working reference.
           </li>
           <li>
             <span>1</span>
+            Validate a terminal Git artifact before checking whether its
+            original sandbox still exists.
+          </li>
+          <li>
+            <span>2</span>
+            Pass prior candidate hashes and approach history to the scheduler
+            so a later agent does not repeat an experiment.
+          </li>
+          <li>
+            <span>3</span>
             Add a licensed ONNX workload adapter with official, fresh,
             adversarial, and metamorphic validation.
           </li>
           <li>
-            <span>2</span>
-            Fix shared-sandbox rollover, then run two explicitly owned cells in
-            parallel before increasing the queue from 12 to 24 live jobs.
-          </li>
-          <li>
-            <span>3</span>
+            <span>4</span>
             Keep files for one controller. Add application-owned PostgreSQL
             leases only when several controllers must claim work concurrently.
           </li>
