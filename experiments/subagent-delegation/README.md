@@ -19,3 +19,17 @@ The safe inspector in `scripts/inspect-subagent-run.py` pages backward through
 the event stream, ignores streaming deltas, and reports only lifecycle,
 metrics, and task-event summaries. It does not print prompts, responses, or
 credentials.
+
+Run the bounded capability gate before any larger comparison:
+
+```bash
+PYTHONPATH=src python3 \
+  experiments/subagent-delegation/scripts/run-enterprise-capability.py \
+  --live \
+  --env-file /path/to/private/enterprise.env \
+  --output /tmp/enterprise-tasktool-result.json
+```
+
+The gate creates one parent, requires one native task action and observation,
+records only sanitized metadata, and pauses the sandbox. Do not run the
+two- or four-child load tests unless this gate reports `status: passed`.

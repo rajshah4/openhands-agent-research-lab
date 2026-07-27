@@ -138,8 +138,12 @@ independent controllers repeatedly chose one task. Managed scheduling reduced
 mean wall time by 22.9% and mean model cost by 23.8%.
 
 Those tests ran the controller outside the Canvas pod. Deploying the same
-controller command as a Kubernetes CronJob beside Canvas is a deployment
-recommendation, not a separately measured performance result.
+controller command as a Kubernetes CronJob beside Canvas is implemented in
+[`experiments/agent-canvas-kubernetes/controller`](../experiments/agent-canvas-kubernetes/controller/README.md).
+The checked-in CronJob is suspended by default, runs one attempt per tick,
+prevents overlapping controller jobs, and keeps its single-writer ledger on a
+dedicated PVC. Its live interruption and resume gates have not yet been run
+because the disposable GKE pilot was deleted after the earlier comparison.
 
 Canvas is efficient because conversations share one Agent Server pod and
 volume. That is also its trust boundary. Use it for one trusted team, not as a

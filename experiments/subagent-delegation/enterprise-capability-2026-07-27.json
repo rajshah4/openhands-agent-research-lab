@@ -1,0 +1,44 @@
+{
+  "capacity_after": {
+    "active": 0,
+    "available_before_limit": 10,
+    "launch_allowed": true,
+    "launch_lock_at": 7,
+    "observed_sandboxes": 241,
+    "runtime_limit": 10,
+    "scope": "authenticated-user-visible-sandboxes",
+    "status_counts": {
+      "MISSING": 6,
+      "PAUSED": 235
+    }
+  },
+  "capacity_before": {
+    "active": 0,
+    "available_before_limit": 10,
+    "launch_allowed": true,
+    "launch_lock_at": 7,
+    "observed_sandboxes": 240,
+    "runtime_limit": 10,
+    "scope": "authenticated-user-visible-sandboxes",
+    "status_counts": {
+      "MISSING": 6,
+      "PAUSED": 234
+    }
+  },
+  "cleanup_status": "PAUSED",
+  "conversation_id": "3041296e385b4e45a12f185ab45b68d6",
+  "enable_sub_agents": true,
+  "execution_status": "finished",
+  "final_contract_present": false,
+  "model_cost": 0.03828935,
+  "sandbox_id": "728X4ok3VuDTiQUsChHHif",
+  "start_task_id": "01a219c7fab9492aa100682104f64e64",
+  "status": "unsupported",
+  "task_actions": 0,
+  "task_observations": 0,
+  "task_results": [],
+  "task_tool_advertised": false,
+  "terminal_status_recovered": false,
+  "tool_concurrency_limit": 1,
+  "wall_seconds": 24.939
+}
