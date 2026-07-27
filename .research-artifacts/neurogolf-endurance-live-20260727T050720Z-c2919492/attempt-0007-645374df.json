@@ -1,0 +1,28 @@
+{
+  "candidate": {
+    "bins": [
+      ["aqua", "flint"],
+      ["ivory", "navy"],
+      ["ember", "brass"],
+      ["moss", "juniper"],
+      ["cedar", "honey"],
+      ["khaki", "pearl"],
+      ["grove", "denim"],
+      ["ochre", "linen"]
+    ]
+  },
+  "lesson": {
+    "evidence": "FFD, BFD, and complementary pairing all achieved optimal 8 bins. Random ordering produced 8-10 bins across 20 trials (avg 9.0). Items form perfect pairs (9+1, 8+2, 7+3, 6+4) filling capacity-10 exactly. Seed 0 random ordering created bin with weight 9, wasting capacity.",
+    "statement": "When sixteen items form eight complementary pairs summing to bin capacity, weight-based ordering (FFD, BFD) achieves optimal packing; random ordering wastes capacity 19 of 20 trials.",
+    "tags": ["bin-packing"]
+  },
+  "next_gate": "validate",
+  "status": "done",
+  "summary": [
+    "Compared FFD, BFD, complementary pairing, and 20 random orderings",
+    "All structured approaches achieved optimal 8 bins",
+    "Random ordering averaged 9.0 bins (range 8-10)",
+    "Perfect complementary pairs fill capacity exactly",
+    "Final candidate verified: 8 bins, all items packed once, no overflow"
+  ]
+}
