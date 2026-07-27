@@ -38,6 +38,12 @@ validates that Git artifact. Conversation events remain useful for status and
 diagnostics, but they are not the sole result channel because the Enterprise app
 retains only a bounded searchable event history for very long conversations.
 
+The prompt automation starts `preset_tick.py` through
+`supervise-endurance-tick.sh`. The supervisor writes a PID, log, and atomic exit
+status inside the automation sandbox. Repeated agent tool calls therefore poll
+one controller process instead of launching duplicate recovery processes when a
+foreground terminal action reaches its own timeout.
+
 The automation is stateless. Every hourly run checks out that branch,
 reconciles incomplete work, completes at most one attempt, checkpoints the
 result, and exits.
