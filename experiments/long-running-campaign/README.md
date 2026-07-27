@@ -28,6 +28,12 @@ conversation identifiers, lifecycle events, validation results, lessons, and
 reports under `.campaign-state/endurance-controller`. Each transition is
 committed to `experiment/endurance-controller-state`.
 
+Each worker also pushes its compact result contract to a unique
+`experiment/worker-artifact/<attempt-id>` branch. The controller fetches and
+validates that Git artifact. Conversation events remain useful for status and
+diagnostics, but they are not the sole result channel because the Enterprise app
+retains only a bounded searchable event history for very long conversations.
+
 The automation is stateless. Every hourly run checks out that branch,
 reconciles incomplete work, completes at most one attempt, checkpoints the
 result, and exits.

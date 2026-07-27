@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 import json
+import re
+import subprocess
 import time
 from collections import Counter
 from collections.abc import Callable
+from pathlib import Path
 from typing import Any, Protocol
 
 from .domain import CampaignSpec, Lesson, TaskSpec, WorkerExecution
@@ -255,10 +258,16 @@ item weights in each bin must not exceed the task capacity."""
     }
     research_protocol = ""
     if campaign.research_protocol == "endurance-v1":
+        safe_attempt_id = re.sub(r"[^A-Za-z0-9._-]", "-", attempt_id)
+        safe_run_id = re.sub(r"[^A-Za-z0-9._-]", "-", run_id)
+        artifact_branch = f"experiment/worker-artifact/{safe_attempt_id}"
+        artifact_path = (
+            f".research-artifacts/{safe_run_id}/{safe_attempt_id}.json"
+        )
         research_protocol = """
 Endurance research protocol:
 - Use terminal tools and a temporary directory outside the repository. Do not
-  edit or commit repository files.
+  edit repository files until the result-artifact step below.
 - Implement and compare at least three solution approaches appropriate to this
   task family: an exact or exhaustive baseline, a standard greedy heuristic,
   and a seeded randomized or local-search refinement.
@@ -272,7 +281,15 @@ Endurance research protocol:
   trials completed, the best valid score, and the final verification result.
 - Return the compact JSON contract as soon as verification is complete. Do not
   perform additional tool calls or add a narrative after verification.
-"""
+- Before returning, write that exact JSON object to
+  ARTIFACT_PATH_PLACEHOLDER. Create branch ARTIFACT_BRANCH_PLACEHOLDER from the
+  selected branch, commit only that artifact, and push the branch to origin.
+  Use a local Git identity if one is not configured. The pushed artifact is the
+  controller's durable result channel; the final response must contain the same
+  JSON object.
+""".replace("ARTIFACT_PATH_PLACEHOLDER", artifact_path).replace(
+            "ARTIFACT_BRANCH_PLACEHOLDER", artifact_branch
+        )
     return f"""You are one bounded experimental worker in a research campaign.
 
 Run ID: {run_id}
@@ -324,6 +341,8 @@ class OpenHandsWorker:
         launch_lock_at: int = 7,
         sleeper: Callable[[float], None] = time.sleep,
         monotonic: Callable[[], float] = time.monotonic,
+        repository_root: Path | None = None,
+        artifact_reader: Callable[[str, str], str | None] | None = None,
     ):
         self.client = client
         self.start_timeout_seconds = start_timeout_seconds
@@ -335,6 +354,42 @@ class OpenHandsWorker:
         self.launch_lock_at = launch_lock_at
         self._sleep = sleeper
         self._monotonic = monotonic
+        self.repository_root = (repository_root or Path.cwd()).resolve()
+        self._artifact_reader = artifact_reader or self._read_git_artifact
+
+    @staticmethod
+    def _artifact_location(run_id: str, attempt_id: str) -> tuple[str, str]:
+        safe_attempt_id = re.sub(r"[^A-Za-z0-9._-]", "-", attempt_id)
+        safe_run_id = re.sub(r"[^A-Za-z0-9._-]", "-", run_id)
+        return (
+            f"experiment/worker-artifact/{safe_attempt_id}",
+            f".research-artifacts/{safe_run_id}/{safe_attempt_id}.json",
+        )
+
+    def _read_git_artifact(self, branch: str, path: str) -> str | None:
+        fetch = subprocess.run(
+            ["git", "fetch", "--quiet", "origin", branch],
+            cwd=self.repository_root,
+            check=False,
+            stdin=subprocess.DEVNULL,
+            text=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            timeout=120,
+        )
+        if fetch.returncode:
+            return None
+        show = subprocess.run(
+            ["git", "show", f"FETCH_HEAD:{path}"],
+            cwd=self.repository_root,
+            check=False,
+            stdin=subprocess.DEVNULL,
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+            timeout=30,
+        )
+        return show.stdout.strip() if show.returncode == 0 else None
 
     def execute(
         self,
@@ -374,9 +429,18 @@ class OpenHandsWorker:
         )
         start_task_id = str(start["id"])
         on_lifecycle("start_task_created", {"start_task_id": start_task_id})
+        artifact_branch: str | None = None
+        artifact_path: str | None = None
+        if campaign.research_protocol == "endurance-v1":
+            artifact_branch, artifact_path = self._artifact_location(
+                run_id,
+                attempt_id,
+            )
         return self._complete_started_attempt(
             start_task_id=start_task_id,
             controlled_dwell_seconds=campaign.controlled_dwell_seconds,
+            artifact_branch=artifact_branch,
+            artifact_path=artifact_path,
             on_lifecycle=on_lifecycle,
         )
 
@@ -391,7 +455,7 @@ class OpenHandsWorker:
         lifecycle_events: list[dict[str, Any]],
         on_lifecycle: Callable[[str, dict[str, Any]], None],
     ) -> WorkerExecution:
-        del task, run_id, attempt_id, lessons
+        del task, lessons
         start_task_id = ""
         for event in lifecycle_events:
             if event.get("kind") == "start_task_created":
@@ -406,9 +470,18 @@ class OpenHandsWorker:
             "openhands_recovery_attached",
             {"start_task_id": start_task_id},
         )
+        artifact_branch: str | None = None
+        artifact_path: str | None = None
+        if campaign.research_protocol == "endurance-v1":
+            artifact_branch, artifact_path = self._artifact_location(
+                run_id,
+                attempt_id,
+            )
         return self._complete_started_attempt(
             start_task_id=start_task_id,
             controlled_dwell_seconds=campaign.controlled_dwell_seconds,
+            artifact_branch=artifact_branch,
+            artifact_path=artifact_path,
             on_lifecycle=on_lifecycle,
         )
 
@@ -417,6 +490,8 @@ class OpenHandsWorker:
         *,
         start_task_id: str,
         controlled_dwell_seconds: int = 0,
+        artifact_branch: str | None = None,
+        artifact_path: str | None = None,
         on_lifecycle: Callable[[str, dict[str, Any]], None],
     ) -> WorkerExecution:
         try:
@@ -472,12 +547,38 @@ class OpenHandsWorker:
                 conversation_id,
                 initial_events=events,
             )
+            final_source = "conversation_events"
+            if artifact_branch and artifact_path:
+                artifact_text = self._artifact_reader(
+                    artifact_branch,
+                    artifact_path,
+                )
+                if artifact_text:
+                    final_text = artifact_text
+                    final_source = "git_artifact"
+                    on_lifecycle(
+                        "worker_artifact_ready",
+                        {
+                            "branch": artifact_branch,
+                            "path": artifact_path,
+                            "length": len(artifact_text),
+                        },
+                    )
+                else:
+                    on_lifecycle(
+                        "worker_artifact_unavailable",
+                        {
+                            "branch": artifact_branch,
+                            "path": artifact_path,
+                        },
+                    )
             on_lifecycle(
                 "final_response_ready",
                 {
                     "conversation_id": conversation_id,
                     "present": bool(final_text),
                     "event_count": len(final_events),
+                    "source": final_source,
                 },
             )
             event_counts = Counter(
@@ -497,6 +598,7 @@ class OpenHandsWorker:
                 "start_task_snapshot": sanitize_metadata(ready),
                 "event_counts": dict(sorted(event_counts.items())),
                 "event_count": len(final_events),
+                "final_response_source": final_source,
             }
             elapsed = self._monotonic() - ready_at
             dwell_remaining = max(controlled_dwell_seconds - elapsed, 0.0)

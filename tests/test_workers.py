@@ -1,3 +1,4 @@
+import json
 import unittest
 
 from research_lab.domain import CampaignSpec, TaskSpec
@@ -253,6 +254,65 @@ class OpenHandsWorkerTests(unittest.TestCase):
         self.assertIn("at least three solution approaches", prompt)
         self.assertIn("12 seeded orderings or perturbations", prompt)
         self.assertIn("complete attempt within twenty minutes", prompt)
+        self.assertIn("experiment/worker-artifact/attempt-1", prompt)
+        self.assertIn(
+            ".research-artifacts/run-1/attempt-1.json",
+            prompt,
+        )
+
+    def test_endurance_worker_prefers_git_artifact(self) -> None:
+        client = FakeOpenHandsClient()
+        lifecycle = []
+        artifact = json.dumps(
+            {
+                "status": "done",
+                "candidate": {"assignments": {"0": 0}},
+                "lesson": None,
+                "summary": ["artifact"],
+                "next_gate": "validate",
+            }
+        )
+        worker = OpenHandsWorker(
+            client,
+            poll_seconds=1,
+            artifact_reader=lambda branch, path: artifact,
+        )
+        campaign = CampaignSpec(
+            id="campaign-1",
+            name="Campaign",
+            policy="managed",
+            attempt_budget=1,
+            repository="owner/repository",
+            branch="main",
+            model=None,
+            tasks=(),
+            research_protocol="endurance-v1",
+        )
+        task = TaskSpec(
+            id="task-1",
+            family="graph-coloring",
+            description="test",
+            tags=("graph-coloring",),
+            nodes=("0",),
+            edges=(),
+            target_score=1,
+        )
+
+        execution = worker.execute(
+            campaign=campaign,
+            task=task,
+            run_id="run-1",
+            attempt_id="attempt-1",
+            lessons=[],
+            on_lifecycle=lambda kind, payload: lifecycle.append((kind, payload)),
+        )
+
+        self.assertEqual(execution.final_text, artifact)
+        self.assertEqual(
+            execution.metadata["final_response_source"],
+            "git_artifact",
+        )
+        self.assertIn("worker_artifact_ready", [kind for kind, _ in lifecycle])
 
     def test_controller_enforces_controlled_dwell_before_cleanup(self) -> None:
         client = FakeOpenHandsClient()
