@@ -1,0 +1,154 @@
+{
+  "candidate": {
+    "selected_sets": [
+      "atlas",
+      "beacon",
+      "cipher"
+    ]
+  },
+  "candidate_hash": "a0c84694813f0bfbad9d4c452a0d5896031f70dab802d511a8cd7d866ee95fef",
+  "contract": {
+    "next_gate": "validate",
+    "status": "done",
+    "summary": [
+      "Exact brute-force: 3 sets (atlas, beacon, cipher)",
+      "Greedy heuristic: 3 sets, matches optimal",
+      "Randomized greedy: 12 trials, best 3 sets, worst 5 sets",
+      "Local search refinement: all 12 trials converged to 3 sets",
+      "Final verified: 3 sets cover all 18 elements with no duplicates"
+    ],
+    "transport": "exact-json",
+    "transport_compliant": true
+  },
+  "conversation": {
+    "conversation_id": "1ca5d272c2924c1a8015fc7d94899018",
+    "execution_status": "finished",
+    "sandbox_id": "1K76vq76eXNEiGUAtxiLR4",
+    "sandbox_status": "MISSING",
+    "start_task_id": "6ba7fa8c6e0a4cb3b7217164065ef9a2",
+    "terminal_status_recovered_from_events": true,
+    "ui_url": "https://app.replicated.rajistics.com/conversations/1ca5d272c2924c1a8015fc7d94899018"
+  },
+  "duplicate_candidate": false,
+  "final_response": {
+    "length": 975,
+    "sha256": "9c8d5fda78589dcf529dc3ed7e1abe085352e55772ad6ae6072cab7b36523c84"
+  },
+  "finished_at": "2026-07-27T08:10:59.610490+00:00",
+  "id": "attempt-0003-56cc5714",
+  "improved": true,
+  "metadata": {
+    "conversation_snapshot": {
+      "acp_server": null,
+      "agent_kind": "openhands",
+      "conversation_url": null,
+      "created_at": "2026-07-27T07:01:08.797299Z",
+      "created_by_user_id": "69c4fcfd-fb0e-4372-b9fd-68c860387888",
+      "execution_status": "finished",
+      "git_provider": null,
+      "id": "1ca5d272c2924c1a8015fc7d94899018",
+      "launched_agent_profile": {
+        "agent_profile_id": "c3c5742a-eb28-40a1-8a66-210fa9b98cd7",
+        "revision": 0
+      },
+      "llm_model": "litellm_proxy/us.anthropic.claude-sonnet-4-5-20250929-v1:0",
+      "metrics": {
+        "accumulated_cost": 0.255562725,
+        "accumulated_token_usage": {
+          "cache_read_tokens": 113755,
+          "cache_write_tokens": 32719,
+          "completion_tokens": 4896,
+          "context_window": 200000,
+          "model": "",
+          "per_turn_token": 32825,
+          "prompt_tokens": 147163,
+          "reasoning_tokens": 0,
+          "response_id": ""
+        },
+        "max_budget_per_task": null,
+        "model_name": "default"
+      },
+      "parent_conversation_id": null,
+      "pr_number": [],
+      "public": null,
+      "sandbox_id": "1K76vq76eXNEiGUAtxiLR4",
+      "sandbox_status": "MISSING",
+      "selected_branch": "main",
+      "selected_repository": "rajshah4/openhands-agent-research-lab",
+      "sub_conversation_ids": [],
+      "tags": {
+        "agentprofileid": "c3c5742a-eb28-40a1-8a66-210fa9b98cd7",
+        "agentprofilerevision": "0",
+        "archiveworkspacepath": "/workspace/project/1ca5d272c2924c1a8015fc7d94899018",
+        "repo_name": "rajshah4/openhands-agent-research-lab",
+        "selected_branch": "main"
+      },
+      "terminal_status_source": "events",
+      "title": "\u2705 Minimize Sets to Cover 18 Signals",
+      "trigger": "openhands_api",
+      "updated_at": "2026-07-27T07:05:29.537544Z"
+    },
+    "event_count": 200,
+    "event_counts": {
+      "ActionEvent": 4,
+      "ConversationStateUpdateEvent": 5,
+      "MessageEvent": 1,
+      "ObservationEvent": 4,
+      "StreamingDeltaEvent": 186
+    },
+    "final_response_source": "git_artifact",
+    "start_task_snapshot": {
+      "agent_server_url": "https://bkjufuohbutswvxs.runtime.replicated.rajistics.com",
+      "app_conversation_id": "1ca5d272c2924c1a8015fc7d94899018",
+      "created_at": "2026-07-27T07:00:59.289527Z",
+      "created_by_user_id": "69c4fcfd-fb0e-4372-b9fd-68c860387888",
+      "detail": null,
+      "id": "6ba7fa8c6e0a4cb3b7217164065ef9a2",
+      "request": {
+        "agent_profile_id": null,
+        "agent_type": "default",
+        "conversation_id": null,
+        "git_provider": null,
+        "initial_message": "<redacted-content>",
+        "llm_model": null,
+        "parent_conversation_id": null,
+        "plugins": null,
+        "pr_number": [],
+        "processors": null,
+        "public": null,
+        "sandbox_id": null,
+        "secrets": null,
+        "selected_branch": "main",
+        "selected_repository": "rajshah4/openhands-agent-research-lab",
+        "suggested_task": null,
+        "system_message_suffix": null,
+        "title": "[research-lab] neurogolf-endurance-live-20260727T050720Z-c2919492 / cover-01-constellations / attempt-0003-56cc5714",
+        "trigger": "openhands_api"
+      },
+      "sandbox_id": "1K76vq76eXNEiGUAtxiLR4",
+      "status": "READY",
+      "updated_at": "2026-07-27T07:01:08.817636Z"
+    }
+  },
+  "outcome": "completed",
+  "promoted_lesson_id": "lesson-fcdf92ed8a09f2e5",
+  "retrieved_lesson_ids": [],
+  "run_id": "neurogolf-endurance-live-20260727T050720Z-c2919492",
+  "scheduler_decision": {
+    "policy": "managed",
+    "policy_version": "1",
+    "rationale": "prioritized task coverage, balanced attempt ownership, then the weakest validated score, with relevant validated memory",
+    "retrieved_lesson_ids": [],
+    "task_id": "cover-01-constellations"
+  },
+  "schema_version": 1,
+  "sequence": 3,
+  "started_at": "2026-07-27T07:00:55.478080+00:00",
+  "task_id": "cover-01-constellations",
+  "validation": {
+    "errors": [],
+    "score": 3.0,
+    "valid": true
+  },
+  "worker_kind": "openhands"
+}
