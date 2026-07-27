@@ -1,0 +1,46 @@
+{
+  "candidate": {
+    "bins": [
+      [
+        "amber",
+        "dune"
+      ],
+      [
+        "gale",
+        "jade"
+      ],
+      [
+        "elm",
+        "birch"
+      ],
+      [
+        "kelp",
+        "heath"
+      ],
+      [
+        "coral",
+        "frost"
+      ],
+      [
+        "iris",
+        "lumen"
+      ]
+    ]
+  },
+  "lesson": {
+    "evidence": "FFD and exact pairing both achieved 6 bins (theoretical minimum). Random ordering with first-fit produced 7 bins in 10 of 12 seeds (83%), with only 2 seeds finding the optimal 6-bin solution. Items form perfect complementary pairs (8+2, 7+3, 6+4) filling capacity-10 bins exactly. Worst random case placed small items together (birch+jade+frost=9) leaving large items isolated.",
+    "statement": "Random first-fit packing is unreliable for perfectly complementary items: only 17% of seeds achieved optimal packing versus 100% for weight-based ordering (FFD).",
+    "tags": [
+      "bin-packing"
+    ]
+  },
+  "next_gate": "validate",
+  "status": "done",
+  "summary": [
+    "Compared FFD, exact pairing, and 12-seed random first-fit.",
+    "All items form complementary pairs summing to capacity 10.",
+    "FFD and exact pairing achieved optimal 6 bins immediately.",
+    "Random ordering found optimum in only 2 of 12 trials.",
+    "Final solution: 6 bins, all exactly filled to capacity."
+  ]
+}
