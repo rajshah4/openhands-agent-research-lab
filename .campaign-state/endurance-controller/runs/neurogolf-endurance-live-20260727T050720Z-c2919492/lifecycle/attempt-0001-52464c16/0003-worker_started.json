@@ -1,0 +1,11 @@
+{
+  "attempt_id": "attempt-0001-52464c16",
+  "id": "0003-worker_started",
+  "kind": "worker_started",
+  "payload": {
+    "worker_kind": "openhands"
+  },
+  "recorded_at": "2026-07-27T05:07:24.589218+00:00",
+  "run_id": "neurogolf-endurance-live-20260727T050720Z-c2919492",
+  "schema_version": 1
+}
