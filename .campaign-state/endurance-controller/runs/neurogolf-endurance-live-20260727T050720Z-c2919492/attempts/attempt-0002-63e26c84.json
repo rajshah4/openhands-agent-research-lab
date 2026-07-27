@@ -1,0 +1,165 @@
+{
+  "candidate": {
+    "assignments": {
+      "u0": 0,
+      "u1": 1,
+      "u2": 0,
+      "u3": 1,
+      "u4": 2,
+      "v0": 0,
+      "v1": 1,
+      "v2": 0,
+      "v3": 1,
+      "v4": 2,
+      "w": 3
+    }
+  },
+  "candidate_hash": "192ca156b9376ee5aeed12d5d787b8b683839d54b66d2f7a168d41afa56a7453",
+  "contract": {
+    "next_gate": "validate",
+    "status": "done",
+    "summary": [
+      "Exact backtracking: 4 colors optimal (3 failed, 4 succeeded)",
+      "Greedy: 4 colors across 12 orderings, all valid",
+      "DSATUR and local search: 4 colors, 12/12 trials valid",
+      "Structure: Mycielski(C5) with shadow layer needs 4th color for universal vertex w",
+      "Final verification: all 11 nodes assigned, 20 edge constraints satisfied"
+    ],
+    "transport": "exact-json",
+    "transport_compliant": true
+  },
+  "conversation": {
+    "conversation_id": "6e2c2bc8904c404e999619bb24310756",
+    "execution_status": "finished",
+    "sandbox_id": "4jriiwAnbqgttpPIbzMZwf",
+    "sandbox_status": "RUNNING",
+    "start_task_id": "a932cd2d727a428eba75ba5582762f62",
+    "terminal_status_recovered_from_events": false,
+    "ui_url": "https://app.replicated.rajistics.com/conversations/6e2c2bc8904c404e999619bb24310756"
+  },
+  "duplicate_candidate": false,
+  "final_response": {
+    "length": 1324,
+    "sha256": "41bceb00b1c41e3945417f31352ab32354587825a0b1060c5021049b0927c961"
+  },
+  "finished_at": "2026-07-27T06:11:18.676850+00:00",
+  "id": "attempt-0002-63e26c84",
+  "improved": true,
+  "metadata": {
+    "conversation_snapshot": {
+      "acp_server": null,
+      "agent_kind": "openhands",
+      "conversation_url": "https://liivuxmoabjaiayb.runtime.replicated.rajistics.com/api/conversations/6e2c2bc8904c404e999619bb24310756",
+      "created_at": "2026-07-27T06:01:12.683137Z",
+      "created_by_user_id": "69c4fcfd-fb0e-4372-b9fd-68c860387888",
+      "execution_status": "finished",
+      "git_provider": null,
+      "id": "6e2c2bc8904c404e999619bb24310756",
+      "launched_agent_profile": {
+        "agent_profile_id": "c3c5742a-eb28-40a1-8a66-210fa9b98cd7",
+        "revision": 0
+      },
+      "llm_model": "litellm_proxy/us.anthropic.claude-sonnet-4-5-20250929-v1:0",
+      "metrics": {
+        "accumulated_cost": 0.37123003500000007,
+        "accumulated_token_usage": {
+          "cache_read_tokens": 190217,
+          "cache_write_tokens": 37877,
+          "completion_tokens": 9074,
+          "context_window": 200000,
+          "model": "",
+          "per_turn_token": 37987,
+          "prompt_tokens": 228850,
+          "reasoning_tokens": 0,
+          "response_id": ""
+        },
+        "max_budget_per_task": null,
+        "model_name": "default"
+      },
+      "parent_conversation_id": null,
+      "pr_number": [],
+      "public": null,
+      "sandbox_id": "4jriiwAnbqgttpPIbzMZwf",
+      "sandbox_status": "RUNNING",
+      "selected_branch": "main",
+      "selected_repository": "rajshah4/openhands-agent-research-lab",
+      "sub_conversation_ids": [],
+      "tags": {
+        "agentprofileid": "c3c5742a-eb28-40a1-8a66-210fa9b98cd7",
+        "agentprofilerevision": "0",
+        "archiveworkspacepath": "/workspace/project/6e2c2bc8904c404e999619bb24310756",
+        "repo_name": "rajshah4/openhands-agent-research-lab",
+        "selected_branch": "main"
+      },
+      "title": "\u26a1\ufe0f 11-Node Triangle-Free Graph Coloring",
+      "trigger": "openhands_api",
+      "updated_at": "2026-07-27T06:06:39.733716Z"
+    },
+    "event_count": 200,
+    "event_counts": {
+      "ActionEvent": 1,
+      "ConversationStateUpdateEvent": 3,
+      "MessageEvent": 1,
+      "ObservationEvent": 3,
+      "StreamingDeltaEvent": 192
+    },
+    "final_response_source": "git_artifact",
+    "start_task_snapshot": {
+      "agent_server_url": "https://liivuxmoabjaiayb.runtime.replicated.rajistics.com",
+      "app_conversation_id": "6e2c2bc8904c404e999619bb24310756",
+      "created_at": "2026-07-27T06:01:03.062555Z",
+      "created_by_user_id": "69c4fcfd-fb0e-4372-b9fd-68c860387888",
+      "detail": null,
+      "id": "a932cd2d727a428eba75ba5582762f62",
+      "request": {
+        "agent_profile_id": null,
+        "agent_type": "default",
+        "conversation_id": null,
+        "git_provider": null,
+        "initial_message": "<redacted-content>",
+        "llm_model": null,
+        "parent_conversation_id": null,
+        "plugins": null,
+        "pr_number": [],
+        "processors": null,
+        "public": null,
+        "sandbox_id": null,
+        "secrets": null,
+        "selected_branch": "main",
+        "selected_repository": "rajshah4/openhands-agent-research-lab",
+        "suggested_task": null,
+        "system_message_suffix": null,
+        "title": "[research-lab] neurogolf-endurance-live-20260727T050720Z-c2919492 / color-02-mycielski-11 / attempt-0002-63e26c84",
+        "trigger": "openhands_api"
+      },
+      "sandbox_id": "4jriiwAnbqgttpPIbzMZwf",
+      "status": "READY",
+      "updated_at": "2026-07-27T06:01:12.697352Z"
+    }
+  },
+  "outcome": "completed",
+  "promoted_lesson_id": "lesson-4a139c332043e55c",
+  "retrieved_lesson_ids": [
+    "lesson-dfa8b0f46c632d98"
+  ],
+  "run_id": "neurogolf-endurance-live-20260727T050720Z-c2919492",
+  "scheduler_decision": {
+    "policy": "managed",
+    "policy_version": "1",
+    "rationale": "prioritized task coverage, balanced attempt ownership, then the weakest validated score, with relevant validated memory",
+    "retrieved_lesson_ids": [
+      "lesson-dfa8b0f46c632d98"
+    ],
+    "task_id": "color-02-mycielski-11"
+  },
+  "schema_version": 1,
+  "sequence": 2,
+  "started_at": "2026-07-27T06:00:59.324777+00:00",
+  "task_id": "color-02-mycielski-11",
+  "validation": {
+    "errors": [],
+    "score": 4.0,
+    "valid": true
+  },
+  "worker_kind": "openhands"
+}
