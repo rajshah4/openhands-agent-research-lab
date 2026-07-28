@@ -1,0 +1,50 @@
+{
+  "cleanup_mode": "delete",
+  "conversation_id": "40e5b9510b634079a9997467082231b6",
+  "error": {
+    "message": "agent conversation did not retain tag 'campaignid'",
+    "type": "OpenHandsAPIError"
+  },
+  "finished_at": "2026-07-27T23:53:53.430842+00:00",
+  "phases": {
+    "capacity_gate": {
+      "active": 0,
+      "available_before_limit": 10,
+      "launch_allowed": true,
+      "launch_lock_at": 7,
+      "observed_sandboxes": 246,
+      "runtime_limit": 10,
+      "scope": "authenticated-user-visible-sandboxes",
+      "status": "passed",
+      "status_counts": {
+        "MISSING": 7,
+        "PAUSED": 239
+      }
+    },
+    "emergency_cleanup": {
+      "sandbox_delete_requested": true,
+      "status": "passed"
+    },
+    "explicit_sandbox_attach": {
+      "conversation_id": "40e5b9510b634079a9997467082231b6",
+      "sandbox_id": "28CB8FLQpE80XzuV1TDCwM",
+      "start_task_id": "ee0e16f680d340549169d7a6ed7c2597",
+      "status": "passed"
+    },
+    "sandbox_create": {
+      "sandbox_id": "28CB8FLQpE80XzuV1TDCwM",
+      "status": "passed"
+    },
+    "sandbox_ready": {
+      "sandbox_id": "28CB8FLQpE80XzuV1TDCwM",
+      "sandbox_status": "RUNNING",
+      "status": "passed"
+    }
+  },
+  "probe": "enterprise-workflow-primitives",
+  "sandbox_id": "28CB8FLQpE80XzuV1TDCwM",
+  "started_at": "2026-07-27T23:53:43.537987+00:00",
+  "status": "failed",
+  "target": "https://app.replicated.rajistics.com",
+  "tested_product_version": "0.24.0"
+}

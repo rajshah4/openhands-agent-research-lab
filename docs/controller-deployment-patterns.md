@@ -51,6 +51,25 @@ The controller must have one durable source of truth. In this reference:
   claim work concurrently;
 - OpenHands internal database tables are never the application contract.
 
+## Verified Enterprise workflow primitives
+
+A bounded live probe on Enterprise `0.24.0` verified that a controller can:
+
+- create and prepare a sandbox before starting a conversation;
+- attach a V1 app conversation to that exact sandbox;
+- add campaign, task, attempt, and controller correlation tags;
+- receive confirmed terminal state through the agent-server WebSocket;
+- reconcile the same result through the app API and durable events;
+- read sandbox idle information and conversation usage metrics; and
+- delete the final conversation and allow Enterprise to remove its sandbox.
+
+Use events as the low-latency path and retain REST reconciliation as the
+recovery path. Use sandbox idle state for resource management, not as proof of
+conversation success. The customer guide, executable probe, intermediate
+failures, and final sanitized result are in
+[`enterprise-workflow-primitives.md`](enterprise-workflow-primitives.md) and
+[`experiments/enterprise-workflow-primitives`](../experiments/enterprise-workflow-primitives/README.md).
+
 ## 1. Enterprise controller
 
 The tested in-platform implementation uses a repository-backed OpenHands prompt
@@ -206,6 +225,9 @@ Run these gates after every platform, image, model, or controller change:
    and verify the final durable message is still retrieved.
 6. Cleanup: require zero active experiment sandboxes and no pause errors.
 7. Evidence: publish sanitized results, including failures and retries.
+8. Primitive compatibility: verify explicit attachment, tags, terminal-event
+   confirmation, idle reporting, metrics, and idempotent cleanup against the
+   deployed product version.
 
 Passing the execution tests does not prove competition performance. A full
 NeuroGolf run still needs the real ONNX workloads, adversarial validators,

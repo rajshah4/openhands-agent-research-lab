@@ -101,7 +101,7 @@ test("organizes the evidence around controller, execution, and memory", async ()
   assert.match(source, /Enterprise grouped/);
   assert.match(source, /Agent Canvas/);
   assert.match(source, /Parent with subagents/);
-  assert.match(source, /src="\/deployment-options\.png"/);
+  assert.match(source, /deployment-options\.png/);
   assert.match(source, /operational tradeoffs among the four structures/);
   assert.ok(
     source.indexOf("operational tradeoffs among the four structures") <
@@ -118,6 +118,9 @@ test("organizes the evidence around controller, execution, and memory", async ()
   assert.match(source, /same four research tasks in three execution structures/);
   assert.match(source, /33\.4% faster than sequential delegation/);
   assert.match(source, /Four first-class Canvas conversations/);
+  assert.match(source, /Enterprise workflow APIs verified/);
+  assert.match(source, /one-conversation\s+integration test, not a concurrency or endurance result/);
+  assert.match(source, /Deleting the last conversation removed its prepared sandbox/);
   assert.match(source, /Recommended hybrid/);
   assert.match(source, /One invalid child did not prevent its three siblings from completing/);
   assert.match(source, /Orchestration does not require Enterprise/);

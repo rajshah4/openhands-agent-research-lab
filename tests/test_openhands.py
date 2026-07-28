@@ -1,5 +1,6 @@
 import unittest
 
+from research_lab.enterprise_events import terminal_signal, websocket_url
 from research_lab.openhands import (
     OpenHandsAPIError,
     OpenHandsClient,
@@ -482,6 +483,147 @@ class OpenHandsHelpersTests(unittest.TestCase):
         snapshot = client.capacity_snapshot(runtime_limit=10, launch_lock_at=7)
         self.assertEqual(snapshot["active"], 7)
         self.assertFalse(snapshot["launch_allowed"])
+
+    def test_explicit_sandbox_attach_and_cleanup_endpoints(self) -> None:
+        calls = []
+
+        def requester(method, url, headers, body=None, timeout=60):
+            calls.append((method, url, body))
+            if method == "POST" and url.endswith("/api/v1/sandboxes"):
+                return {"id": "sandbox-1", "status": "STARTING"}
+            if method == "POST" and url.endswith("/api/v1/app-conversations"):
+                return {"id": "start-1"}
+            if method == "DELETE":
+                return {"success": True}
+            raise AssertionError((method, url))
+
+        client = OpenHandsClient(
+            "https://example.test",
+            "not-logged",
+            requester=requester,
+        )
+        self.assertEqual(client.start_sandbox()["id"], "sandbox-1")
+        client.start_conversation(
+            prompt="test",
+            title="test",
+            repository=None,
+            branch=None,
+            model=None,
+            sandbox_id="sandbox-1",
+            secrets={"SCOPED_TOKEN": "not-logged"},
+        )
+        client.delete_conversation("conversation-1")
+        client.delete_sandbox("sandbox-1")
+        self.assertEqual(
+            calls[1][2]["sandbox_id"],
+            "sandbox-1",
+        )
+        self.assertEqual(
+            calls[1][2]["secrets"],
+            {"SCOPED_TOKEN": "not-logged"},
+        )
+        self.assertIn(
+            "sandbox_id=sandbox-1",
+            calls[3][1],
+        )
+
+    def test_agent_tags_merge_and_server_info(self) -> None:
+        agent_url = (
+            "https://runtime.example.test/api/conversations/conversation-1"
+        )
+        agent_gets = 0
+
+        def requester(method, url, headers, body=None, timeout=60):
+            nonlocal agent_gets
+            if url.endswith("/api/v1/app-conversations?ids=conversation-1"):
+                return [
+                    {
+                        "id": "conversation-1",
+                        "conversation_url": agent_url,
+                        "session_api_key": "not-logged",
+                    }
+                ]
+            if method == "GET" and url == agent_url:
+                agent_gets += 1
+                return {
+                    "tags": (
+                        {"existing": "yes"}
+                        if agent_gets == 1
+                        else {"existing": "yes", "campaignid": "campaign-1"}
+                    )
+                }
+            if method == "PATCH" and url == agent_url:
+                self.assertEqual(
+                    body,
+                    {"tags": {"existing": "yes", "campaignid": "campaign-1"}},
+                )
+                return {"success": True}
+            if method == "GET" and url.endswith("/server_info"):
+                return {
+                    "idle_time": 12.0,
+                    "runtime_idle_timeout_seconds": 1200.0,
+                }
+            raise AssertionError((method, url))
+
+        client = OpenHandsClient(
+            "https://example.test",
+            "not-logged",
+            requester=requester,
+        )
+        self.assertEqual(
+            client.patch_agent_tags(
+                "conversation-1",
+                {"campaignid": "campaign-1"},
+            ),
+            {"existing": "yes", "campaignid": "campaign-1"},
+        )
+        self.assertEqual(
+            client.get_agent_server_info("conversation-1")["idle_time"],
+            12.0,
+        )
+
+    def test_null_tombstones_are_normalized_to_missing_records(self) -> None:
+        def requester(method, url, headers, body=None, timeout=60):
+            return [None]
+
+        client = OpenHandsClient(
+            "https://example.test",
+            "not-logged",
+            requester=requester,
+        )
+        self.assertEqual(client.get_conversation("conversation-1"), {})
+        self.assertEqual(client.get_sandbox("sandbox-1"), {})
+
+    def test_websocket_terminal_confirmation(self) -> None:
+        self.assertEqual(
+            terminal_signal(
+                {
+                    "kind": "ConversationStateUpdateEvent",
+                    "key": "execution_status",
+                    "value": "finished",
+                }
+            ),
+            ("finished", False),
+        )
+        self.assertEqual(
+            terminal_signal(
+                {
+                    "kind": "ConversationStateUpdateEvent",
+                    "key": "full_state",
+                    "value": {"execution_status": "finished"},
+                }
+            ),
+            ("finished", True),
+        )
+        self.assertEqual(
+            websocket_url(
+                "https://runtime.example.test/api/conversations/conversation-1"
+            ),
+            (
+                "wss://runtime.example.test/sockets/events/conversation-1"
+                "?resend_mode=all"
+            ),
+        )
 
 
 if __name__ == "__main__":

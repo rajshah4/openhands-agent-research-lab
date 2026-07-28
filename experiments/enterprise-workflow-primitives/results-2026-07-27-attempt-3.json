@@ -1,0 +1,112 @@
+{
+  "cleanup_mode": "delete",
+  "conversation_id": "2983a805f2fe49e9b1b0bb76a0901de5",
+  "error": {
+    "message": "'NoneType' object has no attribute 'get'",
+    "type": "AttributeError"
+  },
+  "finished_at": "2026-07-27T23:55:45.775943+00:00",
+  "phases": {
+    "capacity_gate": {
+      "active": 0,
+      "available_before_limit": 10,
+      "launch_allowed": true,
+      "launch_lock_at": 7,
+      "observed_sandboxes": 246,
+      "runtime_limit": 10,
+      "scope": "authenticated-user-visible-sandboxes",
+      "status": "passed",
+      "status_counts": {
+        "MISSING": 7,
+        "PAUSED": 239
+      }
+    },
+    "conversation_metrics": {
+      "metrics": {
+        "accumulated_cost": 0.0072567000000000005,
+        "accumulated_token_usage": {
+          "cache_read_tokens": 0,
+          "cache_write_tokens": 0,
+          "completion_tokens": 370,
+          "context_window": 200000,
+          "model": "",
+          "per_turn_token": 719,
+          "prompt_tokens": 349,
+          "reasoning_tokens": 0,
+          "response_id": ""
+        },
+        "max_budget_per_task": null,
+        "model_name": "default"
+      },
+      "status": "passed"
+    },
+    "conversation_tags": {
+      "agent_observed": {
+        "attemptid": "20260727t235524z",
+        "campaignid": "workflowprimitives",
+        "controllerid": "externalprobe",
+        "taskid": "compatibilityprobe"
+      },
+      "app_observed": {
+        "agentprofileid": "c3c5742a-eb28-40a1-8a66-210fa9b98cd7",
+        "agentprofilerevision": "0",
+        "archiveworkspacepath": "/workspace/project/2983a805f2fe49e9b1b0bb76a0901de5",
+        "attemptid": "20260727t235524z",
+        "campaignid": "workflowprimitives",
+        "controllerid": "externalprobe",
+        "taskid": "compatibilityprobe"
+      },
+      "requested": {
+        "attemptid": "20260727t235524z",
+        "campaignid": "workflowprimitives",
+        "controllerid": "externalprobe",
+        "taskid": "compatibilityprobe"
+      },
+      "status": "passed"
+    },
+    "emergency_cleanup": {
+      "message": "DELETE /api/v1/app-conversations/2983a805f2fe49e9b1b0bb76a0901de5 -> HTTP 404: {\"detail\": \"Conversation not found\"}",
+      "status": "failed",
+      "type": "OpenHandsAPIError"
+    },
+    "explicit_sandbox_attach": {
+      "conversation_id": "2983a805f2fe49e9b1b0bb76a0901de5",
+      "sandbox_id": "77i4LpqwbjWUnvp0LEwOPb",
+      "start_task_id": "cda112fe71a34bc6aca6edcccba8dfe8",
+      "status": "passed"
+    },
+    "rest_reconciliation": {
+      "event_count": 30,
+      "execution_status": "finished",
+      "status": "passed",
+      "terminal_recovered_from_events": false
+    },
+    "sandbox_create": {
+      "sandbox_id": "77i4LpqwbjWUnvp0LEwOPb",
+      "status": "passed"
+    },
+    "sandbox_ready": {
+      "sandbox_id": "77i4LpqwbjWUnvp0LEwOPb",
+      "sandbox_status": "RUNNING",
+      "status": "passed"
+    },
+    "server_idle_signal": {
+      "idle_time_present": true,
+      "runtime_idle_timeout_seconds": 3600.0,
+      "status": "passed"
+    },
+    "websocket_terminal": {
+      "confirmed": true,
+      "event_count": 33,
+      "provisional_finished_observed": true,
+      "status": "passed",
+      "terminal_status": "finished"
+    }
+  },
+  "probe": "enterprise-workflow-primitives",
+  "sandbox_id": "77i4LpqwbjWUnvp0LEwOPb",
+  "started_at": "2026-07-27T23:55:24.911530+00:00",
+  "status": "failed",
+  "target": "https://app.replicated.rajistics.com",
+  "tested_product_version": "0.24.0"
+}

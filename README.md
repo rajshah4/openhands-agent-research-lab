@@ -184,6 +184,14 @@ and the [operator runbook](docs/replicated-multi-agent-operations.md).
 The [controller deployment guide](docs/controller-deployment-patterns.md)
 shows how the same control loop fits Enterprise automations, Agent Canvas on
 Kubernetes, and bounded native subagents.
+The [Enterprise workflow primitives guide](docs/enterprise-workflow-primitives.md)
+and its
+[live compatibility probe](experiments/enterprise-workflow-primitives/README.md)
+show explicit sandbox attachment, correlation tags, confirmed WebSocket
+completion, REST reconciliation, idle reporting, metrics, and cleanup on the
+tested Enterprise `0.24.0` installation. Proposed upstream documentation work
+is listed separately in
+[the documentation ticket draft](docs/proposed-openhands-documentation-tickets.md).
 The [controller load report](experiments/controller-load/results-2026-07-26.md)
 records the 4,800-attempt ledger test, the Enterprise failure and recovery
 sequence, the final 6/6 four-active external-controller load, the accepted

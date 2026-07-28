@@ -1765,6 +1765,74 @@ function ControllerGuide({ snapshot }: { snapshot: Snapshot }) {
       <section className="section implementation-section">
         <div className="section-heading report-heading">
           <div>
+            <p className="eyebrow">Enterprise workflow APIs verified</p>
+          </div>
+          <p>
+            A live compatibility probe on Enterprise 0.24.0 exercised the API
+            operations that a controller needs. This was a one-conversation
+            integration test, not a concurrency or endurance result.
+          </p>
+        </div>
+        <div className="agent-table-wrap controller-evidence-table">
+          <table className="agent-table">
+            <thead>
+              <tr>
+                <th>Controller need</th>
+                <th>What the probe did</th>
+                <th>Verified result</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Explicit placement</strong></td>
+                <td>Prepared a sandbox, waited for it to become ready, and attached a new V1 conversation to it.</td>
+                <td>The conversation reported the requested sandbox ID.</td>
+              </tr>
+              <tr>
+                <td><strong>Stable identity</strong></td>
+                <td>Added campaign, run, task, and attempt tags through the agent API.</td>
+                <td>The same tags were visible from both the agent and application records.</td>
+              </tr>
+              <tr>
+                <td><strong>Completion detection</strong></td>
+                <td>Watched the WebSocket stream, required a terminal full-state event, and reconciled with REST.</td>
+                <td>The event stream and application record agreed that the conversation had finished.</td>
+              </tr>
+              <tr>
+                <td><strong>Capacity and accounting</strong></td>
+                <td>Read sandbox idle state and the conversation cost and token fields.</td>
+                <td>The sandbox reported a 3,600-second idle timeout; the final record contained model metrics.</td>
+              </tr>
+              <tr>
+                <td><strong>Cleanup</strong></td>
+                <td>Deleted the completed conversation and checked the sandbox afterward.</td>
+                <td>Deleting the last conversation removed its prepared sandbox, leaving zero active sandboxes.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p className="architecture-note">
+          The reusable sequence is: check capacity, prepare a sandbox, attach a
+          tagged conversation, watch events, reconcile with REST, validate the
+          result, checkpoint durable state in Git, and release capacity.{" "}
+          <a href="https://github.com/rajshah4/openhands-agent-research-lab/tree/main/experiments/enterprise-workflow-primitives">
+            View the executable probe and retained results
+          </a>
+          ,{" "}
+          <a href="https://github.com/rajshah4/openhands-agent-research-lab/blob/main/docs/enterprise-workflow-primitives.md">
+            read the implementation guide
+          </a>
+          , or{" "}
+          <a href="https://github.com/rajshah4/openhands-agent-research-lab/blob/main/docs/proposed-openhands-documentation-tickets.md">
+            review the proposed OpenHands documentation tickets
+          </a>
+          .
+        </p>
+      </section>
+
+      <section className="section implementation-section">
+        <div className="section-heading report-heading">
+          <div>
             <p className="eyebrow">Test results and current limits</p>
           </div>
           <p>

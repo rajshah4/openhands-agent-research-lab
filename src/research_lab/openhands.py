@@ -450,6 +450,46 @@ class OpenHandsClient:
             "observed_sandboxes": len(sandboxes),
         }
 
+    def start_sandbox(self, sandbox_spec_id: str | None = None) -> dict[str, Any]:
+        """Create a sandbox without starting a conversation."""
+        response = self._request(
+            "POST",
+            _endpoint(
+                self.base_url,
+                "/api/v1/sandboxes",
+                {"sandbox_spec_id": sandbox_spec_id} if sandbox_spec_id else None,
+            ),
+            self.headers,
+            timeout=120,
+        )
+        if not isinstance(response, dict) or not response.get("id"):
+            raise OpenHandsAPIError("sandbox create returned no sandbox id")
+        return response
+
+    def poll_sandbox(
+        self,
+        sandbox_id: str,
+        *,
+        desired_status: str = "RUNNING",
+        timeout_seconds: int = 600,
+        poll_seconds: int = 5,
+    ) -> dict[str, Any]:
+        deadline = self._monotonic() + timeout_seconds
+        expected = desired_status.upper()
+        while self._monotonic() < deadline:
+            record = self.get_sandbox(sandbox_id)
+            status = str(record.get("status", "")).upper()
+            if status == expected:
+                return record
+            if status in {"ERROR", "MISSING"}:
+                raise OpenHandsAPIError(
+                    f"sandbox {sandbox_id} reached {status}, expected {expected}"
+                )
+            self._sleep(poll_seconds)
+        raise TimeoutError(
+            f"timed out waiting for sandbox {sandbox_id} to reach {expected}"
+        )
+
     def start_conversation(
         self,
         *,
@@ -458,6 +498,8 @@ class OpenHandsClient:
         repository: str | None,
         branch: str | None,
         model: str | None,
+        sandbox_id: str | None = None,
+        secrets: dict[str, str] | None = None,
     ) -> dict[str, Any]:
         payload: dict[str, Any] = {
             "title": title,
@@ -474,6 +516,10 @@ class OpenHandsClient:
             payload["selected_branch"] = branch
         if model:
             payload["llm_model"] = model
+        if sandbox_id:
+            payload["sandbox_id"] = sandbox_id
+        if secrets:
+            payload["secrets"] = dict(secrets)
         response = self._request(
             "POST",
             _endpoint(self.base_url, "/api/v1/app-conversations"),
@@ -528,7 +574,8 @@ class OpenHandsClient:
             self.headers,
             timeout=60,
         )
-        return records[0] if isinstance(records, list) and records else {}
+        record = records[0] if isinstance(records, list) and records else {}
+        return record if isinstance(record, dict) else {}
 
     def get_sandbox(self, sandbox_id: str) -> dict[str, Any]:
         records = self._request(
@@ -541,7 +588,121 @@ class OpenHandsClient:
             self.headers,
             timeout=60,
         )
-        return records[0] if isinstance(records, list) and records else {}
+        record = records[0] if isinstance(records, list) and records else {}
+        return record if isinstance(record, dict) else {}
+
+    def agent_connection(
+        self,
+        conversation_id: str,
+    ) -> tuple[str, dict[str, str]]:
+        """Return the agent conversation URL and session-auth headers.
+
+        Callers must not log the returned headers.
+        """
+        record = self.get_conversation(conversation_id)
+        conversation_url = str(record.get("conversation_url") or "")
+        session_api_key = str(record.get("session_api_key") or "")
+        if not conversation_url.startswith(("https://", "http://")):
+            raise OpenHandsAPIError(
+                f"conversation {conversation_id} has no agent conversation URL"
+            )
+        if not session_api_key:
+            raise OpenHandsAPIError(
+                f"conversation {conversation_id} has no agent session key"
+            )
+        return conversation_url, {
+            "X-Session-API-Key": session_api_key,
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+        }
+
+    def patch_agent_tags(
+        self,
+        conversation_id: str,
+        tags: dict[str, str],
+    ) -> dict[str, str]:
+        """Merge supported short tags into the agent-side conversation."""
+        for key, value in tags.items():
+            if not key.isalnum() or key.lower() != key:
+                raise ValueError(
+                    "conversation tag keys must be lowercase alphanumeric"
+                )
+            if len(value) > 256:
+                raise ValueError("conversation tag values must be at most 256 chars")
+        conversation_url, headers = self.agent_connection(conversation_id)
+        current = self._request(
+            "GET",
+            conversation_url,
+            headers,
+            timeout=60,
+        )
+        current_tags = (
+            dict(current.get("tags") or {})
+            if isinstance(current, dict)
+            else {}
+        )
+        current_tags.update(tags)
+        self._request(
+            "PATCH",
+            conversation_url,
+            headers,
+            body={"tags": current_tags},
+            timeout=60,
+        )
+        updated = self._request(
+            "GET",
+            conversation_url,
+            headers,
+            timeout=60,
+        )
+        observed = (
+            dict(updated.get("tags") or {})
+            if isinstance(updated, dict)
+            else {}
+        )
+        for key, value in tags.items():
+            if observed.get(key) != value:
+                raise OpenHandsAPIError(
+                    f"agent conversation did not retain tag {key!r}"
+                )
+        return observed
+
+    def get_agent_server_info(self, conversation_id: str) -> dict[str, Any]:
+        conversation_url, headers = self.agent_connection(conversation_id)
+        agent_base_url = conversation_url.split("/api/conversations/", 1)[0]
+        if agent_base_url == conversation_url:
+            raise OpenHandsAPIError("unrecognized agent conversation URL")
+        record = self._request(
+            "GET",
+            f"{agent_base_url}/server_info",
+            headers,
+            timeout=60,
+        )
+        return sanitize_metadata(record or {})
+
+    def delete_conversation(self, conversation_id: str) -> None:
+        self._request(
+            "DELETE",
+            _endpoint(
+                self.base_url,
+                f"/api/v1/app-conversations/"
+                f"{urllib.parse.quote(conversation_id, safe='')}",
+            ),
+            self.headers,
+            timeout=120,
+        )
+
+    def delete_sandbox(self, sandbox_id: str) -> None:
+        self._request(
+            "DELETE",
+            _endpoint(
+                self.base_url,
+                f"/api/v1/sandboxes/{urllib.parse.quote(sandbox_id, safe='')}",
+                {"sandbox_id": sandbox_id},
+            ),
+            self.headers,
+            timeout=120,
+        )
 
     def pause_sandbox(
         self,
